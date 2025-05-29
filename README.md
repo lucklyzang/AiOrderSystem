@@ -1,0 +1,2 @@
+# hospitalMaterialManagementMiniProgram
+一款供医院内部人士进行物料下单的微信小程序
