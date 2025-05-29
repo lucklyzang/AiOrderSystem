@@ -1,2 +1,2 @@
-# hospitalMaterialManagementMiniProgram
-一款供医院内部人士进行物料下单的微信小程序
+# AiOrderSystem
+一款供医院内部人士及其他相关人员智能下单的微信小程序
