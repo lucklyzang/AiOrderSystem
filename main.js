@@ -2,7 +2,7 @@ import App from './App'
 import store from './store'
 import { getCache } from '@/common/js/utils'
 import { noMultipleClicks } from '@/common/js/utils'
-Vue.prototype.$noMultipleClicks = noMultipleClicks
+Vue.prototype.$noMultipleClicks = noMultipleClicks;
 import uView from "uview-ui";
 Vue.use(uView);
 // #ifndef VUE3
