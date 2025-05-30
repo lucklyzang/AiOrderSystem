@@ -1,10 +1,13 @@
 <template>
 	<view class="chat" :style="{ 'padding-top': statusBarHeight + 'px' }">
+		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 'px' }"></view>
 		<u-toast ref="uToast" />
     <!-- 顶部标题 -->
     <view class="topTabbar" :style="{ 'height': navigationBarHeight + 'px', 'lineHeight': navigationBarHeight + 'px', 'paddingRight': capsuleMessage.width + 10 + 'px' }">
+			<!-- 工单类型列表提示框 -->
+			<view class="triangle-rect-list-info" :style="{ 'top': navigationBarHeight + 14 + 'px', 'right': capsuleMessage.width + 22 + 'px' }"></view>
       <!-- 返回图标 -->
-      <u-icon class="icon" name="arrow-left" size="20px" color="#000" @click="goback()"></u-icon>
+      <u-icon class="icon" name="arrow-left" size="20px" color="#fff" @click="goback()"></u-icon>
 			<!-- 消息条数 -->
 		<!-- 	<view class="message-count" @click="goback()">
 				{{ `消息(${messageCount})` }}
@@ -12,12 +15,12 @@
       <!-- 聊天对象名称 -->
       <view class="text">{{ fromName }}</view>
 			<!-- 创建工单图标 -->
-			<view class="create-order-area" @click="openPhoneDialogEvent">
-				<u-icon name="plus" size="24px" color="#101010"></u-icon>
+			<view class="create-order-area" @click="creatWorkOrderEvent">
+				<u-icon name="plus" size="22px" color="#fff"></u-icon>
 			</view>
-			<!-- 查看工单图标 -->
-			<view class="view-order-area" @click="openPhoneDialogEvent">
-				<u-icon name="order" size="24px" color="#101010"></u-icon>
+			<!-- 修改工单图标 -->
+			<view class="view-order-area" @click="modificationWorkOrderEvent">
+				<u-icon name="order" size="26px" color="#fff"></u-icon>
 			</view>
     </view>
 		<u-transition :show="showLoadingHint" mode="fade-down">
@@ -79,7 +82,7 @@
 		<view class="chat-bottom" :style="{height: `${inputHeight}rpx`}">
 			<view class="send-msg" :style="{bottom:`${keyboardHeight - 60}rpx`}">
 				<view class="voice-chat">
-					<u-icon name="plus" size="24px" color="#101010"></u-icon>
+					<image src="@/static/img/voice-icon.png" @click="handleVoiceSend"></image>
 				</view>
         <view class="uni-textarea">
           <textarea v-model="chatMsg"
@@ -94,8 +97,8 @@
 						</textarea>
         </view>
 				<view class="send-btn">
-					<u-icon name="plus" size="24px" color="#101010" @click="handleSend"></u-icon>
-					<u-icon name="plus" size="24px" color="#101010" @click="handleSend"></u-icon>
+					<image src="@/static/img/meme-icon.png" @click="handleMemeSend"></image>
+					<image src="@/static/img/send-icon.png" @click="handleSend"></image>
 				</view>
 			</view>
 		</view>
@@ -113,6 +116,7 @@
 		data() {
 			return {
 				defaultPersonPhotoIconPng: require("@/static/img/default-person-photo.png"),
+				workerOrderTypeList: ['运送','环境','工程','事务'],
 				showLoadingHint: false,
 				infoText: '加载中···',
 				loadingText: '加载中···',
@@ -219,13 +223,13 @@
 		// 		this.isSocketConnct()
 		// 	}, 3000);
 
-		// 	uni.onKeyboardHeightChange(res => {
-		// 		//这里正常来讲代码直接写
-		// 		//this.keyboardHeight=this.rpxTopx(res.height)就行了
-		// 		//但是之前界面ui设计聊天框的高度有点高,为了不让键盘和聊天输入框之间距离差太大所以我改动了一下。
-		// 		this.keyboardHeight = this.rpxTopx(res.height)
-		// 		if(this.keyboardHeight<0)this.keyboardHeight = 0
-		// 	})
+			uni.onKeyboardHeightChange(res => {
+				//这里正常来讲代码直接写
+				//this.keyboardHeight=this.rpxTopx(res.height)就行了
+				//但是之前界面ui设计聊天框的高度有点高,为了不让键盘和聊天输入框之间距离差太大所以我改动了一下。
+				this.keyboardHeight = this.rpxTopx(res.height)
+				if(this.keyboardHeight<0)this.keyboardHeight = 0
+			})
 		},
 		
 		onUnload() {
@@ -264,6 +268,16 @@
 			blur(){
 				this.scrollToBottom()
 			},
+			
+			// 创建工单事件
+			creatWorkOrderEvent () {
+				uni.navigateTo({
+					url: '/createWorkerOrderPackage/pages/createWorkerOrder/index/chooseTransportType'
+				})
+			},
+			
+			// 修改工单事件
+			modificationWorkOrderEvent () {},
 			
 			// 格式化时间
 			getNowFormatDate(currentDate,type) {
@@ -669,6 +683,12 @@
 				},15)
 			},
 			
+			// 语音事件
+			handleVoiceSend () {},
+			
+			// 表情事件
+			handleMemeSend () {},
+			
 			// 发送消息
 			handleSend() {
 				//如果消息为空
@@ -710,53 +730,12 @@
 		::v-deep .u-popup {
 			flex: none !important
 		};
-		.call-phone-box {
-			::v-deep .u-popup {
-				.u-popup__content {
-					width: 80%;
-					padding: 30px 10px 20px 10px;
-					box-sizing: border-box;
-					border-radius: 14px;
-					.u-popup__content__close {
-						.u-icon__icon {
-							color: #101010 !important
-						}
-					};
-					.support-staff-content {
-						.support-staff-top {
-							display: flex;
-							flex-direction: column;
-							align-items: center;
-							>image {
-								width: 100px;
-								height: 100px;
-								border-radius: 50%;
-							};
-							>text {
-								font-size: 14px;
-								color: #101010;
-								&:nth-of-type(1) {
-									margin: 14px 0;
-								}
-							}
-						};
-						.support-staff-bottom {
-							display: flex;
-							width: 80%;
-							height: 38px;
-							line-height: 38px;
-							margin: 0 auto;
-							justify-content: center;
-							align-items: center;
-							background: #1E86FD;
-							border-radius: 7px;
-							margin-top: 20px;
-							font-size: 14px;
-							color: #fff;
-						}
-					}
-				}
-			}
+		.top-background-area {
+			width: 100%;
+			background: #4873C0;
+			position: absolute;
+			top: 0;
+			left: 0
 		};
     .topTabbar {
 			width: 100%;
@@ -765,6 +744,24 @@
 			justify-content: center;
 			align-items: center;
 			position: relative;
+			.triangle-rect-list-info {
+				position: absolute;
+				width: 60px;
+				height: 100px; 
+				background-color: #fff;
+			};
+		 .triangle-rect-list-info:before {
+				content: ""; /* 必须设置content属性 */
+				position: absolute;
+				top: -10px; /* 向上移动以覆盖长方形的顶部 */
+				left: 50%; /* 水平居中 */
+				transform: translateX(-50%); /* 微调位置以完全居中 */
+				width: 0; /* 三角形宽度为0 */
+				height: 0; /* 三角形高度为0 */
+				border-left: 10px solid transparent; /* 左边框透明 */
+				border-right: 10px solid transparent; /* 右边框透明 */
+				border-bottom: 15px solid #fff; /* 下边框颜色和大小，形成三角形 */
+			};
 			> .icon {
 				margin: 0 4rpx 0 20rpx;
 			};
@@ -778,6 +775,7 @@
 				box-sizing: border-box;
 				font-size: 16px;
 				font-weight: 700;
+				color: #fff;
 				flex: 1;
 				@include no-wrap;
 			};
@@ -807,7 +805,7 @@
 				color: transparent;
 			};
 			// background-color: orange;
-			background-color: #F6F6F6;
+			background-color: #EFEFEF;
 			.chat-body {
 				display: flex;
 				flex-direction: column;
@@ -912,21 +910,11 @@
 		};
 		/* 底部聊天发送栏 */
 		.chat-bottom {
-			display: flex;
 			width: 100%;
 			background: #E5E5E5;
 			transition: all 0.1s ease;
 			padding-bottom: 30px;
 			box-sizing: border-box;
-			.voice-chat {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				margin-bottom: 70rpx;
-				margin-right: 25rpx;
-				width: 60rpx;
-				height: 75rpx;
-			};
 			.send-msg {
 				display: flex;
 				background: #E5E5E5;
@@ -938,32 +926,56 @@
 				box-sizing: border-box;
 				bottom: 0;
 				transition: all 0.1s ease;
-			};
-			.uni-textarea {
-				padding-bottom: 70rpx;
-				flex: 1;
-				textarea {
-					width: 537rpx;
-					min-height: 75rpx;
-					max-height: 500rpx;
-					background: #f1f1f1;
-					font-size: 32rpx;
-					font-family: PingFang SC;
-					border-radius: 4px;
-					color: #333333;
-					line-height: 40rpx;
-					padding: 5rpx 8rpx;
-          text-indent: 30rpx;
+				.voice-chat {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					width: 30px;
+					height: 30px;
+					margin-top: 4px;
+					>image {
+						width: 30px;
+						height: 30px;
+						vertical-align: middle;
+					}
+				};
+				.uni-textarea {
+					padding-bottom: 70rpx;
+					flex: 1;
+					margin: 0 6px 0 4px;
+					textarea {
+						width: 100% !important;
+						min-height: 40px;
+						max-height: 500rpx;
+						background: #f1f1f1;
+						font-size: 32rpx;
+						font-family: PingFang SC;
+						border-radius: 4px;
+						color: #333333;
+						line-height: 40rpx;
+						padding: 5rpx 8rpx;
+				    text-indent: 30rpx;
+					}
+				};    
+				.send-btn {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					margin-bottom: 70rpx;
+					width: 67px;
+					height: 33px;
+					margin-top: 4px;
+					>image {
+						width: 28px;
+						height: 28px;
+						vertical-align: middle;
+						&:last-child {
+							width: 33px;
+							height: 33px;
+							margin-left: 6px;
+						}
+					}
 				}
-			};    
-			.send-btn {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				margin-bottom: 70rpx;
-				margin-left: 25rpx;
-				width: 120rpx;
-				height: 75rpx;
 			}
 		}
 	}

@@ -32,6 +32,180 @@
 			}
 		}
 	],
+	"subPackages": [
+		{
+			"root": "createWorkerOrderPackage",
+			"name": "rootCreateWorkerOrderPackage",
+			"pages": [
+				{
+					"path": "pages/createWorkerOrder/index/index",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/createWorkerOrder/index/chooseTransportType",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/createWorkerOrder/createEnvironmentWorkerOrder/createEnvironmentWorkerOrder",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/createWorkerOrder/createProjectWorkerOrder/createProjectWorkerOrder",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/createWorkerOrder/createAffairWorkerOrder/createAffairWorkerOrder",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				}
+			]
+		},
+		{
+			"root": "modificationWorkerOrderPackage",
+			"name": "rootModificationWorkerOrderPackage",
+			"pages": [
+				{
+					"path": "pages/modificationWorkerOrder/index/index",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/modificationWorkerOrder/modificationEnvironmentWorkerOrder/modificationEnvironmentWorkerOrder",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/modificationWorkerOrder/modificationProjectWorkerOrder/modificationProjectWorkerOrder",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/modificationWorkerOrder/modificationAffairWorkerOrder/modificationAffairWorkerOrder",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				}
+			]
+		},
+		{
+			"root": "workerOrderMessagePackage",
+			"name": "rootWorkerOrderMessagePackage",
+			"pages": [
+				{
+					"path": "pages/workerOrderMessage/index/index",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/workerOrderMessage/transportWorkerOrderMessage/transportWorkerOrderMessage",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/workerOrderMessage/environmentWorkerOrderMessage/environmentWorkerOrderMessage",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/workerOrderMessage/projectWorkerOrderMessage/projectWorkerOrderMessage",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/workerOrderMessage/affairWorkerOrderMessage/affairWorkerOrderMessage",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				}
+			]
+		}
+	],
+	"preloadRule": {
+		"createWorkerOrderPackage/pages/createWorkerOrder/index/index": {
+				"network": "all",
+				"packages": ["rootCreateWorkerOrderPackage"]
+		},
+		"modificationWorkerOrderPackage/pages/modificationWorkerOrder/index/index": {
+				"network": "all",
+				"packages": ["rootModificationWorkerOrderPackage"]
+		},
+		"workerOrderMessagePackage/pages/workerOrderMessage/index/index": {
+				"network": "all",
+				"packages": ["rootWorkerOrderMessagePackage"]
+		}
+	},
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
