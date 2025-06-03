@@ -5,9 +5,7 @@ export function getDefaultLoginState() {
 		token: null, //请求token,
 		isLogin: false,
 		overDueWay: false,
-		userBasicInfo: null,
-		nurseRankDictData: [],
-		socketOpen: false
+		templateType: ''
 	}	
 }
 

@@ -11,21 +11,13 @@ export default {
 			state.isLogin = getCache('isLogin') ? getCache('isLogin') === 'false' ? false : true : false;
 			return state.isLogin
 		},
-		socketOpen: (state) => {
-			state.socketOpen = getCache('socketOpen') ? getCache('socketOpen') === 'false' ? false : true : false;
-			return state.socketOpen
+		templateType:  (state) => {
+			state.templateType = getCache('templateType') ? getCache('templateType') : '';
+			return state.templateType
 		},
 		token:(state) => {
 			state.token = getCache('token') ? getCache('token') : null;
 			return state.token
-		},
-		userBasicInfo:(state) => {
-			state.userBasicInfo = getCache('userBasicInfo') ? getCache('userBasicInfo') : {};
-			return state.userBasicInfo
-		},
-		nurseRankDictData:(state) => {
-			state.nurseRankDictData = getCache('nurseRankDictData') ? getCache('nurseRankDictData') : [];
-			return state.nurseRankDictData
 		},
 		overDueWay: state => state.overDueWay
 	},
@@ -36,11 +28,11 @@ export default {
 				state.userInfo = playLoad
 			}
 		},
-		// 存储用户基本信息
-		changeUserBasicInfo(state, playLoad) {
+		// 修改模板状态
+		changeTemplateType(state, playLoad) {
 			if (playLoad && playLoad != 'null') {
-				setCache('userBasicInfo',playLoad);
-				state.userBasicInfo = playLoad
+				setCache('templateType', playLoad);
+				state.templateType = playLoad
 			}
 		},
 		// 修改token状态
@@ -50,25 +42,11 @@ export default {
 				state.token = playLoad
 			}
 		},
-		// 修改socken是否打开
-		changeSocketOpen(state, playLoad) {
-			if (playLoad && playLoad != 'null') {
-				setCache('socketOpen', playLoad);
-				state.socketOpen = playLoad
-			}
-		},
 		// 修改是否登录状态
 		changeIsLogin(state, playLoad) {
 			if (playLoad && playLoad != 'null') {
 				setCache('isLogin', playLoad);
 				state.isLogin = playLoad
-			}
-		},
-		// 修改护师职称字典数据
-		changeNurseRankDictData(state, playLoad) {
-			if (playLoad && playLoad != 'null') {
-				setCache('nurseRankDictData', playLoad);
-				state.nurseRankDictData = playLoad
 			}
 		},
 		// 修改过期方式

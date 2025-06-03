@@ -3,53 +3,17 @@ import request from '@/api/request';
 // 账号密码登录
 export function logIn(data) {
 	return request({
-	    url: '/app-api/member/auth/login',
-	    method: 'post',
-	    data
-	  })
-}
-
-// 账号验证码登录
-export function logInByCode(data) {
-	return request({
-	    url: '/app-api/member/auth/sms-login',
-	    method: 'post',
-	    data
-	  })
-}
-
-// 发送手机验证码
-export function sendPhoneCode(data) {
-	return request({
-	    url: '/app-api/member/auth/send-sms-code',
-	    method: 'post',
-	    data
-	  })
-}
-
-// 重置密码
-export function resetPassword(data) {
-	return request({
-	    url: '/app-api/member/auth/reset-password',
-	    method: 'post',
-	    data
-	  })
-}
-
-// 设置密码
-export function setPassword(data) {
-	return request({
-	    url: '/app-api/member/auth/set-password',
+	    url: 'login/login',
 	    method: 'post',
 	    data
 	  })
 }
 
 // 用户退出登录
-export function userSignOut() {
+export function userSignOut(proId,workerId) {
   return request({
-    url: '/app-api/member/auth/logout',
-    method: 'post'
+    url: `login/signOut/${proId}/${workerId}`,
+    method: 'get'
   })
 };
 
@@ -61,12 +25,20 @@ export function weixinLogIn(code) {
 	})
 }
 
-// 微信小程序一键登录
-export function weixinMiniAppLogin(data) {
+// 微信授权绑定已存在账号
+export function boundExist(code,data) {
 	return request({
-	    url: '/app-api/member/auth/weixin-mini-app-login',
+	    url: `login/wx/boundExist/${code}`,
 	    method: 'post',
 			data
 	})
 }
 
+// 微信授权不绑定账号
+export function boundNotExist(proId,code) {
+	return request({
+	    url: `login/wx/boundNotExist/${proId}/${code}`,
+	    method: 'post',
+			data: {}
+	})
+}

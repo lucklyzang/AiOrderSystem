@@ -4,9 +4,7 @@
 		<u-toast ref="uToast" />
     <!-- 顶部标题 -->
     <view class="topTabbar" :style="{ 'height': navigationBarHeight + 'px', 'lineHeight': navigationBarHeight + 'px', 'paddingRight': capsuleMessage.width + 10 + 'px' }">
-			<!-- 工单类型列表提示框 -->
-			<view class="triangle-rect-list-info" :style="{ 'top': navigationBarHeight + 14 + 'px', 'right': capsuleMessage.width + 22 + 'px' }"></view>
-      <!-- 返回图标 -->
+      <!-- 返回图标
       <u-icon class="icon" name="arrow-left" size="20px" color="#fff" @click="goback()"></u-icon>
 			<!-- 消息条数 -->
 		<!-- 	<view class="message-count" @click="goback()">
@@ -15,8 +13,14 @@
       <!-- 聊天对象名称 -->
       <view class="text">{{ fromName }}</view>
 			<!-- 创建工单图标 -->
-			<view class="create-order-area" @click="creatWorkOrderEvent">
-				<u-icon name="plus" size="22px" color="#fff"></u-icon>
+			<view class="create-order-area">
+				<u-icon name="plus" size="22px" color="#fff" @click="creatWorkOrderListShowEvent"></u-icon>
+				<!-- 工单类型列表提示框 -->
+				<view class="triangle-rect-list-info" :style="{ 'top': navigationBarHeight + 4 + 'px' }" v-if="triangleRectListInfoShow">
+					<view class="triangle-rect-list-content" v-for="(item,index) in workerOrderTypeList" @click="creatWorkOrderEvent(item,index)" :key="index">
+						<text>{{ item }}</text>
+					</view>
+				</view>
 			</view>
 			<!-- 修改工单图标 -->
 			<view class="view-order-area" @click="modificationWorkOrderEvent">
@@ -118,6 +122,7 @@
 				defaultPersonPhotoIconPng: require("@/static/img/default-person-photo.png"),
 				workerOrderTypeList: ['运送','环境','工程','事务'],
 				showLoadingHint: false,
+				triangleRectListInfoShow: false,
 				infoText: '加载中···',
 				loadingText: '加载中···',
 				loadmoreText: '下拉加载更多',
@@ -269,11 +274,19 @@
 				this.scrollToBottom()
 			},
 			
+			// 创建工单列表显示事件
+			creatWorkOrderListShowEvent () {
+				this.triangleRectListInfoShow = !this.triangleRectListInfoShow;
+			},
+			
 			// 创建工单事件
-			creatWorkOrderEvent () {
-				uni.navigateTo({
-					url: '/createWorkerOrderPackage/pages/createWorkerOrder/index/chooseTransportType'
-				})
+			creatWorkOrderEvent (item,index) {
+				this.triangleRectListInfoShow = false;
+				if (item == '运送') {
+					uni.navigateTo({
+						url: '/createWorkerOrderPackage/pages/createWorkerOrder/index/chooseTransportType'
+					})
+				}
 			},
 			
 			// 修改工单事件
@@ -744,24 +757,6 @@
 			justify-content: center;
 			align-items: center;
 			position: relative;
-			.triangle-rect-list-info {
-				position: absolute;
-				width: 60px;
-				height: 100px; 
-				background-color: #fff;
-			};
-		 .triangle-rect-list-info:before {
-				content: ""; /* 必须设置content属性 */
-				position: absolute;
-				top: -10px; /* 向上移动以覆盖长方形的顶部 */
-				left: 50%; /* 水平居中 */
-				transform: translateX(-50%); /* 微调位置以完全居中 */
-				width: 0; /* 三角形宽度为0 */
-				height: 0; /* 三角形高度为0 */
-				border-left: 10px solid transparent; /* 左边框透明 */
-				border-right: 10px solid transparent; /* 右边框透明 */
-				border-bottom: 15px solid #fff; /* 下边框颜色和大小，形成三角形 */
-			};
 			> .icon {
 				margin: 0 4rpx 0 20rpx;
 			};
@@ -781,6 +776,42 @@
 			};
 			.create-order-area {
 				margin-right: 10px;
+				position: relative;
+				.triangle-rect-list-info {
+					z-index: 1000 !important;
+					position: absolute;
+					width: 67px;
+					background-color: #fff;
+					transform: translateX(-50%);
+					left: 50%;
+					display: flex;
+					flex-direction: column;
+					.triangle-rect-list-content {
+						flex: 1;
+						display: flex;
+						justify-content: center;
+						align-items: center;
+						font-size: 14px;
+						color: #101010;
+						border-bottom: 1px solid #BBBBBB;
+						box-sizing: border-box;
+						&:last-child {
+							border: none !important;
+						}
+					};
+				};
+				.triangle-rect-list-info:before {
+					content: ""; /* 必须设置content属性 */
+					position: absolute;
+					top: -10px; /* 向上移动以覆盖长方形的顶部 */
+					left: 50%; /* 水平居中 */
+					transform: translateX(-50%); /* 微调位置以完全居中 */
+					width: 0; /* 三角形宽度为0 */
+					height: 0; /* 三角形高度为0 */
+					border-left: 10px solid transparent; /* 左边框透明 */
+					border-right: 10px solid transparent; /* 右边框透明 */
+					border-bottom: 15px solid #fff; /* 下边框颜色和大小，形成三角形 */
+				}
 			};
 			.view-order-area {
 			};

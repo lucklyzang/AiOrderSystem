@@ -7,7 +7,7 @@ const instance = axios.create({
 	// 开发域名 https://blink.blinktech.cn/nblink
 	// 准生产域名 https://ver.blinktech.cn/nblink
 	// 测试域名 https://show.blinktech.cn/nblink
-  baseURL: 'https://blink.blinktech.cn/radar',
+  baseURL: 'https://blink.blinktech.cn/trans',
 	retry: 3, // 网络请求异常后，重试次数 
 	retryDelay: 1000, // 每次重试间隔时间
 	timeout: 30000,
@@ -57,9 +57,9 @@ instance.interceptors.request.use(function (config) {
   if (config['url'] == 'auth/login') {
   	config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
   };
-	// 请求头添加token
+	// 请求头添加Bearer token
 	if (store.getters.token) {
-	  config.headers['Authorization'] = `Bearer ${store.getters.token}`
+	  config.headers['Authorization'] = `${store.getters.token}`
 	};
 	if (isTokenExpired() && store.getters.userInfo['refreshToken'] && store.getters.isLogin) {
 	 // 如果token快过期了
@@ -69,7 +69,7 @@ instance.interceptors.request.use(function (config) {
 				headers: {
 					'tenant-id': 1
 				},
-				baseURL: 'https://blink.blinktech.cn/radar',
+				baseURL: 'https://blink.blinktech.cn',
 				method: 'post',
 				url: `app-api/member/auth/refresh-token?refreshToken=${store.getters.userInfo['refreshToken']}`
 			 }).then(res => {
@@ -112,7 +112,7 @@ instance.interceptors.request.use(function (config) {
 		// 此时, Promise的状态就会变成resolve
 		addSubscriber((newToken) => {
 			// 表示用新的token去替换掉原来的token
-			config.headers['Authorization'] = `Bearer ${newToken}`;
+			config.headers['Authorization'] = `${newToken}`;
 			// 替换掉url -- 因为baseURL会扩展请求url
 			config.url = config.url.replace(config.baseURL, '');
 			// 返回重新封装的config, 就会将新配置去发送请求
