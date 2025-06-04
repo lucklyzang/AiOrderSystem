@@ -290,7 +290,11 @@
 			},
 			
 			// 修改工单事件
-			modificationWorkOrderEvent () {},
+			modificationWorkOrderEvent () {
+				uni.navigateTo({
+					url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
+				})
+			},
 			
 			// 格式化时间
 			getNowFormatDate(currentDate,type) {
