@@ -140,6 +140,79 @@ export const dataURItoBlob = (urlData) => {
     });
 }
 
+/*
+ * 合并重复的运送类型
+ * @param{Array}
+ * @return {Array}
+ *
+*/
+
+export const  mergeMethods =  (testData) => {
+  if (!Array.isArray(testData)) { return };
+  var mergeData = [];
+  for (var i = 0, len = testData.length; i < len; i++ ) {
+    var temporaryObj = {typeList:[]};
+    var temporaryParentTypeName = [];
+    temporaryObj['typeList'].push({
+      patientName: testData[i]['patientName'],
+      bedNumber: testData[i]['bedNumber'],
+      sex: testData[i]['sex'],
+      quarantine: testData[i]['quarantine'],
+      typeChildList: []
+    });
+    for (var innerI = 0, innerLen = testData[i]['typeList'].length; innerI < innerLen; innerI++ ) {
+      // 判断运送大类是否存在已有的数组元素中
+      if (testData[i]['typeList'].length == 0) { continue };
+      var tragetIndex = mergeData.findIndex(function(item) { return item.parentTypeName == testData[i]['typeList'][innerI]['parentTypeName']});
+      if (tragetIndex == -1) {
+        // 判断该病人是否存在多个运送大类
+        if (temporaryParentTypeName.indexOf(testData[i]['typeList'][innerI]['parentTypeName']) != -1) {
+          temporaryObj['parentTypeName'] = testData[i]['typeList'][innerI]['parentTypeName'];
+          temporaryObj['typeList'][0]['typeChildList'].push({
+            taskTypeName: testData[i]['typeList'][innerI]['taskTypeName'],
+            quantity: testData[i]['typeList'][innerI]['quantity'],
+          })
+        } else {
+          var temporaryinnerObj = {typeList:[]};
+          temporaryinnerObj['parentTypeName'] = testData[i]['typeList'][innerI]['parentTypeName'];
+          temporaryinnerObj['typeList'].push({
+            patientName: testData[i]['patientName'],
+            bedNumber: testData[i]['bedNumber'],
+            sex: testData[i]['sex'],
+            quarantine: testData[i]['quarantine'],
+            typeChildList: []
+          });
+          temporaryinnerObj['typeList'][0]['typeChildList'].push({
+            taskTypeName: testData[i]['typeList'][innerI]['taskTypeName'],
+            quantity: testData[i]['typeList'][innerI]['quantity'],
+          })
+          mergeData.push(temporaryinnerObj)
+        }
+      } else {
+        // 判断病人是否存在于已有运送大类的typelist中
+        var patientIndex = mergeData[tragetIndex]['typeList'].findIndex(function(item) { return item.bedNumber == temporaryObj['typeList'][0]['bedNumber']});
+        if (patientIndex == -1) {
+          mergeData[tragetIndex]['typeList'].push({
+            patientName: testData[i]['patientName'],
+            bedNumber: testData[i]['bedNumber'],
+            sex: testData[i]['sex'],
+            quarantine: testData[i]['quarantine'],
+            typeChildList: []
+          })
+        };
+        mergeData[tragetIndex]['typeList'][mergeData[tragetIndex]['typeList'].length-1]['typeChildList'].push({
+          taskTypeName: testData[i]['typeList'][innerI]['taskTypeName'],
+          quantity: testData[i]['typeList'][innerI]['quantity'],
+        })
+      };
+      // 存储该病人信息下的运送大类(一个病人有可能会有多个运送大类)
+      temporaryParentTypeName.push(testData[i]['typeList'][innerI]['parentTypeName']);
+    };
+    temporaryObj.hasOwnProperty('parentTypeName') && mergeData.push(temporaryObj)
+  };
+  return mergeData
+}
+
 /* 
  * 生成随机字符串
  */

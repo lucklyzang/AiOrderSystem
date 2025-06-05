@@ -9,17 +9,12 @@
 				<view class="select-bar bg-white">
 					<view class="action text-blue" @tap="cancelClick">{{cancelText}}</view>
 					<view class="action search-box">
-					<!-- 	<u-field right-icon="search" :border-bottom="true"
-						 @input="searchEvent"
-						 v-model="searchText"
-						 placeholder="请输入搜索关键字"
-						:clearable="false" :border-top="true"
-						></u-field> -->
-						<u-input right-icon="search" border="bottom"
-						 @input="searchEvent"
-						 :value="searchText"
-						 placeholder="请输入搜索关键字"
-						:clearable="false" :border-top="true"
+						<u-input suffixIcon="search"
+							@input="searchEvent"
+							v-model="searchText"
+							placeholder="请输入搜索关键字"
+							clearable
+							border="none"
 						></u-input>
 					</view>
 					<view class="action text-green" @tap="confirmClick">{{confirmText}}</view>
@@ -120,6 +115,7 @@
 		},
 		watch: {
 			searchText (newVal, oldVal) {
+				console.log('搜索结果',newVal, oldVal);
 				let temporaryArray = _.cloneDeep(this.list);
 				this.listData = temporaryArray.filter((item) => { return item.value.indexOf(newVal) != -1});
 				if (newVal === '') {

@@ -19,6 +19,14 @@ export function queryTransportTypeClass(data) {
   })
 };
 
+// 查询调度任务(根据id)
+export function getDispatchTaskMessageById(taskId,tempFlag) {
+  return request({
+    url: store.getters.templateType == 'template_one' ? `task/query/${taskId}/${tempFlag}` : `dispatch/app/query/${taskId}`,
+    method: 'get'
+  })
+};
+
 // 查询目的地(科室)
 export function queryAllDestination(proId) {
   return request({

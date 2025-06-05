@@ -14,7 +14,7 @@
 		/>
 		<view class="plus-box"
 			@click.stop="plusNumEvent">
-			<u-icon name="plus"></u-icon>
+			<u-icon name="plus" color="#fff"></u-icon>
 		</view>
 	</view>
 </template>
@@ -129,7 +129,9 @@
 			width: 30px;
 			height: 33px;
 			background: #d2d2d2;
-			line-height: 33px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
 		};
 		input {
 			flex: 1;
@@ -140,7 +142,9 @@
 			width: 30px;
 			height: 33px;
 			background: #d2d2d2;
-			line-height: 33px
+			display: flex;
+			justify-content: center;
+			align-items: center;
 		}
 	}
 </style>

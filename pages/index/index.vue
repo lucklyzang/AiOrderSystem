@@ -286,6 +286,10 @@
 					uni.navigateTo({
 						url: '/createWorkerOrderPackage/pages/createWorkerOrder/index/chooseTransportType'
 					})
+				} else if (item == '工程') {
+					uni.navigateTo({
+						url: '/createWorkerOrderPackage/pages/createWorkerOrder/createProjectWorkerOrder/createProjectWorkerOrder'
+					})
 				}
 			},
 			

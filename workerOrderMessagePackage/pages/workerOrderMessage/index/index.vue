@@ -122,10 +122,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view>
+					<view @click.stop="modificationOrderEvent">
 						修改
 					</view>
-					<view>
+					<view @click.stop="cancelOrderEvent">
 						取消订单
 					</view>
 				</view>
@@ -175,10 +175,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view>
+					<view @click.stop="modificationOrderEvent">
 						修改
 					</view>
-					<view>
+					<view @click.stop="cancelOrderEvent">
 						取消订单
 					</view>
 				</view>
@@ -228,10 +228,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view>
+					<view @click.stop="modificationOrderEvent">
 						修改
 					</view>
-					<view>
+					<view @click.stop="cancelOrderEvent">
 						取消订单
 					</view>
 				</view>
@@ -281,10 +281,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view>
+					<view @click.stop="modificationOrderEvent">
 						修改
 					</view>
-					<view>
+					<view @click.stop="cancelOrderEvent">
 						取消订单
 					</view>
 				</view>
@@ -393,12 +393,14 @@
 				})
 			},
 			
-			// 修改订单详情事件
+			// 修改订单事件
 			modificationOrderEvent () {
-				
+				uni.navigateTo({
+					url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/index/index'
+				})
 			},
 			
-			// 取消订单详情事件
+			// 取消订单事件
 			cancelOrderEvent () {
 				
 			},

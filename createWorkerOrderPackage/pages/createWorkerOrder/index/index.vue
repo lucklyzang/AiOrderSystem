@@ -66,7 +66,7 @@
 					<view class="creat-form-field">
 						<text>床号</text>
 						<u-input
-							:value="bedNumber"
+							v-model="bedNumber"
 							 border="bottom"
 							placeholder="请输入床号"
 						>
@@ -75,7 +75,7 @@
 					<view class="creat-form-field">
 						<text>姓名</text>
 						<u-input
-							:value="patientName"
+							v-model="patientName"
 							 border="bottom"
 							placeholder="请输入姓名"
 						>
@@ -87,7 +87,7 @@
 						<text>住院号</text>
 						<u-input
 							border="bottom"
-							:value="patientNumber"
+							v-model="patientNumber"
 							placeholder="请输入住院号"
 						>
 						</u-input>
@@ -95,7 +95,7 @@
 					<view class="creat-form-field">
 						<text>运送数量</text>
 						<u-input
-							:value="actualData"
+							v-model="actualData"
 							 border="bottom"
 							placeholder="请输入运送数量"
 							type="number"
@@ -135,8 +135,8 @@
 				<view class="creat-priority-title">运送员是否返回</view>
 				<view class="transport-isBack">
 					<u-radio-group v-model="isBackValue" @change="isBackGroupChange">
-						<u-radio name="0" activeColor="#2c9af1" label="否"></u-radio>
-						<u-radio name="1" activeColor="#2c9af1" label="是"></u-radio>
+						<u-radio name="0" activeColor="#fcd388" labelColor="#fcd388" label="否"></u-radio>
+						<u-radio name="1" activeColor="#8af08a" labelColor="#8af08a" label="是"></u-radio>
 					</u-radio-group>
 				</view>
 			</view>
@@ -172,15 +172,15 @@
 				<view class="creat-priority-title">运送员是否返回</view>
 				<view class="transport-isBack">
 					<u-radio-group v-model="isBackValue" @change="isBackGroupChange">
-						<u-radio name="0" activeColor="#2c9af1" label="否"></u-radio>
-						<u-radio name="1" activeColor="#2c9af1" label="是"></u-radio>
+						<u-radio name="0" activeColor="#fcd388" labelColor="#fcd388" label="否"></u-radio>
+						<u-radio name="1" activeColor="#8af08a" labelColor="#8af08a" label="是"></u-radio>
 					</u-radio-group>
 				</view>
 			</view>
 			<view class="creat-priority creat-is-back trans-total">
 				<view class="trans-total-title">该任务运送总数</view>
 				<view class="trans-total-content">
-					<u-input disabled :value="taskTotal" type="text" :border="true" />
+					<u-input disabled v-model="taskTotal" type="text" :border="true" />
 				</view>
 			</view>
 			<view class="creat-chooseHospital">
@@ -219,29 +219,29 @@
 						<view class="creat-form-top">
 							<view class="creat-form-field">
 								<text>床号</text>
-								<u-input :value="templateTwoMessage[index].bedNumber"  border="none" disabled :clearable="false">
+								<u-input v-model="templateTwoMessage[index].bedNumber"  border="none" disabled :clearable="false">
 								</u-input>
 							</view>
 							<view class="creat-form-field">
 								<text>姓名</text>
-								<u-input :value="templateTwoMessage[index].patientName"  border="none" disabled :clearable="false">
+								<u-input v-model="templateTwoMessage[index].patientName"  border="none" disabled :clearable="false">
 								</u-input>
 							</view>
 						</view>
 						<view class="creat-form-bottom">
 							<view class="creat-form-field">
 								<text>住院号</text>
-								<u-input :value="templateTwoMessage[index].patientNumber" border="none" disabled :clearable="false">
+								<u-input v-model="templateTwoMessage[index].patientNumber" border="none" disabled :clearable="false">
 								</u-input>
 							</view>
 							<view class="creat-form-field">
 								<text>性别</text>
-								<u-input :value="templateTwoMessage[index].genderValue" border="none" disabled :clearable="false">
+								<u-input v-model="templateTwoMessage[index].genderValue" border="none" disabled :clearable="false">
 								</u-input>
 							</view>
 							<view class="creat-form-field">
 								<text>运送数量</text>
-								<u-input disabled :value="templateTwoMessage[index].actualData" type="text" border="none" disabled :clearable="false">
+								<u-input disabled v-model="templateTwoMessage[index].actualData" type="text" border="none" disabled :clearable="false">
 								</u-input>
 							</view>
 						</view>
@@ -272,7 +272,7 @@
 				<button class="cancelBtn" type="primary" @click="cancel">取消</button>
 			</view>
 		</view>
-		<view class="u-modal-center-box">
+		<view class="u-modal-center-box" v-if="patienModalShow">
 			<u-modal :show="patienModalShow" :title="isPressEdit ? `病人${updateIndex+1}`:`病人信息`" 
 				:showCancelButton="true"
 				:title-style="{color: '#000000',textAlign: 'left',fontSize: '18px'}"
@@ -297,19 +297,19 @@
 					<view class="bedNumberBox scroll-view-item">
 						<view>床号</view>
 						<view>
-							<u-input :value="patienModalMessage.bedNumber" border="none" placeholder="请输入床号" />
+							<u-input v-model="patienModalMessage.bedNumber" border="none" placeholder="请输入床号" />
 						</view>
 					</view>
 					<view class="bedNumberBox scroll-view-item">
 						<view>姓名</view>
 						<view>
-							<u-input :value="patienModalMessage.patientName" border="none" placeholder="请输入姓名" />
+							<u-input v-model="patienModalMessage.patientName" border="none" placeholder="请输入姓名" />
 						</view>
 					</view>
 					<view class="bedNumberBox scroll-view-item">
 						<view>住院号</view>
 						<view>
-							<u-input :value="patienModalMessage.patientNumber" border="none" placeholder="请输入住院号" />
+							<u-input v-model="patienModalMessage.patientNumber" border="none" placeholder="请输入住院号" />
 						</view>
 					</view>
 					<view class="genderBox scroll-view-item">
@@ -325,7 +325,7 @@
 					<view class="bedNumberBox scroll-view-item transport-number">
 						<view>运送数量</view>
 						<view>
-							<u-input :value="patienModalMessage.actualData" disabled border="none" />
+							<u-input v-model="patienModalMessage.actualData" disabled border="none" />
 						</view>
 					</view>
 					<view class="transportBox scroll-view-item">
@@ -369,6 +369,7 @@
 		setCache,
 		removeAllLocalStorage
 	} from '@/common/js/utils'
+	import _ from 'lodash'
 	import {
 		queryTransportTypeClass,
 		queryTransportTools,
@@ -449,7 +450,8 @@
 				transportTypeParent: [],
 				transportTypeChild: [],
 				patienModalShow: false,
-				isPressEdit: false
+				isPressEdit: false,
+				titleText: {}
 			}
 		},
 		// 监听每个病人对应的运送类型数量
@@ -494,7 +496,6 @@
 			}
 		},
 		mounted() {
-			console.log('1',this.templateType);
 			this.startPointId = this.depId;
 			this.startPointName = this.depName;
 			this.parallelFunction()
@@ -503,8 +504,12 @@
 			if (options.transmitData == '{}') { return };
 			let transmitContent = JSON.parse(options.transmitData);
 			this.taskTypeText = transmitContent.value;
-			this.templateTwoMessage[0].sampleValue = transmitContent.value;
-			this.templateTwoMessage[0].sampleId = transmitContent.id
+			this.titleText = {
+				id: transmitContent.id,
+				value: transmitContent.value
+			};
+			this.templateTwoMessage[0].sampleValue = this.titleText.value;
+			this.templateTwoMessage[0].sampleId = this.titleText.id;
 		},	
 		methods: {
 			...mapMutations([
@@ -776,8 +781,8 @@
 						})
 						.catch((err) => {
 							this.$refs.uToast.show({
-								title: `${err.message}`,
-								type: 'warning'
+								message: `${err.message}`,
+								type: 'error'
 							}).then(() => {})
 						})
 				},
@@ -786,7 +791,7 @@
 					Promise.all([this.getAllDestination(), this.getTransportTools(), this.getTransPorttype({
 							proId: this.proId,
 							state: 0,
-							parentId: this.titleText.id
+							parentId: this.templateTwoMessage[0].sampleId
 						}), this.getTransportsTypeParent()])
 						.then((res) => {
 							if (res && res.length > 0) {
@@ -932,7 +937,7 @@
 						sampleList: this.transportTypeParent,
 						sampleValue: this.titleText.value,
 						sampleId: this.titleText.id
-					});
+					})
 				},
 				// 病人信息删除事件
 				deletetMessage(index) {
@@ -963,7 +968,7 @@
 					generateDispatchTask(data).then((res) => {
 							if (res && res.data.code == 200) {
 								this.$refs.uToast.show({
-									title: `${res.data.msg}`,
+									message: `${res.data.msg}`,
 									type: 'success'
 								});
 								setTimeout(() => {
@@ -971,15 +976,15 @@
 								}, 1000)
 							} else {
 								this.$refs.uToast.show({
-									title: `${res.data.msg}`,
-									type: 'warning'
+									message: `${res.data.msg}`,
+									type: 'error'
 								})
 							};
 							this.showLoadingHint = false
 						})
 						.catch((err) => {
 							this.$refs.uToast.show({
-								title: `${err.message}`,
+								message: `${err.message}`,
 								type: 'error'
 							})
 							this.showLoadingHint = false;
@@ -992,7 +997,7 @@
 					generateDispatchTaskMany(data).then((res) => {
 							if (res && res.data.code == 200) {
 								this.$refs.uToast.show({
-									title: `${res.data.msg}`,
+									message: `${res.data.msg}`,
 									type: 'success'
 								});
 								setTimeout(() => {
@@ -1000,15 +1005,15 @@
 								}, 1000)
 							} else {
 								this.$refs.uToast.show({
-									title: `${res.data.msg}`,
-									type: 'warning'
+									message: `${res.data.msg}`,
+									type: 'error'
 								})
 							};
 							this.showLoadingHint = false
 						})
 						.catch((err) => {
 							this.$refs.uToast.show({
-								title: `${err.message}`,
+								message: `${err.message}`,
 								type: 'error'
 							});
 							this.showLoadingHint = false;
@@ -1025,7 +1030,7 @@
 									if (this.titleText.value == '检查') {
 										if (this.isContactisolationValue === null) {
 											this.$refs.uToast.show({
-												title: '请确认病人是否需要接触隔离!',
+												message: '请确认病人是否需要接触隔离!',
 												type: 'warning'
 											})
 										} else {
@@ -1039,7 +1044,7 @@
 										let temporaryFlag = this.templateTwoMessage.some((item) => { return item.isContactisolationValue === null });
 										if (temporaryFlag) {
 											this.$refs.uToast.show({
-												title: '请确认病人是否需要接触隔离!',
+												message: '请确认病人是否需要接触隔离!',
 												type: 'warning'
 											})
 										} else {
@@ -1054,7 +1059,7 @@
 							}
 						} else {
 							this.$refs.uToast.show({
-								title: `${res.data.msg}`,
+								message: `${res.data.msg}`,
 								type: 'error'
 							})
 						};
@@ -1062,7 +1067,7 @@
 					})
 					.catch((err) => {
 						this.$refs.uToast.show({
-							title: `${err.message}`,
+							message: `${err.message}`,
 							type: 'error'
 						});
 						this.showLoadingHint = false;
@@ -1571,8 +1576,11 @@
 					vertical-align: middle;
 					padding: 6px 6px 8px 0;
 					box-sizing: border-box;
-					/deep/ u-radio-group {
-						width: 100%
+					::v-deep .u-radio-group {
+						width: 100%;
+						.u-radio {
+							margin-left: 10px !important;
+						}
 					}
 				}
 			};
@@ -1882,6 +1890,7 @@
 		}
 		.template-two {
 			.trans-total {
+				display: flex;
 				.trans-total-title {
 					float: left;
 					width: 30%;
@@ -1893,18 +1902,21 @@
 				.trans-total-content {
 					height: 59px !important;
 					float: right;
-					width: 70%;
+					flex: 1;
 					position: relative;
+					background: #fff;
 					/deep/ .u-input {
 						position: absolute;
 						top: 50%;
 						width: 100%;
-						min-height: 40px;
+						height: 40px !important;
 						color: $color-text-right;
 						transform: translateY(-50%);
+						padding-top: 0 !important;
+						padding-bottom: 0 !important;
 						left: 0;
 						border: none;
-						background: #f9f9f9
+						background: #f9f9f9 !important
 					}
 				};
 			}

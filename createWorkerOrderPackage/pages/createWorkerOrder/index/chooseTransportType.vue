@@ -91,16 +91,14 @@
 						this.$refs.uToast.show({
 							message: res.data.msg,
 							type: 'error',
-							position: 'bottom'
 						})
 					}
 				})
 				.catch((err) => {
 					this.showLoadingHint = false;
 					this.$refs.uToast.show({
-						message: err.message,
-						type: 'error',
-						position: 'bottom'
+						message: `${err.message}`,
+						type: 'error'
 					})
 				})
 			},
