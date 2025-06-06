@@ -20,3 +20,11 @@ export function getDefaultCommonState() {
 		capsuleMessage: {}
 	}	
 }
+
+// 工程信息store的初始值
+export function getDefaultProjectState() {
+	return {
+		// 暂存创建维修任务的信息
+		temporaryStorageCreateRepairsTaskMessage: {}
+	}	
+}

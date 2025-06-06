@@ -214,6 +214,22 @@ export const  mergeMethods =  (testData) => {
 }
 
 /* 
+  * 引用类型数据深度克隆
+  * @param{Array || Object} obj
+*/
+export const deepClone = (obj) => {
+  let newObj=Array.isArray(obj)?[]:{}
+  if(obj&&typeof obj ==="object"){
+    for(let key in obj){
+      if(obj.hasOwnProperty(key)){
+        newObj[key]=(obj && typeof obj[key]==='object')?deepClone(obj[key]):obj[key];
+      }
+    }
+  }
+  return newObj
+}
+
+/* 
  * 生成随机字符串
  */
 
