@@ -326,7 +326,7 @@
 				showGoalSpaces: false,
 				currentGoalSpaces: [],
 	
-				taskTypeOption: [{id:1,text:'飒飒'},{id:2,text:'大苏打'},{id:3,text:'发顺丰'},{id:4,text:'方式'}],
+				taskTypeOption: [{id:1,text:'飒飒'},{id:2,text:'大苏打'},{id:3,text:'发顺丰'},{id:4,text:'方式'},{id:5,text:'打的'},{id:6,text:'很符合'}],
 				showTaskType: false,
 				currentTaskType: '请选择',
 	

@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" text="登录中,请稍候···" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
+		<!-- <ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" text="登录中,请稍候···" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/> -->
 		<u-modal v-model="modalShow" :content="modalContent"
 		 :show-cancel-button="true" @confirm="sureCancel" @cancel="cancelSure">
 		</u-modal>
@@ -38,7 +38,7 @@
       <view class="weixin-login">
         <u-divider border-color="#6d6d6d" color="#333">微信授权登陆</u-divider>
         <view class="image-wrapper" @click="weixinLoginEvent">
-          <image src="/static/img/weixin.png">
+          <!-- <image src="/static/img/weixin.png"> -->
         </view>
       </view>
       <view class="bottom-character">

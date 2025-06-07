@@ -14,7 +14,7 @@
       <view class="text">{{ fromName }}</view>
 			<!-- 创建工单图标 -->
 			<view class="create-order-area">
-				<u-icon name="plus" size="22px" color="#fff" @click="creatWorkOrderListShowEvent"></u-icon>
+				<u-icon name="plus" size="22px" color="#fff" @click="creatWorkOrderListShowEvent('show')"></u-icon>
 				<!-- 工单类型列表提示框 -->
 				<view class="triangle-rect-list-info" :style="{ 'top': navigationBarHeight + 4 + 'px' }" v-if="triangleRectListInfoShow">
 					<view class="triangle-rect-list-content" v-for="(item,index) in workerOrderTypeList" @click="creatWorkOrderEvent(item,index)" :key="index">
@@ -274,8 +274,9 @@
 				this.scrollToBottom()
 			},
 			
+			
 			// 创建工单列表显示事件
-			creatWorkOrderListShowEvent () {
+			creatWorkOrderListShowEvent (str) {
 				this.triangleRectListInfoShow = !this.triangleRectListInfoShow;
 			},
 			
@@ -295,6 +296,9 @@
 			
 			// 修改工单事件
 			modificationWorkOrderEvent () {
+				if (this.triangleRectListInfoShow) {
+					this.triangleRectListInfoShow = false;
+				};
 				uni.navigateTo({
 					url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
 				})

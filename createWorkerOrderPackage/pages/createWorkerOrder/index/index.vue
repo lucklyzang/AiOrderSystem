@@ -124,9 +124,9 @@
 							activeColor="#333"
 							shape="circle"
 							v-for="(item, index) in toolList" :key="index"
+							:label="item.text"
 							:name="item.value"
 						>
-							{{item.text}}
 						</u-radio>
 					</u-radio-group>
 				</view>
@@ -162,8 +162,7 @@
 				<view class="creat-priority-content">
 					<u-radio-group v-model="toolValue" @change="toolGroupChange">
 						<u-radio @change="toolChange" activeColor="#2c9af1" shape="circle" v-for="(item, index) in toolList" :key="index"
-						 :name="item.value">
-							{{item.text}}
+						 :name="item.value" :label="item.text">
 						</u-radio>
 					</u-radio-group>
 				</view>
@@ -1898,6 +1897,7 @@
 					padding-left: 4px;
 					line-height: 59px !important;
 					height: 59px !important;
+					box-sizing: border-box;
 				};
 				.trans-total-content {
 					height: 59px !important;

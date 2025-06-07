@@ -26,10 +26,9 @@
 						</u-search>
 					</view>
 					<picker-view v-if="list.length > 0" :immediate-change='true' :value="setValues"
-						@change="bindChange" mask-style="height:100rpx;"
-						style="width: 100%; flex: 1;text-align:center;background:white;overflow: scroll;max-height: 200px">
-						<picker-view-column class="pickViewColumn">
-							<view v-for="(item,index) in list" :key="item.id" class="u-column-item">{{item.text}}
+						@change="bindChange" mask-style="height:100rpx;" indicator-style="height: 34px;">
+						<picker-view-column>
+							<view v-for="(item,index) in list" :key="item.id" :class="{ 'selectStyle': form.id == item.id }" class="u-column-item">{{item.text}}
 							</view>
 						</picker-view-column>
 					</picker-view>
@@ -209,6 +208,7 @@
 		padding: 20px 10px;
 		box-sizing: border-box;
 		width: 100%;
+		height: 50%;
 		background: #fff;
 		bottom: 0;
 		z-index: 1000;
@@ -256,7 +256,6 @@
 				text-align:center;
 				background:white;
 				overflow: scroll;
-				max-height: 200px;
 			};
 			.button-box {
 				height: 60px;
@@ -294,43 +293,18 @@
 		}
 	}
  
-	.pickViewColumn {
-		height: 60%;
-		/deep/ .selected {
-			color: blue;
-		}
-		/* margin-top: -300rpx; */
-	}
- 
-	.pickerCancel {
-		font-size: 30rpx;
-		color: #606266;
-		// margin-right: 30rpx;
-		// padding: 16rpx;
-		box-sizing: border-box;
-		text-align: center;
-		text-decoration: none;
- 
-		padding: 0rpx 8rpx;
-	}
- 
-	.pickerConfirm {
-		font-size: 30rpx;
-		color: #2979ff;
-		// margin-left: 30rpx;
-		// padding: 16rpx;
-		box-sizing: border-box;
-		text-align: center;
-		text-decoration: none;
-		padding: 0rpx 8rpx;
-	}
- 
 	.u-column-item {		
 		color: #101010;
-		font-size: 22px;
-		line-height: 40px;
+		font-size: 20px;
+		line-height: 34px;
 		text-align: center;
-		height: 40px;
 		background-color: #fff;
+	}
+	
+	.selectStyle {
+		color: #3B9DF9 !important;
+		font-size: 22px !important;
+		background: #f3f3f3 !important;
+		
 	}
 </style>
