@@ -6,8 +6,8 @@
 			</view>
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
-		<u-toast ref="uToast" />
-		  <!-- 目的建筑 -->
+		<u-toast ref="uToast"></u-toast>
+		<!-- 目的建筑 -->
 		<view class="transport-rice-box" v-if="showStructure">
 			<ScrollSelection v-model="showStructure" :columns="structureOption" title="目的建筑" @sure="structureSureEvent" @cancel="structureCancelEvent" @close="structureCloseEvent" />
 		</view>
@@ -31,7 +31,7 @@
 		<view class="transport-rice-box" v-if="showUseTool">
 			<BottomSelect :columns="useToolOption" title="工具" :currentSelectData="currentUseTool"  @sure="useToolSureEvent" @cancel="useToolCancelEvent" @close="useToolCloseEvent" />
 		</view>
-		 <!-- 参与人 -->
+		<!-- 参与人 -->
 		<view class="transport-rice-box" v-if="showParticipant">
 			<BottomSelect :columns="participantOption" title="参与人" :currentSelectData="currentParticipant" @sure="participantSureEvent" @cancel="participantCancelEvent" @close="participantCloseEvent" />
 		</view>
@@ -158,10 +158,11 @@
 								{{item.mateName}}-{{item.model}}
 							</text>
 							<text>
-								<van-stepper 
+								<u-number-box 
 								@change="(value,detail) => {stepperEvent(value,detail,item,index)}" 
 								@plus="stepperPlusEvent(item,index)"
-								v-model.number="item.number" min="0" :max="item.quantity+1" />
+								v-model.number="item.number" min="0" :max="item.quantity+1">
+								</u-number-box>
 							</text>
 							<text>
 								<u-icon name="delete" color="red" @click="deleteEvent(item,index)" /></u-icon>
@@ -172,19 +173,19 @@
 			</view>
 			<view class="btn-box">
 				<text class="operate-one" @click="sureEvent">确认</text>
-				<text class="operate-two" @click="temporaryStorageEvent">暂存</text>
+				<!-- <text class="operate-two" @click="temporaryStorageEvent">暂存</text> -->
 				<text class="operate-three" @click="cancelEvent">取消</text>
 			</view>
 		</view>
 		<!-- 物料弹框  -->
 		<view class="material-box">
-			<u-modal :show="materialShow"  show-cancel-button width="100%"
-					@confirm="materialSure" @cancel="materialCancel" confirm-button-text="添加"
-					cancel-button-text="取消"
+			<u-modal :show="materialShow"  show-cancel-button width="700rpx"
+					@confirm="materialSure" @cancel="materialCancel" confirmText="添加"
+					cancelText="取消"
 				>
 					<view class="dialog-top">
 						<view class="select-title">添加耗材</view>
-						<van-icon name="cross" size="24" @click="closeScreenDialogEvent" />
+						<u-icon name="close" size="24" @click="closeScreenDialogEvent" />
 					</view>
 					<view class="tool-name-list">
 						<view class="tool-name-list-title-innner">
@@ -192,52 +193,57 @@
 									<u--input
 										v-model="searchValue"
 										placeholder="物资"
+										border="none"
 									/>
 									</u--input>
-									<text class="icon-text">
-										<van-icon name="search" color="#B7B6B6" />
-									</text>
+									<u-icon name="search" size="22" color="#B7B6B6"></u-icon>
 								</view>
 								<view class="search-btn" @click="searchEvent">搜索</view>
 						</view>
 						<view class="tool-name-list-content">
-							<van-row class="static-row">
-								<view class="circulation-area-title-box">
-									<text>物资名称</text>
-									<text>单位</text>
-									<text>型号</text>
-									<text>规格</text>
-								</view>
-								<view class="circulation-area-content-box"> 
-									<view v-for="(item,index) in inventoryMsgList" :key="item" class="circulation-area-content">
-										<text @click="mateNameEvent(item,index)">
-											{{item.mateName}}
-										</text>
-										<text>
-											{{item.unit ? item.unit : '无'}}
-										</text>
-										<text>
-											{{ item.model ?  item.model : '无'}}
-										</text>
-										<text>
-											{{ item.norms ?  item.norms : '无' }}
-										</text>
+							<view class="static-row">
+								<u-row>
+									<view class="circulation-area-title-box">
+										<text>物资名称</text>
+										<text>单位</text>
+										<text>型号</text>
+										<text>规格</text>
 									</view>
-									<u-empty description="暂无数据" v-if="inventoryMsgList.length == 0" />
-								</view>
-							</van-row>
-							<van-row class="absolute-row">
-								<view class="absolute-title">
-									占位
-								</view>
-								<view class="absolute-operate">
-									<view v-for="(item,index) in inventoryMsgList" :key="item">
-										<text>
-											<van-checkbox v-model="item.checked" shape="square" :disabled="item.disabled"></van-checkbox>
-										</text>
+									<view class="circulation-area-content-box"> 
+										<view v-for="(item,index) in inventoryMsgList" :key="item" class="circulation-area-content">
+											<text @click="mateNameEvent(item,index)">
+												{{item.mateName}}
+											</text>
+											<text>
+												{{item.unit ? item.unit : '无'}}
+											</text>
+											<text>
+												{{ item.model ?  item.model : '无'}}
+											</text>
+											<text>
+												{{ item.norms ?  item.norms : '无' }}
+											</text>
+										</view>
+										<u-empty description="暂无数据" v-if="inventoryMsgList.length == 0" />
 									</view>
-								</view>
-							</van-row>
+								</u-row>
+							</view>
+							<view class="absolute-row">
+								<u-row>
+									<view class="absolute-title">
+										占位
+									</view>
+									<view class="absolute-operate">
+										<view v-for="(item,index) in inventoryMsgList" :key="item">
+											<view>
+												<u-checkbox-group v-model="item.checked">
+													<u-checkbox shape="square" :disabled="item.disabled"></u-checkbox>
+												</u-checkbox-group>
+											</view>
+										</view>
+									</view>
+								</u-row>
+							</view>	
 							<view class="shadow-box"></view> 
 						</view>
 						<view class="page-area">
@@ -259,7 +265,7 @@
 					cancel-button-text="取消"
 				>
 					<view class="dialog-top">
-						<!-- <image :src="deleteInfoPng" alt=""> -->
+						<image src="@/static/img/delete-info.png"></image>
 					</view>
 					<view class="dialog-center">
 					 {{`是否删除:${deleteMaterial}?`}}
@@ -274,7 +280,7 @@
 		mapGetters,
 		mapMutations
 	} from 'vuex'
-	import { createRepairsTask, getTransporter, querySpace, queryDepartment, queryRepairsTaskTool, queryStructure, queryRepairsTaskMaterial, getRepairsTaskType } from '@/api/transport.js'
+	import { createRepairsTask, getTransporter, querySpace, queryDepartment, queryRepairsTaskTool, queryStructure, queryRepairsTaskMaterial, getRepairsTaskType } from '@/api/project.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import { setCache,removeAllLocalStorage } from '@/common/js/utils'
 	import _ from 'lodash'
@@ -326,7 +332,7 @@
 				showGoalSpaces: false,
 				currentGoalSpaces: [],
 	
-				taskTypeOption: [{id:1,text:'飒飒'},{id:2,text:'大苏打'},{id:3,text:'发顺丰'},{id:4,text:'方式'},{id:5,text:'打的'},{id:6,text:'很符合'}],
+				taskTypeOption: [],
 				showTaskType: false,
 				currentTaskType: '请选择',
 	
@@ -364,7 +370,7 @@
 			}
 		},
 		onLoad() {
-			// this.parallelFunction();
+			this.parallelFunction();
 			//判断是否回显暂存的数据
 			// if (JSON.stringify(this.temporaryStorageCreateRepairsTaskMessage) != '{}' && this.temporaryStorageCreateRepairsTaskMessage['isTemporaryStorage']) {
 			// 	this.echoTemporaryStorageMessage()
@@ -428,7 +434,10 @@
 					this.$nextTick(() => {
 						this.$set(this.consumableMsgList[index],'number',item.quantity)
 					});
-					this.$toast('已超出库存数量')
+					this.$refs.uToast.show({
+						message: '已超出库存数量',
+						position: 'center'
+					})
 				}
 				},
 
@@ -438,7 +447,10 @@
 					this.$nextTick(() => {
 						this.$set(this.consumableMsgList[index],'number',item.quantity)
 					});
-					this.$toast('已超出库存数量')
+					this.$refs.uToast.show({
+						message: '已超出库存数量',
+						position: 'center'
+					})
 				}
 				},
 
@@ -594,6 +606,7 @@
 							};
 							// 物料信息
 							if (item4) {
+								console.log('物料信息',item4);
 								this.inventoryMsgList = [];
 								this.temporaryInventoryMsgList = [];
 								this.echoInventoryMsgList = [];
@@ -812,7 +825,10 @@
 				// 目的科室列点击事件
 				goalDepartmentClickEvent () {
 				if (this.currentStructure == '请选择') {
-					this.$toast('请选择建筑')
+					this.$refs.uToast.show({
+						message: '请选择建筑',
+						position: 'center'
+					})
 				} else {
 					this.getDepartmentByStructureId(this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value'],true,false)
 				}
@@ -836,7 +852,10 @@
 				// 目的房间列点击事件
 				goalSpacesClickEvent () {
 				if (this.currentGoalDepartment == '请选择') {
-					this.$toast('请选择科室')
+					this.$refs.uToast.show({
+						message: '请选择科室',
+						position: 'center'
+					})
 				} else {
 					this.getSpacesByDepartmentId(this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'],true)
 				}
@@ -888,7 +907,10 @@
 				sureEvent () {
 				// 任务类型不能为空
 				if (this.currentTaskType == '请选择') {
-					this.$toast('任务类型不能为空');
+					this.$refs.uToast.show({
+						message: '任务类型不能为空',
+						position: 'center'
+					});
 					return
 				};
 				// 创建维修任务
@@ -970,7 +992,11 @@
 				createRepairsTask(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
-						this.$toast(`${res.data.msg}`);
+						this.$refs.uToast.show({
+							message: `${res.data.msg}`,
+							type: 'success',
+							position: 'center'
+						});
 						this.commonIsTemporaryStorageMethods();
 					} else {
 						this.$refs.uToast.show({
@@ -1008,12 +1034,13 @@
 
 				// 删除物料弹框确定事件
 				materialDeleteSure () {
-				this.consumableMsgList.splice(this.deleteMaterialIndex,1)
+					this.materialDeleteShow = false;
+					this.consumableMsgList.splice(this.deleteMaterialIndex,1)
 				},
 
 				// 删除物料弹框取消事件
 				materialDeleteCancel () {
-
+					this.materialDeleteShow = false;
 				},
 
 				// 耗材名称点击事件
@@ -1023,9 +1050,13 @@
 
 				// 添加物料确认
 				materialSure () {
+				this.materialShow = false;
 				let count = this.echoInventoryMsgList.some((item)=> {return item.checked == true && !item.disabled});
 				if (!count) {
-					this.$toast('至少要选择一种耗材')
+					this.$refs.uToast.show({
+						message: '至少要选择一种耗材',
+						position: 'center'
+					})
 				} else {
 					this.materialShow = false;
 					this.materialContentShow = true;
@@ -1048,7 +1079,8 @@
 
 				// 添加物料取消
 				materialCancel () {
-				this.currentPage = 1
+					this.materialShow = false;
+					this.currentPage = 1
 				},
 
 
@@ -1110,12 +1142,16 @@
 				casuallyTemporaryStorageCreateRepairsTaskMessage['consumableMsgList'] = this.consumableMsgList;
 				casuallyTemporaryStorageCreateRepairsTaskMessage['isTemporaryStorage'] = true;
 				this.changeTemporaryStorageCreateRepairsTaskMessage(casuallyTemporaryStorageCreateRepairsTaskMessage);
-				this.$toast('暂存成功');
+				this.$refs.uToast.show({
+					type: 'success',
+					message: '暂存成功',
+					position: 'center'
+				})
 				},
 
 				// 取消事件
 				cancelEvent () {
-				this.commonIsTemporaryStorageMethods();
+					this.backTo()
 				}
 		}
 	}
@@ -1143,6 +1179,343 @@
 		};
 		::v-deep .u-transition {
 			z-index: 100000 !important;
+		};
+		.material-box {
+				/deep/ .u-modal {
+					top: auto !important;
+					left: 0 !important;
+					border-right: 1px solid #fff;
+					bottom: 0 !important;
+					border-top-left-radius: 20px !important;
+					border-top-right-radius: 20px !important;
+					border-bottom-left-radius: 0 !important;
+					border-bottom-right-radius: 0 !important;
+					transform: translate3d(0,0,0) !important;
+					.u-modal__content {
+							padding: 0 20px 0 20px !important;
+							box-sizing: border-box;
+							height: 60vh;
+							display: flex;
+							flex-direction: column;
+							.dialog-top {
+								height: 60px;
+								position: relative;
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								.select-title {
+									font-size: 18px;
+									color: #101010;
+									text-align: center
+								};
+								.u-icon {
+									position: absolute;
+									top: 50%;
+									transform: translateY(-50%);
+									right: 0
+								}
+							};
+							.tool-name-list {
+								flex: 1;
+								display: flex;
+								height: 0;
+								display: flex;
+								position: relative;
+								flex-direction: column;
+								.tool-name-list-title-innner {
+									display: flex;
+									justify-content: space-between;
+									align-items: center;
+									height: 52px;
+									.search-input {
+										flex: 1;
+										padding: 10px;
+										position: relative;
+										.u-input {
+											padding: 4px 4px 4px 30px !important;
+											background: #F7F7F9;
+											box-sizing: border-box;
+											border-radius: 10px;
+										};
+										.u-icon {
+											position: absolute;
+											top: 50%;
+											transform: translateY(-50%);
+											display: inline-block;
+											left: 16px;
+										}
+									};
+									.search-btn {
+										font-size: 14px;
+										color: #3B9DF9;
+										margin-left: 6px;
+									}
+								};
+								.tool-name-list-content {
+									width: 100%;
+									position: relative;
+									flex: 1;
+									padding: 20px 6px 10px 6px;
+									display: flex;
+									flex-direction: column;
+									height: 0;
+									box-sizing: border-box;
+									border-top: 1px solid #b2b2b2;
+									.u-empty {
+										position: absolute;
+										top: 50%;
+										left: 50%;
+										transform: translate(-50%,-50%)
+									};
+									.static-row {
+										width: 90%;
+										height: 100%;
+										overflow-x: auto;
+										white-space: nowrap;
+										.u-row {
+											height: 100%;
+											display: flex;
+											flex-direction: column;
+											align-items: flex-start !important;
+											&::-webkit-scrollbar {
+												height: 0;
+												display: none
+											};
+											.circulation-area-content-box {
+												flex: 1;
+												width: 100%;
+												.circulation-area-content {
+													padding: 10px 0;
+													box-sizing: border-box;
+													font-size: 0;
+													background: #fff;
+													> text {
+														line-height: 20px;
+														font-size: 15px;
+														display: inline-block;
+														@include no-wrap();
+														&:first-child {
+															width: 50%;
+														};
+														&:nth-child(2) {
+															width: 20%;
+															text-align: center
+														};
+														&:nth-child(3) {
+															width: 25%;
+															text-align: center
+														};
+														&:nth-child(4) {
+															width: 30%;
+															text-align: center
+														}
+													}
+												}
+											};  
+											.circulation-area-title-box {
+												width: 100%;
+												font-size: 0;
+												text {
+													height: 40px;
+													line-height: 40px;
+													display: inline-block;
+													width: 20%;
+													font-size: 16px;
+													font-weight: bold;
+													&:first-child {
+														width: 50%;
+														text-align: center
+													};
+													&:nth-child(2) {
+														width: 20%;
+														text-align: center;
+													};
+													&:nth-child(3) {
+														width: 25%;
+														text-align: center;
+													};
+													&:nth-child(4) {
+														width: 30%;
+														text-align: center;
+													}
+												}
+											}
+										}
+									};
+									.absolute-row {
+										height: 90%;
+										width: 10%;
+										z-index: 100;
+										position: absolute;
+										top: 20px;
+										right: 0;
+										background: #fff;
+										.u-row {
+											height: 100%;
+											width: 100%;
+											display: flex;
+											flex-direction: column;
+											.absolute-title {
+												line-height: 20px;
+												width: 100%;
+												font-size: 0;
+												padding: 10px 0;
+												box-sizing: border-box;
+											};
+											.absolute-operate {
+												width: 100%;
+												flex: 1;
+												overflow-y: auto;
+												>view {
+													padding: 10px 0;
+													box-sizing: border-box;
+													>view {
+														line-height: 20px;
+														display: flex;
+														justify-content: center;
+														align-items: center;
+														.u-checkbox {
+															.u-checkbox__icon {
+																.u-icon {
+																	border-radius: 4px
+																}
+															}
+														}
+													}
+												}  
+											}
+										}
+									};
+									.shadow-box {
+										position: absolute;
+										background: #fff;
+										right: 0;
+										width: 10%;
+										height: 90%;
+										box-shadow: -3px 0 3px 0 #dddddd;
+									}  
+								};
+								.page-area {
+									height: 40px;
+									width: 70%;
+									margin: 0 auto;
+									display: flex;
+									align-items: center;
+									justify-content: space-between;
+									.page-left {
+										font-size: 14px;
+										padding: 4px 6px;
+										border-radius: 2px;
+										box-sizing: border-box;
+										border: 1px solid #d0d0d0
+	
+									};
+									.page-center {
+										>text {
+											font-size: 12px;
+											color: #333;
+											&:nth-child(1) {
+												color: #3B9DF9
+											};
+											&:nth-child(2) {
+												margin: 0 4px;
+											}
+										}
+									};
+									.page-right {
+										font-size: 14px;
+										border-radius: 2px;
+										padding: 4px 6px;
+										box-sizing: border-box;
+										border: 1px solid #d0d0d0
+									};
+									.pageSpanStyle {
+										color: #d0d0d0 !important
+									}
+								}
+							}
+					};
+					.u-modal__button-group {
+						padding: 10px 20px 20px 20px !important;
+						box-sizing: border-box;
+						justify-content: space-between;
+						::after {
+							content: none
+						};
+					.u-modal__button-group__wrapper--cancel {
+							box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
+							background: #fff;
+							border-radius: 30px;
+							margin-right: 20px;
+							.u-modal__button-group__wrapper__text {
+								color: #1864FF !important;
+							}
+					};
+					.u-modal__button-group__wrapper--confirm {
+							background: linear-gradient(to right, #6cd2f8, #2390fe);
+							box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
+							color: #fff !important;
+							border-radius: 30px;
+							.u-modal__button-group__wrapper__text {
+									color: #fff !important;
+							}
+					}
+					};
+					.van-hairline--top::after {
+						border-top-width: 0 !important
+					}
+				}
+		};
+		.material-delete-box {
+			/deep/ .u-modal {
+				.u-modal__content {
+						padding: 20px 20px 0 20px !important;
+						box-sizing: border-box;
+						display: flex;
+						flex-direction: column;
+						.dialog-top {
+							text-align: center;
+							>image {
+								width: 30px;
+								height: 30px;
+								vertical-align: middle;
+							}
+						};
+						.dialog-center {
+							text-align: center;
+							line-height: 20px;
+							padding: 20px 0;
+							box-sizing: border-box;
+							font-weight: bold;
+							color: #101010;
+							font-size: 16px
+						}
+					};
+					.u-modal__button-group {
+						padding: 10px 40px 20px 40px !important;
+						box-sizing: border-box;
+						justify-content: space-between;
+						::after {
+							content: none
+						};
+					.u-modal__button-group__wrapper--cancel {
+							height: 40px;
+							color: #3B9DF9;
+							border: 1px solid #3B9DF9;
+							border-radius: 8px;
+							margin-right: 20px
+					};
+					.u-modal__button-group__wrapper--confirm {
+							height: 40px;
+							background: #3B9DF9;
+							color: #fff !important;
+							border-radius: 8px;
+					}
+					};
+					.van-hairline--top::after {
+						border-top-width: 0 !important
+					}
+			}
 		};
 		.top-background-area {
 			width: 100%;
@@ -1396,7 +1769,7 @@
 						align-items: center;
 						line-height: 30px;
 						margin-bottom: 8px;
-						>span {
+						>text {
 							font-size: 14px;
 							display: inline-block;
 							&:first-child {
@@ -1410,7 +1783,6 @@
 								line-height: 23px;
 								background: #3B9DF9;
 								color: #fff;
-
 							}
 						}
 					}
@@ -1422,7 +1794,7 @@
 					height: 60px;
 					display: flex;
 					align-items: center;
-					justify-content: space-between;
+					justify-content: center;
 					>text {
 						width: 40%;
 						display: inline-block;
@@ -1441,7 +1813,7 @@
 						&:nth-child(2) {
 							color: #1864FF;
 							box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
-							margin-right: 30px
+							// margin-right: 30px
 						};
 						&:last-child {
 							color: #1864FF;

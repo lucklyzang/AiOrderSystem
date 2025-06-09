@@ -291,8 +291,12 @@
 					uni.navigateTo({
 						url: '/createWorkerOrderPackage/pages/createWorkerOrder/createProjectWorkerOrder/createProjectWorkerOrder'
 					})
+				} else if (item == '事务') {
+					uni.navigateTo({
+						url: '/createWorkerOrderPackage/pages/createWorkerOrder/createAffairWorkerOrder/createAffairWorkerOrder'
+					})
 				}
-			},
+			}, 
 			
 			// 修改工单事件
 			modificationWorkOrderEvent () {

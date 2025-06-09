@@ -42,6 +42,9 @@
 <script>
 import { deepClone } from '@/common/js/utils'
 export default {
+	options: {
+		styleIsolation: 'shared'
+	},
    props:{
       // 顶部标题
       title: {
@@ -219,10 +222,10 @@ export default {
       height: 40px;
       position: relative;
       ::v-deep .u-icon {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        right: 0
+      	position: absolute;
+      	top: 50%;
+      	transform: translateY(-50%);
+      	right: 0
       }
     };
     .search-box {
@@ -281,7 +284,7 @@ export default {
 				&:nth-child(2) {
 						color: #1864FF;
 						box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
-						margin-right: 40px
+						// margin-right: 40px
 				};
 				&:last-child {
 						color: #fff;
