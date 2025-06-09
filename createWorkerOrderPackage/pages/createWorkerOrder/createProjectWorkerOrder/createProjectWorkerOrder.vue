@@ -165,7 +165,7 @@
 								</u-number-box>
 							</text>
 							<text>
-								<u-icon name="delete" color="red" @click="deleteEvent(item,index)" /></u-icon>
+								<u-icon name="trash" color="red" @click="deleteEvent(item,index)" /></u-icon>
 							</text>
 						</view>
 					</view>
@@ -234,10 +234,10 @@
 										占位
 									</view>
 									<view class="absolute-operate">
-										<view v-for="(item,index) in inventoryMsgList" :key="item">
+										<view v-for="(item,index) in inventoryMsgList" :key="item.mateId">
 											<view>
-												<u-checkbox-group v-model="item.checked">
-													<u-checkbox shape="square" :disabled="item.disabled"></u-checkbox>
+												<u-checkbox-group @change="checkboxChange">
+													<u-checkbox :checked="item.checked" :name="item.mateName" shape="square" :key="item.mateId" :disabled="item.disabled"></u-checkbox>
 												</u-checkbox-group>
 											</view>
 										</view>
@@ -419,6 +419,15 @@
 					temporaryArray.push(innerItem.text)
 				};
 				return temporaryArray.join('、')
+				},
+				
+				// 物料复选框变化事件
+				checkboxChange (detail) {
+					let mateIndex;
+					mateIndex = this.inventoryMsgList.findIndex((item) => {return item.mateName == detail[0]});
+					this.$nextTick(() => {
+						this.$set(this.inventoryMsgList[mateIndex],'checked',!this.inventoryMsgList[mateIndex]['checked'])
+					})
 				},
 
 				// 删除物料事件
@@ -1689,7 +1698,6 @@
 						font-size: 14px;
 						margin-top: 6px;
 						.circulation-area {
-						 
 						> view {
 							height: 50px;
 							border-radius: 4px;
