@@ -47,10 +47,10 @@
 					</view>
 					<view class="message-one-right">
 						<u-radio-group v-model="priorityRadioValue" @change="radioGroupChange">
-							<u-radio name="1" activeColor="#8af08a" labelColor="#8af08a" label="正常"></u-radio>
-							<u-radio name="2" activeColor="#fcd388" labelColor="#fcd388" label="重要"></u-radio>
-							<u-radio name="3" activeColor="#ea7171" labelColor="#ea7171" label="紧急"></u-radio>
-							<u-radio name="4" activeColor="#b62b2b" labelColor="#b62b2b" label="紧急重要"></u-radio>
+							<u-radio name="1" activeColor="#289E8E" labelColor="#289E8E" label="正常"></u-radio>
+							<u-radio name="2" activeColor="#F2A15F" labelColor="#F2A15F" label="重要"></u-radio>
+							<u-radio name="3" activeColor="#E8CB51" labelColor="#E8CB51" label="紧急"></u-radio>
+							<u-radio name="4" activeColor="#E86F50" labelColor="#E86F50" label="紧急重要"></u-radio>
 						</u-radio-group>
 					</view>
 				</view>
@@ -132,9 +132,9 @@
 						我方解决
 					</view>
 					<view class="message-one-right">
-						<u-radio-group v-model="isMeRadioValue" @change="isBackGroupChange">
-							<u-radio name="0" activeColor="#fcd388" labelColor="#fcd388" label="否"></u-radio>
-							<u-radio name="1" activeColor="#8af08a" labelColor="#8af08a" label="是"></u-radio>
+						<u-radio-group v-model="isMeRadioValue" @change="isBackGroupChange" activeColor="#3B9DF9">
+							<u-radio name="0" label="否"></u-radio>
+							<u-radio name="1" label="是"></u-radio>
 						</u-radio-group>
 					</view>
 				</view>
@@ -153,20 +153,19 @@
 					</view>
 					<view class="circulation-area">
 						<view v-for="(item,index) in consumableMsgList" :key="item">
-							<text>{{index+1}}</text>
-							<text>
+							<view>{{index+1}}</view>
+							<view>
 								{{item.mateName}}-{{item.model}}
-							</text>
-							<text>
+							</view>
+							<view>
 								<u-number-box 
-								@change="(value,detail) => {stepperEvent(value,detail,item,index)}" 
-								@plus="stepperPlusEvent(item,index)"
-								v-model.number="item.number" min="0" :max="item.quantity+1">
+									@change="(value,detail) => {stepperEvent(value,detail,item,index)}" 
+									v-model.number="item.number" min="0" :max="item.quantity+1">
 								</u-number-box>
-							</text>
-							<text>
-								<u-icon name="trash" color="red" @click="deleteEvent(item,index)" /></u-icon>
-							</text>
+							</view>
+							<view>
+								<u-icon name="trash" color="red" size="30" @click="deleteEvent(item,index)" /></u-icon>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -234,10 +233,10 @@
 										占位
 									</view>
 									<view class="absolute-operate">
-										<view v-for="(item,index) in inventoryMsgList" :key="item.mateId">
+										<view v-for="(item,index) in inventoryMsgList" :key="item.id">
 											<view>
 												<u-checkbox-group @change="checkboxChange">
-													<u-checkbox :checked="item.checked" :name="item.mateName" shape="square" :key="item.mateId" :disabled="item.disabled"></u-checkbox>
+													<u-checkbox :checked="item.checked" :name="item.id" shape="square" :key="item.id" :disabled="item.disabled"></u-checkbox>
 												</u-checkbox-group>
 											</view>
 										</view>
@@ -260,7 +259,7 @@
 		</view>
 		<!-- 物料删除提示框   -->
 		<view class="material-delete-box">
-			 <u-modal :show="materialDeleteShow"  show-cancel-button width="90%"
+			 <u-modal :show="materialDeleteShow"  show-cancel-button width="600rpx"
 					@confirm="materialDeleteSure" @cancel="materialDeleteCancel" confirm-button-text="确定"
 					cancel-button-text="取消"
 				>
@@ -424,10 +423,12 @@
 				// 物料复选框变化事件
 				checkboxChange (detail) {
 					let mateIndex;
-					mateIndex = this.inventoryMsgList.findIndex((item) => {return item.mateName == detail[0]});
-					this.$nextTick(() => {
-						this.$set(this.inventoryMsgList[mateIndex],'checked',!this.inventoryMsgList[mateIndex]['checked'])
-					})
+					mateIndex = this.inventoryMsgList.findIndex((item) => {return item.id == detail[0]});
+					if (mateIndex != -1) {
+						this.$nextTick(() => {
+							this.$set(this.inventoryMsgList[mateIndex],'checked',!this.inventoryMsgList[mateIndex]['checked'])
+						})
+					}
 				},
 
 				// 删除物料事件
@@ -436,31 +437,32 @@
 				this.deleteMaterial = `${item.mateName}-${item.model}`;
 				this.deleteMaterialIndex = index
 				},
+				
+				// 点击物料加事件
+				stepperPlusEvent(item,index) {
+					if (item.number  >= item.quantity) {
+						this.$nextTick(() => {
+							this.$set(this.consumableMsgList[index],'number',item.quantity)
+						});
+						this.$refs.uToast.show({
+							message: '已超出库存数量',
+							position: 'center'
+						})
+					}
+				},
+				
 
 				// 物料数量变化事件
 				stepperEvent (value,detail,item,index) {
-				if (item.number > item.quantity) {
-					this.$nextTick(() => {
-						this.$set(this.consumableMsgList[index],'number',item.quantity)
-					});
-					this.$refs.uToast.show({
-						message: '已超出库存数量',
-						position: 'center'
-					})
-				}
-				},
-
-				// 点击物料加事件
-				stepperPlusEvent(item,index) {
-				if (item.number  >= item.quantity) {
-					this.$nextTick(() => {
-						this.$set(this.consumableMsgList[index],'number',item.quantity)
-					});
-					this.$refs.uToast.show({
-						message: '已超出库存数量',
-						position: 'center'
-					})
-				}
+					if (item.number > item.quantity) {
+						this.$nextTick(() => {
+							this.$set(this.consumableMsgList[index],'number',item.quantity)
+						});
+						this.$refs.uToast.show({
+							message: '已超出库存数量',
+							position: 'center'
+						})
+					}
 				},
 
 				// 格式化时间
@@ -929,7 +931,7 @@
 					destinationId: '', // 目的地id
 					depId: this.currentGoalDepartment == '请选择' ? '' : this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'], // 目的科室id
 					select: '',
-					isMe: this.isMe, // 是否我方解决 0-否，1-是
+					isMe: this.isMeRadioValue, // 是否我方解决 0-否，1-是
 					priority: this.priorityRadioValue,
 					taskRemark: this.taskDescribe, //任务描述
 					proId: this.proId,
@@ -997,6 +999,7 @@
 
 				// 生成维修任务
 				postGenerateRepairsTask (data) {
+				console.log('拼接的数据',data);
 				this.showLoadingHint = true;
 				createRepairsTask(data).then((res) => {
 					this.showLoadingHint = false;
@@ -1509,16 +1512,20 @@
 						};
 					.u-modal__button-group__wrapper--cancel {
 							height: 40px;
-							color: #3B9DF9;
 							border: 1px solid #3B9DF9;
 							border-radius: 8px;
-							margin-right: 20px
+							margin-right: 20px;
+							.u-modal__button-group__wrapper__text {
+								color: #3B9DF9;
+							}
 					};
 					.u-modal__button-group__wrapper--confirm {
 							height: 40px;
 							background: #3B9DF9;
-							color: #fff !important;
 							border-radius: 8px;
+							.u-modal__button-group__wrapper__text {
+								color: #fff !important;
+							}
 					}
 					};
 					.van-hairline--top::after {
@@ -1708,11 +1715,7 @@
 							&:last-child {
 								margin-bottom:0
 							};
-							> text {
-								height: 50px;
-								line-height: 50px;
-								font-size: 16px;
-								display: inline-block;
+							> view {
 								text-align: center;
 								&:first-child {
 									width: 10%
@@ -1731,8 +1734,8 @@
 								};
 								&:nth-child(3) {
 									margin-right: 4px;
-									/deep/ .van-stepper {
-										.van-stepper__minus {
+									/deep/ .u-number-box {
+										.u-number-box__minus {
 											color: #3B9DF9;
 											border-left: 1px solid #b5b5b5;
 											border-top: 1px solid #b5b5b5;
@@ -1741,12 +1744,12 @@
 												height: 3px
 											}
 										};
-										.van-stepper__input {
+										.u-number-box__input {
 											border: 1px solid #b5b5b5;
 											width: 45px;
 											margin: 0 !important
 										};
-										.van-stepper__plus {
+										.u-number-box__plus {
 											color: #3B9DF9;
 											border-right: 1px solid #b5b5b5;
 											border-top: 1px solid #b5b5b5;

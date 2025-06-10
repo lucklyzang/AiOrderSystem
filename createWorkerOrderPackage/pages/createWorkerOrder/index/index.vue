@@ -16,10 +16,10 @@
 				<view class="creat-priority-title">优先级</view>
 				<view class="creat-priority-content">
 					<u-radio-group v-model="priorityValue" @change="radioGroupChange">
-						<u-radio name="1" activeColor="#8af08a" labelColor="#8af08a" label="正常"></u-radio>
-						<u-radio name="2" activeColor="#fcd388" labelColor="#fcd388" label="重要"></u-radio>
-						<u-radio name="3" activeColor="#ea7171" labelColor="#ea7171" label="紧急"></u-radio>
-						<u-radio name="4" activeColor="#b62b2b" labelColor="#b62b2b" label="紧急重要"></u-radio>
+						<u-radio name="1" activeColor="#289E8E" labelColor="#289E8E" label="正常"></u-radio>
+						<u-radio name="2" activeColor="#F2A15F" labelColor="#F2A15F" label="重要"></u-radio>
+						<u-radio name="3" activeColor="#E8CB51" labelColor="#E8CB51" label="紧急"></u-radio>
+						<u-radio name="4" activeColor="#E86F50" labelColor="#E86F50" label="紧急重要"></u-radio>
 					</u-radio-group>
 				</view>
 			</view>
@@ -150,10 +150,10 @@
 				<view class="creat-priority-title">优先级</view>
 				<view class="creat-priority-content">
 					<u-radio-group v-model="priorityValue" @change="radioGroupChange">
-						<u-radio name="1" activeColor="#8af08a" labelColor="#8af08a" label="正常"></u-radio>
-						<u-radio name="2" activeColor="#fcd388" labelColor="#fcd388" label="重要"></u-radio>
-						<u-radio name="3" activeColor="#ea7171" labelColor="#ea7171" label="紧急"></u-radio>
-						<u-radio name="4" activeColor="#b62b2b" labelColor="#b62b2b" label="紧急重要"></u-radio>
+						<u-radio name="1" activeColor="#289E8E" labelColor="#289E8E" label="正常"></u-radio>
+						<u-radio name="2" activeColor="#F2A15F" labelColor="#F2A15F" label="重要"></u-radio>
+						<u-radio name="3" activeColor="#E8CB51" labelColor="#E8CB51" label="紧急"></u-radio>
+						<u-radio name="4" activeColor="#E86F50" labelColor="#E86F50" label="紧急重要"></u-radio>
 					</u-radio-group>
 				</view>
 			</view>

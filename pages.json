@@ -68,6 +68,16 @@
 					}
 				},
 				{
+					"path": "pages/createWorkerOrder/createEnvironmentWorkerOrder/choosePosition",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
 					"path": "pages/createWorkerOrder/createProjectWorkerOrder/createProjectWorkerOrder",
 					"style": {
 						"navigationBarTitleText": "",

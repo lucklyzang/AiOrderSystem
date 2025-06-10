@@ -295,6 +295,10 @@
 					uni.navigateTo({
 						url: '/createWorkerOrderPackage/pages/createWorkerOrder/createAffairWorkerOrder/createAffairWorkerOrder'
 					})
+				} else if (item == '环境') {
+					uni.navigateTo({
+						url: '/createWorkerOrderPackage/pages/createWorkerOrder/createEnvironmentWorkerOrder/createEnvironmentWorkerOrder'
+					})
 				}
 			}, 
 			
