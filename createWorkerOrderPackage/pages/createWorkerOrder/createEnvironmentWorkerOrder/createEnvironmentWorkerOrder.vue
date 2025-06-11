@@ -113,7 +113,7 @@
 				</view>
 				<UFieldCheckbox
 					placeholder="请选择违反标准"
-					v-model="standardValue"
+					v-model="selectValue"
 					:columns="standardColumns"
 					label-width="100"
 					:option="{label:'text',value:'value'}"
@@ -166,7 +166,6 @@
 				infoText: '加载中',
 				
 				photoBox: false,
-				selectStandard: [],
 				imageIndex: '',
 				isExpire: false,
 				deleteInfoDialogShow: false,
@@ -181,11 +180,23 @@
 				minDate: new Date(2010, 0, 1),
 				maxDate: new Date(2050, 10, 1),
 				currentDate: new Date(),
-				standardValue: [],
+				selectStandard: [],
+				selectValue: [1,2],
 				standardColumns: [
 					{
 						text: '扫扫赶紧',
-						value: 0
+						value: 0,
+						checked: false
+					},
+					{
+						text: '等哈看的',
+						value: 1,
+						checked: false
+					},
+					{
+						text: '加大监督',
+						value: 2,
+						checked: false
 					}
 				],
 				categoryOption: [
@@ -344,6 +355,7 @@
 			
 			 // 违反标准下拉框确定事件
 				standardConfirm (data1, data2) {
+					console.log('传递数据',data1, data2);
 					this.selectStandard = [];
 					if (data2.length > 0) {
 						for (let item of data2) {
@@ -364,7 +376,8 @@
 			              for ( let i =0, len = res.data.data.length; i< len ; i++) {
 			                this.standardColumns.push({
 			                  text: res.data.data[i],
-			                  value: i+1
+			                  value: i+1,
+												checked: false
 			                })
 			              }
 			            }
@@ -577,7 +590,7 @@
 			            this.priorityValue = 1;
 			            this.currentDate = new Date();
 			            this.locationValue = '';
-			            this.standardValue = [];
+			            this.selectValue = [];
 			            this.personNumberValue = '';
 			            this.durationValue = '';
 			            this.$router.push({

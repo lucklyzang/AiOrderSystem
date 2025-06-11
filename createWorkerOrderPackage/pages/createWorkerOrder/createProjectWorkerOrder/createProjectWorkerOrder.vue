@@ -235,7 +235,7 @@
 									<view class="absolute-operate">
 										<view v-for="(item,index) in inventoryMsgList" :key="item.id">
 											<view>
-												<u-checkbox-group @change="checkboxChange">
+												<u-checkbox-group @change="(detail) => {checkboxChange(detail,index)}">
 													<u-checkbox :checked="item.checked" :name="item.id" shape="square" :key="item.id" :disabled="item.disabled"></u-checkbox>
 												</u-checkbox-group>
 											</view>
@@ -421,14 +421,10 @@
 				},
 				
 				// 物料复选框变化事件
-				checkboxChange (detail) {
-					let mateIndex;
-					mateIndex = this.inventoryMsgList.findIndex((item) => {return item.id == detail[0]});
-					if (mateIndex != -1) {
-						this.$nextTick(() => {
-							this.$set(this.inventoryMsgList[mateIndex],'checked',!this.inventoryMsgList[mateIndex]['checked'])
-						})
-					}
+				checkboxChange (detail,index) {
+					this.$nextTick(() => {
+						this.$set(this.inventoryMsgList[index],'checked',!this.inventoryMsgList[index]['checked'])
+					})
 				},
 
 				// 删除物料事件
