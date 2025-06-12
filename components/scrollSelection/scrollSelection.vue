@@ -97,7 +97,6 @@
 				list: this.columns,
 			}
 		},
-		onLoad(option) {},
 		mounted () {
 			console.log('初始数据',this.columns)
 		},

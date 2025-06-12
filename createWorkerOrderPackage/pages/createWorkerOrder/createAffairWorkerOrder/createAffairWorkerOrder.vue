@@ -2,7 +2,7 @@
 	<view class="content-box">
 		<u-transition :show="showLoadingHint" mode="fade-down">
 			<view class="loading-box" v-if="showLoadingHint">
-				<u-loading-icon :show="showLoadingHint" text="加载中···" size="18" textSize="16"></u-loading-icon>
+				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
 			</view>
 		</u-transition>
 		<u-modal :show="sureCancelShow" :content="content" title="确定删除此图片?" :showCancelButton="true" @confirm="sureCancel"
@@ -120,7 +120,7 @@
 		data() {
 			return {
 				showLoadingHint: false,
-				infoText: '加载中',
+				infoText: '加载中···',
 				sureCancelShow: false,
 				content: '',
 				priorityRadioValue: '1',

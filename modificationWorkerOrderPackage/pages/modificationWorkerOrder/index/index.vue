@@ -2,7 +2,7 @@
 	<view class="content-box">
 		<u-transition :show="showLoadingHint" mode="fade-down">
 			<view class="loading-box" v-if="showLoadingHint">
-				<u-loading-icon :show="showLoadingHint" text="加载中···" size="18" textSize="16"></u-loading-icon>
+				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
 			</view>
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
@@ -392,7 +392,7 @@
 		data() {
 			return {
 				isShowNoData: false,
-				infoText: '加载中',
+				infoText: '加载中···',
 				isShowModal: false,
 				showLoadingHint: false,
 				controlListShow: false,

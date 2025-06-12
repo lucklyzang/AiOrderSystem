@@ -34,23 +34,6 @@ export function createRepairsTask (data) {
   })
 };
 
-// 维修任务分配
-export function assignRepairsTask (data) {
-  return request({
-    url: 'project/bxTask/assignTask',
-    method: 'put',
-    data
-  })
-};
-
-// 维修任务延迟
-export function delayRepairsTask (data) {
-  return request({
-    url: 'project/bxTask/delayTask',
-    method: 'put',
-    data
-  })
-};
 
 // 维修任务取消
 export function cancelRepairsTask (data) {
@@ -61,17 +44,7 @@ export function cancelRepairsTask (data) {
   })
 };
 
-// 维修任务完成
-export function completeRepairsTask (data) {
-  return request({
-    url: 'project/bxTask/completeTask',
-    method: 'put',
-    data
-  })
-};
-
 // 维修任务编辑
-
 export function editRepairsTask (data) {
   return request({
     url: 'project/bxTask/update',
@@ -84,14 +57,6 @@ export function editRepairsTask (data) {
 export function queryRepairsTaskCancelReason(proId) {
   return request({
     url: `project/cancel/queryAll?proId=${proId}`,
-    method: 'get'
-  })
-};
-
-// 维修任务延迟原因查询
-export function queryRepairsTaskDelayReason(proId) {
-  return request({
-    url: `project/delay/queryAll?proId=${proId}`,
     method: 'get'
   })
 };

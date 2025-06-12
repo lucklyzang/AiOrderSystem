@@ -2,7 +2,7 @@
 	<view class="content-box">
 		<u-transition :show="showLoadingHint" mode="fade-down">
 			<view class="loading-box" v-if="showLoadingHint">
-				<u-loading-icon :show="showLoadingHint" text="加载中···" size="18" textSize="16"></u-loading-icon>
+				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
 			</view>
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
@@ -113,12 +113,13 @@
 				</view>
 				<UFieldCheckbox
 					placeholder="请选择违反标准"
-					v-model="selectValue"
+					:selectValue="selectValue"
 					:columns="standardColumns"
 					label-width="100"
 					:option="{label:'text',value:'value'}"
 					@showPopu="standardOptionOpenEvent"
 					@confirm="standardConfirm"
+					@cancel="standardCancel"
 			/>
 			</view>
 			<view class="enter-remark">
@@ -163,16 +164,12 @@
 			return {
 				showLoadingHint: false,
 				isShowNoData: false,
-				infoText: '加载中',
-				
+				infoText: '加载中···',
 				photoBox: false,
 				imageIndex: '',
 				isExpire: false,
 				deleteInfoDialogShow: false,
 				showDateBox: false,
-				overlayShow: false,
-				loadingShow: false,
-				loadText: '创建中',
 				enterRemark: "",
 				personNumberValue: '',
 				durationValue: '',
@@ -266,7 +263,8 @@
 					}
 				]],
 				resultimageList: [],
-				imageOnlinePathArr: []
+				imageOnlinePathArr: [],
+				fileList: []
 			}
 		},
 		computed: {
@@ -285,6 +283,10 @@
 			}
 		},
 		onLoad() {
+			this.getWorkerList();
+		},
+		onShow(){
+		  this.echoLoactionMessage();
 		},
 		methods: {
 			...mapMutations([
@@ -353,16 +355,21 @@
 				this.workerPickerShow = false
 			},
 			
-			 // 违反标准下拉框确定事件
-				standardConfirm (data1, data2) {
-					console.log('传递数据',data1, data2);
-					this.selectStandard = [];
-					if (data2.length > 0) {
-						for (let item of data2) {
-							this.selectStandard.push(item.text)
-						}
+			// 违反标准下拉框取消事件
+			standardCancel () {
+				
+			},
+			
+			// 违反标准下拉框确定事件
+			standardConfirm (data1, data2) {
+				this.selectStandard = [];
+				this.selectValue = data1;
+				if (data2.length > 0) {
+					for (let item of data2) {
+						this.selectStandard.push(item.text)
 					}
-				},
+				}
+			},
 			
 			    // 违反标准下拉框打开事件
 			    standardOptionOpenEvent () {
@@ -371,10 +378,10 @@
 			        getViolateStandardMessage({id: this.locationMessage[3]['id']}).then((res) => {
 			          this.showLoadingHint = false;
 			          if (res && res.data.code == 200) {
-			            this.standardColumns = [];
+			            this.standardColumns = [[]];
 			            if (res.data.data.length > 0) {
 			              for ( let i =0, len = res.data.data.length; i< len ; i++) {
-			                this.standardColumns.push({
+			                this.standardColumns[0].push({
 			                  text: res.data.data[i],
 			                  value: i+1,
 												checked: false
@@ -439,7 +446,9 @@
 			
 			     // 查询保洁员列表
 			    getWorkerList () {
-			      attendanceWorkerList(this.userInfo.proIds[0]).then((res) => {
+						this.showLoadingHint = true;
+			      attendanceWorkerList(this.userInfo.proId).then((res) => {
+							this.showLoadingHint = false;
 			          if (res && res.data.code == 200) {
 			            if (res.data.data.length > 0) {
 			              for (let item of res.data.data) {
@@ -459,6 +468,7 @@
 			          }
 			        }).
 			        catch((err) => {
+								this.showLoadingHint = false;
 			          this.$refs.uToast.show({
 			          	message: `${err}`,
 			          	type: 'error'
@@ -468,9 +478,16 @@
 					
 					// 选择图片方法
 					getImg() {
-						var that = this
+						if (this.resultimageList.length == 9) {
+							this.$refs.uToast.show({
+								message: "至多只能上传9张图片",
+								position: 'center'
+							});
+							return
+						};
+						let that = this;
 						uni.chooseImage({
-							count: 3,
+							count: 9,
 							sizeType: ['original', 'compressed'],
 							sourceType: ['album', 'camera'],
 							success: function(res) {
@@ -478,9 +495,31 @@
 									urls: res.tempFilePaths
 								});
 								for (let imgI = 0, len = res.tempFilePaths.length; imgI < len; imgI++) {
-									that.srcImage = res.tempFilePaths[imgI];
+									let url = res.tempFiles[imgI].path;
+									//获取最后一个的位置
+									let index = url.lastIndexOf(".");
+									//获取后缀
+									let jpgUrl = url.substr(index + 1);
+									if (jpgUrl != "png" && jpgUrl != "jpg" && jpgUrl != "jpeg") {
+										that.$refs.uToast.show({
+											message: '只可上传jpg或png格式的图片!',
+											type: 'error',
+											position: 'center'
+										});
+										continue
+									};
+									let isLt2M = res.tempFiles[imgI].size/1024/1024 < 5;
+									if (!isLt2M) {
+										that.$refs.uToast.show({
+											message: '图片必须小于5MB!',
+											type: 'error',
+											position: 'center'
+										});
+										continue
+									};
+									that.fileList.push(res.tempFiles[imgI]['path']);
 									uni.getFileSystemManager().readFile({
-										filePath: that.srcImage,
+										filePath: res.tempFilePaths[imgI],
 										encoding: 'base64',
 										success: res => {
 											let base64 = 'data:image/jpeg;base64,' + res.data;
@@ -489,7 +528,48 @@
 									})
 								}
 							}
-						});
+						})
+					},
+					
+					// 上传图片到服务器
+					uploadFileEvent (imgI) {
+						this.showLoadingHint = true;
+						return new Promise((resolve, reject) => {
+							uni.uploadFile({
+							 url: 'https://dev.nurse.blinktech.cn/nurse/app-api/infra/file/upload',
+							 filePath: imgI,
+							 name: 'file',
+							 header: {
+								'content-type': 'multipart/form-data',
+								'Authorization': `Bearer ${store.getters.token}`
+							 },
+							 success: (res) => {
+								if (res.statusCode == 200) {
+									let temporaryData = JSON.parse(res.data);
+									this.imageOnlinePathArr.push(temporaryData.data);
+									resolve()
+								} else {
+									this.showLoadingHint = false;
+									this.$refs.uToast.show({
+										message: '上传图片失败',
+										type: 'error',
+										position: 'center'
+									});
+									reject()
+								}
+							 },
+							 fail: (err) => {
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: err.errMsg,
+									type: 'error',
+									duration: 5000,
+									position: 'center'
+								});
+								reject()
+							 }
+							})
+						})
 					},
 			
 			    // 任务提交事件
@@ -538,15 +618,13 @@
 			        planPersons: this.personNumberValue, // 任务预计所需人数
 			        planUseTime: this.durationValue, // 任务预计用时，单位为分钟
 			        taskRemark: this.enterRemark, // 任务备注信息
-			        proId: this.userInfo.proIds[0], // 所属项目id
-			        proName: this.userInfo.hospitalList[0]['hospitalName'] // 所属项目名称
+			        proId: this.userInfo.proId, // 所属项目id
+			        proName: this.userInfo.proName // 所属项目名称
 			      };
 			      // 上传图片到阿里云服务器
-			      if (this.resultimageList.length > 0) {
-			        this.loadText ='创建中';
-			        this.overlayShow = true;
-			        this.loadingShow = true;
-			        for (let imageI of this.resultimageList) {
+			      if (this.fileList.length > 0) {
+			        this.showLoadingHint = true;
+			        for (let imageI of this.fileList) {
 			          if (Object.keys(this.timeMessage).length > 0) {
 			            // 判断签名信息是否过期
 			            if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
@@ -575,6 +653,7 @@
 			      addForthwithCleanTask(data).then((res) => {
 			         this.showLoadingHint = false;
 			          this.imageOnlinePathArr = [];
+								this.fileList = [];
 								if (res && res.data.code == 200) {
 			            this.$toast({
 										message: '任务创建成功',
@@ -593,9 +672,7 @@
 			            this.selectValue = [];
 			            this.personNumberValue = '';
 			            this.durationValue = '';
-			            this.$router.push({
-			              path: "/cleanTaskList"
-			            })
+									this.backTo();
 								} else {
 									this.$refs.uToast.show({
 										message: res.data.msg,
@@ -609,6 +686,7 @@
 									type: 'error'
 								});
 			          this.imageOnlinePathArr = [];
+								this.fileList = [];
 								this.showLoadingHint = false;
 						})
 			    },
@@ -653,7 +731,7 @@
 								// OSS地址
 								const aliyunServerURL = this.ossMessage.host;
 								// 存储路径(后台固定位置+随即数+文件格式)
-								const aliyunFileKey = this.ossMessage.dir + new Date().getTime() + Math.floor(Math.random() * 100) + base64imagetoFile(filePath).name;
+								const aliyunFileKey = this.ossMessage.dir + new Date().getTime() + Math.floor(Math.random() * 100) + filePath.name;
 								// 临时AccessKeyID0
 								const OSSAccessKeyId = this.ossMessage.accessId;
 								// 加密策略
@@ -666,7 +744,7 @@
 								formData.append('OSSAccessKeyId',OSSAccessKeyId);
 								formData.append('success_action_status','200');
 								formData.append('Signature',signature);
-								formData.append('file',base64imagetoFile(filePath));
+								formData.append('file',filePath);
 								axios({
 									url: aliyunServerURL,
 									method: 'post',

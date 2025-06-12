@@ -183,7 +183,7 @@ export default {
     }
 };
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .picker {
   background-color: rgba(0,0,0,.7);
   max-height: 100vh;

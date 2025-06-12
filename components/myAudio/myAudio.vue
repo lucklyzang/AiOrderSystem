@@ -88,7 +88,7 @@ export default {
     }
 }
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .x-audio-wrap{
     height: 30px;
     width: 110px;

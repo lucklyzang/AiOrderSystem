@@ -34,6 +34,6 @@ export function getDefaultEnvironmentState() {
 	return {
 		timeMessage: {},
 		ossMessage: {},
-		locationMessage: {}
+		locationMessage: []
 	}	
 }

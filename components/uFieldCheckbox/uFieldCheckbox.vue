@@ -67,6 +67,20 @@ export default {
     prop: 'selectValue',
 		event: ''
   },
+	
+	data () {
+	  return {
+	    show: false,
+	    searchVal: '',
+			allCheckboxValue: [],
+			allCheckboxChecked: false,
+			allCheckboxList: [{name: '全选',value:1}],
+	    columnsData: JSON.parse(JSON.stringify(this.columns)),
+	    checkboxValue: JSON.parse(JSON.stringify(this.selectValue)),
+	    resultValue: JSON.parse(JSON.stringify(this.selectValue))
+	  }
+	},
+	
   props: {
     columns: {
       type: Array,
@@ -99,35 +113,44 @@ export default {
       default: 0
     }
   },
+	
+	watch: {
+	  selectValue: function (newVal) {
+	    this.resultValue = newVal
+	  },
+		
+	  resultValue (val) {
+	    this.searchVal = ''
+	    this.columnsData = JSON.parse(JSON.stringify(this.columns));
+			this.change(val);
+	    this.$emit('input', val)
+	  },
+		
+	  columns: {
+	    handler (val) {
+	      this.columnsData = JSON.parse(JSON.stringify(val))
+	    },
+	    immediate: true
+	  }
+	},
+	
   computed: {
     resultLabel: {
       get () {
-				console.log('病了',this.selectValue);
-        var columns = JSON.parse(JSON.stringify(this.columns))
+        let columns = JSON.parse(JSON.stringify(this.columns));
         const res = columns.filter(item => {
           return this.resultValue.indexOf(item[this.option.value]) > -1
-        })
+        });
         const resLabel = res.map(item => {
           return item[this.option.label]
-        })
+        });
         return resLabel.join(',');
       },
       set () {
       }
     }
   },
-  data () {
-    return {
-      show: false,
-      searchVal: '',
-			allCheckboxValue: [],
-			allCheckboxChecked: false,
-			allCheckboxList: [{name: '全选',value:1}],
-      columnsData: JSON.parse(JSON.stringify(this.columns)),
-      checkboxValue: JSON.parse(JSON.stringify(this.selectValue)),
-      resultValue: JSON.parse(JSON.stringify(this.selectValue))
-    }
-  },
+	
   methods: {
     search (val) {
       if (val) {
@@ -202,22 +225,6 @@ export default {
 			  this.$emit('showPopu')
 			}
     }
-  },
-  watch: {
-    selectValue: function (newVal) {
-      this.resultValue = newVal
-    },
-    resultValue (val) {
-      this.searchVal = ''
-      this.columnsData = JSON.parse(JSON.stringify(this.columns))
-      this.$emit('input', val)
-    },
-    columns: {
-      handler (val) {
-        this.columnsData = JSON.parse(JSON.stringify(val))
-      },
-      immediate: true
-    }
   }
 }
 </script>
@@ -232,7 +239,7 @@ export default {
 			.u-button {
 				width: 100px;
 				height: 44px;
-				font-size: 18px;
+				font-size: 16px;
 				&:first-child {
 					color: #a3a3a3 !important;
 				};

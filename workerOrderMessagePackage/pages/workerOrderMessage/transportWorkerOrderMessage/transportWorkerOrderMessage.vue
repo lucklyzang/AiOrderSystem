@@ -2,7 +2,7 @@
 	<view class="content-box">
 		<u-transition :show="showLoadingHint" mode="fade-down">
 			<view class="loading-box" v-if="showLoadingHint">
-				<u-loading-icon :show="showLoadingHint" text="加载中···" size="18" textSize="16"></u-loading-icon>
+				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
 			</view>
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
@@ -142,6 +142,10 @@
 			</view>
 		</view>
 	</view>
+	<div class="btn-box">
+		<text class="operate-one" @click="editEvent">修改</text>
+		<text class="operate-two" @click="cancelReasonEvent">取消订单</text>
+	</div> 
 	</view>
 </template>
 
@@ -167,9 +171,17 @@
 			return {
 				showLoadingHint: false,
 				isShowNoData: false,
-				infoText: '加载中',
+				infoText: '加载中···',
 				transportList: [],
-				dispatchTaskMessage: {}
+				dispatchTaskMessage: {},
+				taskInfoPng: require('@/static/img/basic-message.png'),
+				noEndPng: require('@/static/img/no-end.png'),
+				noReferPng: require('@/static/img/no-refer.png'),
+				noStartPng: require('@/static/img/no-start.png'),
+				taskFinshedPng: require('@/static/img/task-finshed.png'),
+				taskGoingPng: require('@/static/img/task-going.png'),
+				taskCancelPng: require('@/static/img/task-cancel.png'),
+				contactIsolationPng: require("@/static/img/contact-isolation.png")
 			}
 		},
 		computed: {
@@ -194,6 +206,42 @@
 			// 顶部导航返回事件
 			backTo () {
 				uni.navigateBack()
+			},
+			
+			// 修改点击事件
+			editEvent () {},
+			
+			// 取消点击事件
+			cancelReasonEvent(item,index,text) {
+			  this.cancelReasonShow = true;
+			  this.taskId = item.id;
+			  if (this.activeName == 'repairsTask') {
+			    this.cancelReasonOption = this.repairsCancelReasonOption
+			  }
+			},
+			
+			// 任务状态转换图片
+			stateTransferimage (index) {
+				switch(index) {
+					case 1 :
+						return this.noReferPng
+						break;
+					case 2 :
+						return  this.noStartPng
+						break;
+					case 3 :
+						return  this.taskGoingPng
+						break;
+					case 4 :
+						return  this.noEndPng
+						break;
+					case 6 :
+						return this.taskCancelPng
+						break;
+					case 7 :
+						return  this.taskFinshedPng
+						break;
+				}
 			},
 			
 			// 获取任务详情
@@ -265,8 +313,8 @@
 	};
 	.content-box {
 		@include content-wrapper;
+		background: #f6f6f6;
 		box-sizing: border-box;
-		background: #fff;
 		::v-deep .u-popup {
 			flex: none !important
 		};
@@ -345,7 +393,7 @@
 					margin-top: 10px
 				};
 				.handle-message-line-wrapper {
-					p {
+					>view {
 						display: flex;
 						overflow: auto;
 						height: 30px;
@@ -385,7 +433,7 @@
 					}
 				};
 				.message-name {
-					p {
+					>view {
 						display: flex;
 						>text {
 							&:nth-child(2) {
@@ -444,7 +492,7 @@
 					}
 				};
 				.handle-message-line-wrapper-other {
-					p {
+					>view {
 						width: 100%;
 					}
 				};
@@ -452,13 +500,13 @@
 					display: flex;
 					flex-flow: row now;
 					line-height: 35px;
-					>p:first-child {
+					>view:first-child {
 						width: 25%;
 						text {
 							color: #a0a0a0;
 						}
 					};
-					> p:last-child {
+					>view:last-child {
 						flex: 1;
 						text {
 							color: black
@@ -469,6 +517,35 @@
 					}
 				}
 			}
+		};
+		.btn-box {
+				height: 50px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding-bottom: 20px;
+				box-sizing: border-box;
+				>text {
+					font-weight: bold;
+					display: inline-block;
+					font-size: 14px;
+					width: 108px;
+					height: 40px;
+					text-align: center;
+					line-height: 40px;
+					box-sizing: border-box;
+					border-radius: 4px;
+					color: #fff;
+				};
+				.operate-one {
+					margin-right: 10px;
+					background: #E8CB51
+				};
+				.operate-two {
+					background: #ffffff;
+					color: #101010 !important;
+					border: 1px solid #BBBBBB;
+				}
 		}
 }
 </style>

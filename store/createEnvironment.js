@@ -7,7 +7,7 @@ export default {
 
   getters:{
 		locationMessage:(state) => {
-			state.locationMessage = getCache('locationMessage') ? getCache('locationMessage') : {};
+			state.locationMessage = getCache('locationMessage') ? getCache('locationMessage') : [];
 			return state.locationMessage
 		},
 		timeMessage: (state) => {

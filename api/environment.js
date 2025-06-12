@@ -63,6 +63,15 @@ export function getFunctionAreaMessage(data) {
     })
 }
 
+// 退回任务(即时保洁和专项保洁)
+export function returnTask(data) {
+    return request({
+        url: 'clean/cleanTask/returnTask',
+        method: 'put',
+        data
+    })
+}
+
 // 获取阿里云签名接口
 export function getAliyunSign() {
 	return request({

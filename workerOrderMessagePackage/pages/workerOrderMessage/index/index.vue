@@ -2,7 +2,7 @@
 	<view class="content-box">
 		<u-transition :show="showLoadingHint" mode="fade-down">
 			<view class="loading-box" v-if="showLoadingHint">
-				<u-loading-icon :show="showLoadingHint" text="加载中···" size="18" textSize="16"></u-loading-icon>
+				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
 			</view>
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
@@ -312,7 +312,7 @@
 			return {
 				showLoadingHint: false,
 				isShowNoData: false,
-				infoText: '加载中',
+				infoText: '加载中···',
 				transportOrderShow: true,
 				environmentOrderShow: false,
 				projectOrderShow: false,
@@ -391,6 +391,15 @@
 				uni.navigateTo({
 					url: '/workerOrderMessagePackage/pages/workerOrderMessage/transportWorkerOrderMessage/transportWorkerOrderMessage'
 				})
+				// uni.navigateTo({
+				// 	url: '/workerOrderMessagePackage/pages/workerOrderMessage/projectWorkerOrderMessage/projectWorkerOrderMessage'
+				// });
+				// uni.navigateTo({
+				// 	url: '/workerOrderMessagePackage/pages/workerOrderMessage/affairWorkerOrderMessage/affairWorkerOrderMessage'
+				// })
+				// uni.navigateTo({
+				// 	url: '/workerOrderMessagePackage/pages/workerOrderMessage/environmentWorkerOrderMessage/environmentWorkerOrderMessage'
+				// })
 			},
 			
 			// 修改订单事件
