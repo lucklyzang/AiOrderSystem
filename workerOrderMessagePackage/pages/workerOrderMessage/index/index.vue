@@ -7,6 +7,25 @@
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
+		<!-- 取消原因弹框 -->
+		<view class="allocation-box">
+		  <u-modal :show="cancelReasonShow" show-cancel-button 
+		    confirm-button-color="#2390fe"
+		    @confirm="cancelReasonDialogSure"
+		    @cancel="cancelReasonDialogCancel"
+				confirmColor="#fff"
+				cancelColor="#3B9DF9"
+		    confirmText="确定"
+		    cancelText="取消"
+		  >
+		    <view class="dialog-top">
+		      请选择取消原因
+		    </view>
+		    <view class="dialog-center">
+		      <SelectSearch :itemData="cancelReasonOption" ref="cancelOption" :isNeedSearch="false" :curData="cancelReasonValue" @change="cancelReasonOptionChange" />
+		    </view>
+		  </u-modal>
+		</view>
 		<view class="nav">
 			<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="订单" @backClick="backTo">
 			</nav-bar> 
@@ -30,102 +49,68 @@
 		</u-tabs>
 		<view class="order-commom transport-order-content" v-if="transportOrderShow">
 			<u-empty text="暂无运送订单" mode="list" v-if="isShowTransportNoData"></u-empty>
-			<view class="transport-order-list" @click="enterOrderDetailsEvent">
+			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'trans')" v-for="(item,index) in transOrderList" :key="index">
 				<view class="list-content-top">
 					<view class="list-content-top-left">
 						<image src="@/static/img/ai-create-order-icon.png"></image>
 						<text>Ai下单</text>
-						<text>2025-05-15 22:11</text>
+						<text>{{ item.createTime }}</text>
 					</view>
-					<view class="list-content-top-right">
-						<text>未分配</text>
+					<view class="list-content-top-right" :class="{'noLookupStyle':item.state == 1,'noStartStyle':item.state == 2,'underwayStyle':item.state == 3,'noEndStyle':item.state == 4}">
+						<text>{{stateTransfer(item.state)}}</text>
 					</view>
 				</view>
 				<view class="list-content-center">
 					<view class="list-content-center-top">
 						<view>
 							<text>出发地:</text>
-							<text>急诊</text>
+							<text>{{item.setOutPlaceName}}</text>
 						</view>
-						<view>
-							<text>目的地:</text>
-							<text>急诊</text>
+						<view class="bed-number" v-if="templateType === 'template_one'">
+							<text>目的地: </text>
+							<text class="destina-list">{{ !item.destinationName  ? '无' : item.destinationName }}</text>
 						</view>
-						<view>
-							<text>运送类型:</text>
-							<text>急诊</text>
+						<view class="bed-number" v-if="templateType === 'template_two'">
+							<text>目的地: </text>
+							<text class="destina-list" v-for="(innerItem,innerIndex) in item.destinations" :key="innerIndex">{{ item.destinations.length > 0 ? innerItem.destinationName : '无' }}</text>
+						</view>
+						<view class="destination-point" v-if="templateType == 'template_one'">
+							<text>运送类型 :</text>
+							<text>{{item.taskTypeName}}</text>
+						</view>
+						<view class="destination-point" v-else-if="templateType === 'template_two'">
+							<text>运送类型 :</text>
+							<text>{{item.patientInfoList[0].typeList.length > 0 ? item.patientInfoList[0].typeList[0].parentTypeName : '无'}}</text>
 						</view>
 					</view>
 					<view class="list-content-center-top list-content-center-bottom">
 						<view>
 							<text>运送员:</text>
-							<text>急诊</text>
+							<text>{{!item.workerName ? '无' : item.workerName}}</text>
 						</view>
-						<view>
-							<text>床号:</text>
-							<text>急诊</text>
+						<view class="bed-number" v-if="templateType === 'template_one'">
+							<text>床号 :</text>
+							<text>{{item.bedNumber}}</text>
 						</view>
-						<view>
-							<text>病人:</text>
-							<text>急诊</text>
+						<view class="bed-number" v-else-if="templateType === 'template_two'">
+							<text>床号 :</text>
+							<text>{{ extractBedNumber(item.patientInfoList) }}</text>
 						</view>
-					</view>
-				</view>
-				<view class="list-content-bottom">
-					<view @click.stop="modificationOrderEvent">
-						修改
-					</view>
-					<view @click.stop="cancelOrderEvent">
-						取消订单
-					</view>
-				</view>
-			</view>
-			<view class="transport-order-list">
-				<view class="list-content-top">
-					<view class="list-content-top-left">
-						<image src="@/static/img/manual-create-icon.png"></image>
-						<text>手动下单</text>
-						<text>2025-05-15 22:11</text>
-					</view>
-					<view class="list-content-top-right">
-						<text>未分配</text>
-					</view>
-				</view>
-				<view class="list-content-center">
-					<view class="list-content-center-top">
-						<view>
-							<text>地点:</text>
-							<text>急诊</text>
+						<view class="bed-number" v-if="templateType === 'template_one'">
+							<text>病人 :</text>
+							<text>{{item.patientName}}</text>
 						</view>
-						<view>
-							<text>目的地:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>运送类型:</text>
-							<text>急诊</text>
-						</view>
-					</view>
-					<view class="list-content-center-top list-content-center-bottom">
-						<view>
-							<text>问题描述:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>床号:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>病人:</text>
-							<text>急诊</text>
+						<view class="bed-number" v-else-if="templateType === 'template_two'">
+							<text>病人 :</text>
+							<text>{{ extractPatientName(item.patientInfoList) }}</text>
 						</view>
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view @click.stop="modificationOrderEvent">
+					<view @click.stop="modificationOrderEvent(item,'trans')">
 						修改
 					</view>
-					<view @click.stop="cancelOrderEvent">
+					<view @click.stop="cancelOrderEvent(item,'trans')">
 						取消订单
 					</view>
 				</view>
@@ -133,7 +118,7 @@
 		</view>
 		<view class="transport-order-content environment-order-content" v-if="environmentOrderShow">
 			<u-empty text="暂无环境订单" mode="list" v-if="isShowEnvironmentNoData"></u-empty>
-			<view class="transport-order-list">
+			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'environment')">
 				<view class="list-content-top">
 					<view class="list-content-top-left">
 						<image src="@/static/img/send-icon.png"></image>
@@ -175,10 +160,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view @click.stop="modificationOrderEvent">
+					<view @click.stop="modificationOrderEvent(item,'environment')">
 						修改
 					</view>
-					<view @click.stop="cancelOrderEvent">
+					<view @click.stop="cancelOrderEvent(item,'environment')">
 						取消订单
 					</view>
 				</view>
@@ -186,7 +171,7 @@
 		</view>
 		<view class="transport-order-content project-order-content" v-if="projectOrderShow">
 			<u-empty text="暂无工程订单" mode="list" v-if="isShowProjectNoData"></u-empty>
-			<view class="transport-order-list">
+			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'project')">
 				<view class="list-content-top">
 					<view class="list-content-top-left">
 						<image src="@/static/img/send-icon.png"></image>
@@ -228,10 +213,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view @click.stop="modificationOrderEvent">
+					<view @click.stop="modificationOrderEvent(item,'project')">
 						修改
 					</view>
-					<view @click.stop="cancelOrderEvent">
+					<view @click.stop="cancelOrderEvent(item,'project')">
 						取消订单
 					</view>
 				</view>
@@ -239,7 +224,7 @@
 		</view>
 		<view class="transport-order-content affair-order-content" v-if="affairOrderShow">
 			<u-empty text="暂无事务订单" mode="list" v-if="isShowAffairNoData"></u-empty>
-			<view class="transport-order-list">
+			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'affair')">
 				<view class="list-content-top">
 					<view class="list-content-top-left">
 						<image src="@/static/img/send-icon.png"></image>
@@ -281,10 +266,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view @click.stop="modificationOrderEvent">
+					<view @click.stop="modificationOrderEvent(item,'affair')">
 						修改
 					</view>
-					<view @click.stop="cancelOrderEvent">
+					<view @click.stop="cancelOrderEvent(item,'affair')">
 						取消订单
 					</view>
 				</view>
@@ -302,25 +287,40 @@
 		setCache,
 		removeAllLocalStorage
 	} from '@/common/js/utils'
+	import {getDispatchTaskComplete, queryDispatchTaskCancelReason, updateDispatchTask} from '@/api/transport.js'
 	import { queryTransportTypeClass } from '@/api/transport.js'
 	import navBar from "@/components/zhouWei-navBar"
+	import SelectSearch from "@/components/selectSearch/selectSearch";
 	export default {
 		components: {
-			navBar
+			navBar,
+			SelectSearch
 		},
 		data() {
 			return {
 				showLoadingHint: false,
 				isShowNoData: false,
 				infoText: '加载中···',
+				transOrderList: [],
 				transportOrderShow: true,
-				environmentOrderShow: false,
-				projectOrderShow: false,
-				affairOrderShow: false,
 				isShowTransportNoData: false,
+				selectCancelReason: {},
+				cancelReasonShow: false,
+				cancelReasonValue: null,
+				cancelReasonOption: [{text: "请选择取消原因",value: null}],
+				
+				environmentOrderList: [],
+				environmentOrderShow: false,
 				isShowEnvironmentNoData: false,
+				
+				projectOrderList: [],
+				projectOrderShow: false,
 				isShowProjectNoData: false,
+				
+				affairOrderList: [],
+				affairOrderShow: false,
 				isShowAffairNoData: false,
+				taskId: '',
 				transportTypeList: [
 					{
 						name: '运送订单'
@@ -342,18 +342,27 @@
 				'userInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
+				'templateType'
 			]),
 			userName() {
+				return this.userInfo.userName
 			},
 			proId() {
 				return this.userInfo.extendData.proId
 			}
 		},
-		onLoad() {
-			// this.getTransportsType();
+		onShow() {
+			this.queryCompleteDispatchTask({
+				proId:this.proId, workerId:'',state: -1,
+				departmentId: this.userInfo.depId
+			})
 		},
 		methods: {
 			...mapMutations([
+				'changeAffairTaskMessage',
+				'changeCleanTaskDetails',
+				'changeSchedulingTaskDetails',
+				'changeDispatchTaskMessage'
 			]),
 			
 			// 顶部导航返回事件
@@ -368,6 +377,10 @@
 					this.environmentOrderShow = false;
 					this.projectOrderShow = false;
 					this.affairOrderShow = false;
+					this.queryCompleteDispatchTask({
+						proId:this.proId, workerId:'',state: -1,
+						departmentId: this.userInfo.depId
+					})
 				} else if (item.name === '环境订单') {
 					this.transportOrderShow = false;
 					this.environmentOrderShow = true;
@@ -386,69 +399,290 @@
 				}
 			},
 			
-			// 进入订单详情事件
-			enterOrderDetailsEvent () {
-				uni.navigateTo({
-					url: '/workerOrderMessagePackage/pages/workerOrderMessage/transportWorkerOrderMessage/transportWorkerOrderMessage'
-				})
-				// uni.navigateTo({
-				// 	url: '/workerOrderMessagePackage/pages/workerOrderMessage/projectWorkerOrderMessage/projectWorkerOrderMessage'
-				// });
-				// uni.navigateTo({
-				// 	url: '/workerOrderMessagePackage/pages/workerOrderMessage/affairWorkerOrderMessage/affairWorkerOrderMessage'
-				// })
-				// uni.navigateTo({
-				// 	url: '/workerOrderMessagePackage/pages/workerOrderMessage/environmentWorkerOrderMessage/environmentWorkerOrderMessage'
-				// })
+			// 任务优先级转换
+			priorityTransfer (index) {
+				switch(index) {
+				  case 1 :
+					return '正常'
+					break;
+				  case 2 :
+					return '重要'
+					break;
+				  case 3 :
+					return '紧急'
+					break;
+				  case 4 :
+					return '紧急重要'
+					break;
+				}
 			},
 			
-			// 修改订单事件
-			modificationOrderEvent () {
-				uni.navigateTo({
-					url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/index/index'
-				})
+			// 任务状态转换
+			stateTransfer (state) {
+				switch(state) {
+				 case 0 :
+					 return '未分配'
+					 break;
+				 case 1 :
+					 return '未查阅'
+					 break;
+				 case 2 :
+					 return '未开始'
+					 break;
+				 case 3 :
+					 return '进行中'
+					 break;
+				 case 4 :
+					 return '未结束'
+					 break
+				}
 			},
 			
-			// 取消订单事件
-			cancelOrderEvent () {
-				
+			// 提取床号
+			extractBedNumber (patientInfoList) {
+				if (patientInfoList.length == 0) { return "无"};
+				let temporaryArr = [];
+				for (let item of patientInfoList) {
+					temporaryArr.push(item.bedNumber)
+				};
+				return temporaryArr.join("、")
 			},
 			
-			// 查询运送类型分类
-			getTransportsType () {
+			// 提取病人姓名
+			extractPatientName (patientInfoList) {
+				if (patientInfoList.length == 0) { return "无"};
+				let temporaryArr = [];
+				for (let item of patientInfoList) {
+					temporaryArr.push(item.patientName)
+				};
+				return temporaryArr.join("、")
+			},
+			
+			// 获取运送订单取消原因列表
+			getDispatchTaskCancelReason (data) {
 				this.showLoadingHint = true;
-				this.transportTypeList = [];
-				let that = this;
-				queryTransportTypeClass({proId: this.proId, state: 0}).then((res) => {
+				this.infoText = '查询中···'
+				queryDispatchTaskCancelReason(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
-						if (res.data.data.length > 0) {
-							this.isShowNoData = false;
-							for (let item of res.data.data) {
-								this.transportTypeList.push({
-									id: item.id,
-									value: item.typeName
-								})
-							}
-						} else {
-							this.isShowNoData = true;
+						this.cancelReasonShow = true;
+						this.cancelReasonOption = [{text: "请选择取消原因",value: null}];
+						for (let item of res.data.data) {
+							let temporaryWorkerMessageArray = [];
+							for (let innerItem in item) {
+								if (innerItem == 'id') {
+									temporaryWorkerMessageArray.push(item[innerItem])
+								};
+								if (innerItem == 'cancelName') {
+									temporaryWorkerMessageArray.push(item[innerItem])
+								}
+							};
+							this.cancelReasonOption.push({text: temporaryWorkerMessageArray[1], value: temporaryWorkerMessageArray[1]})
 						}
 					} else {
 						this.$refs.uToast.show({
-							message: res.data.msg,
-							type: 'error',
-							position: 'bottom'
+							message: `${res.data.msg}`,
+							type: 'error'
 						})
 					}
 				})
 				.catch((err) => {
 					this.showLoadingHint = false;
 					this.$refs.uToast.show({
-						message: err.message,
-						type: 'error',
-						position: 'bottom'
+						message: `${err}`,
+						type: 'error'
 					})
 				})
+			},
+			
+			// 运送订单的取消
+			cancelDispatchTask (data) {
+				this.showLoadingHint = true;
+				this.infoText = '取消中···'
+			  updateDispatchTask(data)
+			  .then((res) => {
+					this.showLoadingHint = false;
+					this.$refs['cancelOption'].clearSelectValue()
+					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							message: `${res.data.msg}`,
+							type: 'success'
+						});
+						this.queryCompleteDispatchTask(
+						{
+						 proId:this.proId, workerId:'',state: -1,
+						 departmentId: this.userInfo.depId
+						})
+					} else {
+					 this.$refs.uToast.show({
+						message: `${res.data.msg}`,
+						type: 'error'
+					 })
+					}
+			  })
+			  .catch((err) => {
+					this.showLoadingHint = false;
+					this.$refs['cancelOption'].clearSelectValue();
+					this.$refs.uToast.show({
+						message: `${err.message}`,
+						type: 'error'
+					})
+			  })
+			},
+			
+			// 运送订单取消原因弹框下拉框选值变化事件
+			cancelReasonOptionChange (item) {
+			  this.selectCancelReason = item;
+			},
+			
+			// 运送订单取消原因弹框确定事件
+			cancelReasonDialogSure () {
+				this.cancelReasonShow = false;
+			  if (this.selectCancelReason.value == null) {
+					this.$refs.uToast.show({
+						message: '请选择取消原因'
+					});
+					return 
+				};
+				
+			  // 运送订单取消
+				this.cancelDispatchTask({
+					tempFlag: this.templateType === 'template_one' ? 1 : 2, //模板(1:旧模板,2:新模板)
+					endType: 2, //终止类型(0-web,1-安卓APP，2-微信小程序)
+					endUser: this.userName, // 取消者(当前登录用户名)
+					proId: this.proId,	//当前项目ID
+					id: this.taskId, //当前任务ID
+					state: 6, //取消后的状态
+					cancelReason: this.selectCancelReason['text'] //取消原因
+				})
+			},
+			
+			// 运送订单取消原因弹框取消事件
+			cancelReasonDialogCancel () {
+				this.cancelReasonShow = false;
+			  this.$refs['cancelOption'].clearSelectValue()
+			},
+			
+			// 查询运送订单
+			queryCompleteDispatchTask (data) {
+			  this.isShowTransportNoData = false;
+			  this.showLoadingHint = true;
+			  getDispatchTaskComplete(data).then((res) => {
+					this.showLoadingHint = false;
+					if (res && res.data.code == 200) {
+						this.transOrderList = [];
+						let temporaryDataList = [];
+						if (res.data.data.length > 0) {
+							temporaryDataList = res.data.data;
+							if (temporaryDataList.length > 0) {
+								this.isShowTransportNoData = false;
+							} else {
+								this.isShowTransportNoData = true;
+							};
+							for (let item of temporaryDataList) {
+								this.transOrderList.push({
+									createTime: item.createTime,
+									planUseTime: item.planUseTime,
+									planStartTime: item.planStartTime,
+									patientInfoList: item.patientInfoList,
+									state: item.state,
+									setOutPlaceName: item.setOutPlaceName,
+									destinationName: item.destinationName,
+									taskTypeName: item.taskTypeName,
+									toolName: item.toolName,
+									priority: item.priority,
+									number: item.taskNumber,
+									id: item.id,
+									quarantine: item.quarantine,
+									distName: item.distName,
+									destinations: item.destinations,
+									patientName: item.patientName,
+									bedNumber: item.bedNumber,
+									startPhoto: item.startPhoto,
+									endPhoto: item.endPhoto,
+									isBack: item.isBack,
+									isSign: item.isSign,
+									workerName: item.workerName
+								})
+							}
+						} else {
+							this.isShowTransportNoData = true
+						}
+					} else {
+						this.$refs.uToast.show({
+							message: `${res.data.msg}`,
+							type: 'error'
+						})
+					}
+			  })
+			  .catch((err) => {
+					this.$refs.uToast.show({
+						message: `${err}`,
+						type: 'error'
+					});
+					this.showLoadingHint = false;
+					this.isShowTransportNoData = true;
+			  })
+			},
+			
+			// 进入订单详情事件
+			enterOrderDetailsEvent (item, text) {
+				if (text == 'trans') {
+					this.changeDispatchTaskMessage(item);
+					uni.navigateTo({
+						url: '/workerOrderMessagePackage/pages/workerOrderMessage/transportWorkerOrderMessage/transportWorkerOrderMessage'
+					})
+				} else if (text == 'environment') {
+					this.changeCleanTaskDetails(item);
+					uni.navigateTo({
+						url: '/workerOrderMessagePackage/pages/workerOrderMessage/environmentWorkerOrderMessage/environmentWorkerOrderMessage'
+					})
+				} else if (text == 'project') {
+					this.changeSchedulingTaskDetails(item);
+					uni.navigateTo({
+						url: '/workerOrderMessagePackage/pages/workerOrderMessage/projectWorkerOrderMessage/projectWorkerOrderMessage'
+					});
+				} else if (text == 'affair') {
+					this.changeAffairTaskMessage(item);
+					uni.navigateTo({
+						url: '/workerOrderMessagePackage/pages/workerOrderMessage/affairWorkerOrderMessage/affairWorkerOrderMessage'
+					})
+				}
+			},
+			
+			// 修改订单事件
+			modificationOrderEvent (item,text) {
+				if (text == 'trans') {
+					uni.navigateTo({
+						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/index/index'
+					})
+				} else if (text == 'environment') {
+					uni.navigateTo({
+						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationEnvironmentWorkerOrder/modificationEnvironmentWorkerOrder'
+					})
+				} else if (text == 'project') {
+					uni.navigateTo({
+						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationProjectWorkerOrder/modificationProjectWorkerOrder'
+					})
+				} else if (text == 'affair') {
+					uni.navigateTo({
+						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationAffairWorkerOrder/modificationAffairWorkerOrder'
+					})
+				}
+			},
+			
+			// 取消订单事件
+			cancelOrderEvent (item,text) {
+				this.taskId = item.id
+				if (text == 'trans') {
+					this.getDispatchTaskCancelReason({proId: this.proId, state: 0});
+				} else if (text == 'environment') {
+					
+				} else if (text == 'project') {
+					
+				} else if (text == 'affair') {
+					
+				}
 			}
 		}
 	}
@@ -485,6 +719,67 @@
 			left: 0;
 			z-index: 10
 		};
+		/* 取消原因弹框 */
+		.allocation-box {
+		    /deep/ .u-modal {
+		      border-radius: 10px !important;
+		      overflow: inherit !important;
+		      .u-modal__content {
+		          padding: 0 !important;
+		          box-sizing: border-box;
+							display: flex;
+							flex-direction: column;
+		          .dialog-top {
+		            border-top-left-radius: 10px !important;
+		            border-top-right-radius: 10px !important;
+		            height: 40px;
+		            padding-left: 10px;
+		            position: relative;
+		            display: flex;
+		            align-items: center;
+		            font-size: 14px;
+		            color: #fff;
+		            background: #3B9DF9;
+		            text-align: left
+		          };
+		          .dialog-center {
+		            width: 80%;
+		            height: 20vh;
+		            margin: 0 auto;
+		            margin-top: 20px
+		          }
+		      };
+		      .u-modal__button-group {
+		          padding: 20px !important;
+		          box-sizing: border-box;
+		          justify-content: center;
+		          ::after {
+		            content: none
+		          };
+		        .u-modal__button-group__wrapper--cancel {
+		            width: 40%;
+		            height: 40px;
+		            line-height: 40px;
+		            background: #fff;
+		            flex: none !important;
+		            border-radius: 10px;
+		            border: 1px solid #3B9DF9;
+		            margin-right: 30px
+		        };
+		        .u-modal__button-group__wrapper--confirm {
+		            height: 40px;
+		            line-height: 40px;
+		            flex: none !important;
+		            width: 40%;
+		            background: #3B9DF9;
+		            border-radius: 10px;
+		        }
+		      };
+		      .u-hairline--top::after {
+		        border-top-width: 0 !important
+		      }
+		    }  
+		  };
 		.nav {
 			width: 100%;
 		};
@@ -555,10 +850,22 @@
 						display: flex;
 						align-items: center;
 						justify-content: center;
-						background: #E86F50;
 						border-radius: 3px;
 						font-size: 12px;
+						background: #E86F50;
 						color: #fff;
+					};
+					.noLookupStyle {
+						background: #E8CB51 !important
+					};
+					.noStartStyle {
+						background: #174E97 !important
+					};
+					.underwayStyle {
+						background: #289E8E !important
+					};
+					.noEndStyle {
+						background: #F2A15F !important
 					}
 				};
 				.list-content-center {

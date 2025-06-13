@@ -92,10 +92,10 @@
 					</view>
 				</view>
 			</view>	
-			<view class="btn-box">
-				<text class="operate-one" @click="sureEvent">确认</text>
-				<text class="operate-three" @click="cancelEvent">取消</text>
-			</view>
+		</view>
+		<view class="btn-box">
+			<text class="operate-one" @click="sureEvent">确认</text>
+			<text class="operate-three" @click="cancelEvent">取消</text>
 		</view>
 	</view>
 </template>
@@ -761,38 +761,33 @@
 						}
 					}
 				}
-			};
-			.btn-box {
-				width: 90%;
-				margin: 0 auto;
-				height: 60px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				>text {
-					width: 40%;
-					display: inline-block;
-					height: 45px;
-					font-size: 18px;
-					line-height: 45px;
-					background: #fff;
-					text-align: center;
-					border-radius: 30px;
-					&:nth-child(1) {
-						color: #fff;
-						background: linear-gradient(to right, #6cd2f8, #2390fe);
-						box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
-						margin-right: 30px
-					};
-					&:nth-child(2) {
-						color: #1864FF;
-						box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
-						// margin-right: 30px
-					};
-					&:last-child {
-						color: #1864FF;
-						box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1)
-					}
+			}
+		};
+		.btn-box {
+			width: 90%;
+			margin: 0 auto;
+			height: 100px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			>text {
+				width: 40%;
+				display: inline-block;
+				height: 45px;
+				font-size: 18px;
+				line-height: 45px;
+				background: #fff;
+				text-align: center;
+				border-radius: 30px;
+				&:nth-child(1) {
+					color: #fff;
+					background: linear-gradient(to right, #6cd2f8, #2390fe);
+					box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
+					margin-right: 30px
+				};
+				&:last-child {
+					color: #1864FF;
+					box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1)
 				}
 			}
 		}

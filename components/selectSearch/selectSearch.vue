@@ -53,7 +53,7 @@ import { deepClone } from '@/common/js/utils'
 			default: false
 		},
 		curData: String | Number | null | Array,	// 当前选中数据
-		itemData:Array,	// 所有选项数据
+		itemData:Array,	// 所有选项数据[{text:"",value: ""}]
 		isNeedSearch:{	// 是否需要搜索
 			type: Boolean,
 			default: true
@@ -75,10 +75,10 @@ import { deepClone } from '@/common/js/utils'
 				 if (!this.multiple) {
 				 if (newVal == null || !isNaN(newVal)) {
 					this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal})[0]['text'] : '';
-						this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal})[0] : null
+					this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal})[0] : null
 				 } else {
 					this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal['value']})[0]['text'] : '';
-						this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal['value']})[0] : null
+					this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal['value']})[0] : null
 				 }
 				 } else {
 						this.datalist = this.itemData;
@@ -137,13 +137,12 @@ import { deepClone } from '@/common/js/utils'
   },
   
   mounted () {
-		
 		this.datalist = this.itemData;
 		//单选
 		if (!this.multiple) {
-			if (this.curData == null || !isNaN(this.curData )) {
+			if (this.curData == null || !isNaN(this.curData)) {
 				this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData})[0]['text'] : '';
-				this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData})[0] : null
+				this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData})[0] : null;
 			} else {
 				this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData['value']})[0]['text'] : '';
 				this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData['value']})[0] : null
@@ -224,7 +223,7 @@ import { deepClone } from '@/common/js/utils'
 				this.current = this.datalist.filter((innerItem) => { return innerItem.value == item.value})[0]['text'];
 				this.currentFullValue = this.datalist.filter((innerItem) => { return innerItem.value == item.value})[0];
 				this.isShow = false;
-				this.$emit('change',item)
+				this.$emit('change',item);
 			} else {
 				if (item['value'] == null) { return };
 				this.datalist[index]['selected'] = !this.datalist[index]['selected'];

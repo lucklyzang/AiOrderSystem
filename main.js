@@ -1,8 +1,11 @@
 import App from './App'
 import store from './store'
+import moment from 'moment'
 import { getCache } from '@/common/js/utils'
 import { noMultipleClicks } from '@/common/js/utils'
 Vue.prototype.$noMultipleClicks = noMultipleClicks;
+moment.locale('zh-cn');
+Vue.prototype.$moment = moment;
 import uView from "uview-ui";
 Vue.use(uView);
 // #ifndef VUE3

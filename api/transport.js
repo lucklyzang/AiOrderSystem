@@ -1,6 +1,6 @@
 import request from '@/api/request';
 import Qs from 'qs'
-
+import store from '@/store'
 // 查询运送类型
 export function queryTransportType(data) {
   return request({
@@ -89,14 +89,6 @@ export function updateDispatchTask(data) {
   })
 };
 
-// 调度任务催单
-export function taskReminder(proId,taskId) {
-  return request({
-    url: store.getters.templateType == 'template_one' ? `trans/task/reminder/${proId}/${taskId}` : `trans/dispatch/reminder/${proId}/${taskId}`,
-    method: 'get'
-  })
-};
-
 // 根据科室查询房间信息
 export function departmentRoom(data) {
   return request({
@@ -105,133 +97,6 @@ export function departmentRoom(data) {
     params: data
   })
 };
-
-/**
- * 预约任务
-*/
-
-
-// 查询预约任务
-export function queryAppointTaskMessage(data) {
-  return request({
-    url: 'trans/bookTask/queryTask',
-    method: 'get',
-    params: data
-  })
-};
-
-/**
- * 循环任务
-*/
-
-// 查询循环任务
-export function queryCirculationTask(data) {
-  return request({
-    url: 'trans/circleTask/workerTask',
-    method: 'get',
-    params: data
-  })
-};
-
-// 查询反馈意见
-export function queryFeedback(data) {
-  return request({
-    url: 'trans/feedbackConf/queryAll',
-    method: 'get',
-    params: data
-  })
-};
-
-// 提交总体反馈意见
-export function submitFeedback(data) {
-  return request({
-    url: 'trans/wholeFeedback/add',
-    method: 'post',
-    data
-  })
-};
-
-// 提交任务反馈意见
-export function submitTaskFeedback(data,type) {
-  return request({
-    url: `trans/feedback/feedback/${type}`,
-    method: 'post',
-    data
-  })
-};
-
-// 工程维修
-
-// 巡检问题上报
-export function reportProblem(data) {
-  return request({
-    url: 'trans/bxTask/reportProblem',
-    method: 'post',
-    data
-  })
-};
-
-// 查询任务类型
-export function queryTaskType(data) {
-  return request({
-    url: 'trans/bxTaskType/queryAll',
-    method: 'get',
-    params: data
-  })
-};
-
-// 查询协助人员
-export function helpWorkers(data) {
-  return request({
-    url: 'trans/bxWorker/workers',
-    method: 'get',
-    params: data
-  })
-};
-
-// 查询备注信息
-export function getRemarks(data) {
-  return request({
-    url: 'trans/bxRemark/remarks',
-    method: 'get',
-    params: data
-  })
-};
-
-// 查询工程任务列表
-export function getMaintainTask(data) {
-  return request({
-    url: 'trans/bxTask/queryTask',
-    method: 'get',
-    params: data
-  })
-};
-
-// 任务取消
-export function projectTaskCancel(data) {
-  return request({
-    url: 'trans/bxTask/cancelTask',
-    method: 'put',
-    data
-  })
-};
-
-// 工程任务催单
-export function projectTaskReminder(proId,taskId) {
-  return request({
-    url: `trans/bxTask/reminder/${proId}/${taskId}`,
-    method: 'get'
-  })
-};
-
-// 任务取消原因
-export function projectTaskCancelReason(data) {
-  return request({
-    url: 'trans/cancel/queryAll',
-    method: 'get',
-    params: data
-  })
-}
 
 // 查询创建调度任务时是否配置接触隔离选项
 export function queryTransConfig (proId, key) {

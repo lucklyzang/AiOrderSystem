@@ -170,11 +170,10 @@
 					</view>
 				</view>
 			</view>
-			<view class="btn-box">
-				<text class="operate-one" @click="sureEvent">确认</text>
-				<!-- <text class="operate-two" @click="temporaryStorageEvent">暂存</text> -->
-				<text class="operate-three" @click="cancelEvent">取消</text>
-			</view>
+		</view>
+		<view class="btn-box">
+			<text class="operate-one" @click="sureEvent">确认</text>
+			<text class="operate-two" @click="cancelEvent">取消</text>
 		</view>
 		<!-- 物料弹框  -->
 		<view class="material-box">
@@ -352,8 +351,7 @@
 				'userInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
-				"templateType",
-				"temporaryStorageCreateRepairsTaskMessage"
+				"templateType"
 			]),
 			proId () {
 				return this.userInfo.extendData.proId
@@ -370,44 +368,15 @@
 		},
 		onLoad() {
 			this.parallelFunction();
-			//判断是否回显暂存的数据
-			// if (JSON.stringify(this.temporaryStorageCreateRepairsTaskMessage) != '{}' && this.temporaryStorageCreateRepairsTaskMessage['isTemporaryStorage']) {
-			// 	this.echoTemporaryStorageMessage()
-			// }
 		},
 		methods: {
 			...mapMutations([
-				'changeTemporaryStorageCreateRepairsTaskMessage'
 			]),
 			
 			// 顶部导航返回事件
 			backTo () {
 				uni.navigateBack()
 			},
-			
-			// 回显暂存的信息
-				async echoTemporaryStorageMessage () {
-				let casuallyTemporaryStorageCreateRepairsTaskMessage = this.temporaryStorageCreateRepairsTaskMessage;
-				this.priorityRadioValue = casuallyTemporaryStorageCreateRepairsTaskMessage['priorityRadioValue'];
-				this.currentTaskType = casuallyTemporaryStorageCreateRepairsTaskMessage['currentTaskType'];
-				this.currentStructure = casuallyTemporaryStorageCreateRepairsTaskMessage['currentStructure'];
-				this.currentGoalDepartment = casuallyTemporaryStorageCreateRepairsTaskMessage['currentGoalDepartment'];
-				this.currentGoalSpaces = casuallyTemporaryStorageCreateRepairsTaskMessage['currentGoalSpaces'];
-				this.problemOverview = casuallyTemporaryStorageCreateRepairsTaskMessage['problemOverview'];
-				this.currentTransporter = casuallyTemporaryStorageCreateRepairsTaskMessage['currentTransporter'];
-				this.currentParticipant = casuallyTemporaryStorageCreateRepairsTaskMessage['currentParticipant'];
-				this.currentUseTool = casuallyTemporaryStorageCreateRepairsTaskMessage['currentUseTool'];
-				this.isMeRadioValue = casuallyTemporaryStorageCreateRepairsTaskMessage['isMeRadioValue'];
-				this.taskDescribe = casuallyTemporaryStorageCreateRepairsTaskMessage['taskDescribe'];
-				this.consumableMsgList = casuallyTemporaryStorageCreateRepairsTaskMessage['consumableMsgList']
-				},
-
-				// 公共修改是否暂存的方法
-				commonIsTemporaryStorageMethods () {
-				let casuallyTemporaryStorageCreateRepairsTaskMessage = this.temporaryStorageCreateRepairsTaskMessage;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['isTemporaryStorage'] = false;
-				this.changeTemporaryStorageCreateRepairsTaskMessage(casuallyTemporaryStorageCreateRepairsTaskMessage)
-				},
 
 				// 处理维修任务参与者
 				disposeTaskPresent (item) {
@@ -1132,29 +1101,9 @@
 				// 根据页码分割展示对应的数据
 				this.inventoryMsgList = this.temporaryInventoryMsgList.slice((this.currentPage - 1) * this.pageSize,(this.currentPage - 1) * this.pageSize + this.pageSize);
 				},
-
-				// 暂存事件
-				temporaryStorageEvent () {
-				let casuallyTemporaryStorageCreateRepairsTaskMessage = this.temporaryStorageCreateRepairsTaskMessage;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['priorityRadioValue'] = this.priorityRadioValue;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['currentTaskType'] = this.currentTaskType;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['currentStructure'] = this.currentStructure;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['currentGoalDepartment'] = this.currentGoalDepartment;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['currentGoalSpaces'] = this.currentGoalSpaces;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['problemOverview'] = this.problemOverview;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['currentTransporter'] = this.currentTransporter;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['currentParticipant'] = this.currentParticipant;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['currentUseTool'] = this.currentUseTool;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['isMeRadioValue'] = this.isMeRadioValue;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['taskDescribe'] = this.taskDescribe;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['consumableMsgList'] = this.consumableMsgList;
-				casuallyTemporaryStorageCreateRepairsTaskMessage['isTemporaryStorage'] = true;
-				this.changeTemporaryStorageCreateRepairsTaskMessage(casuallyTemporaryStorageCreateRepairsTaskMessage);
-				this.$refs.uToast.show({
-					type: 'success',
-					message: '暂存成功',
-					position: 'center'
-				})
+				
+				// 确认事件
+				sureEvent () {
 				},
 
 				// 取消事件
@@ -1794,40 +1743,35 @@
 						}
 					}
 					}
-				};
-				.btn-box {
-					width: 90%;
-					margin: 0 auto;
-					height: 60px;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					>text {
-						width: 40%;
-						display: inline-block;
-						height: 45px;
-						font-size: 18px;
-						line-height: 45px;
-						background: #fff;
-						text-align: center;
-						border-radius: 30px;
-						&:nth-child(1) {
-							color: #fff;
-							background: linear-gradient(to right, #6cd2f8, #2390fe);
-							box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
-							margin-right: 30px
-						};
-						&:nth-child(2) {
-							color: #1864FF;
-							box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
-							// margin-right: 30px
-						};
-						&:last-child {
-							color: #1864FF;
-							box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1)
-						}
-					}
 				}
+		};
+		.btn-box {
+			width: 90%;
+			margin: 0 auto;
+			height: 100px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			>text {
+				width: 40%;
+				display: inline-block;
+				height: 45px;
+				font-size: 18px;
+				line-height: 45px;
+				background: #fff;
+				text-align: center;
+				border-radius: 30px;
+				&:nth-child(1) {
+					color: #fff;
+					background: linear-gradient(to right, #6cd2f8, #2390fe);
+					box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
+					margin-right: 30px
+				};
+				&:last-child {
+					color: #1864FF;
+					box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1)
+				}
+			}
 		}
 	}
 </style>

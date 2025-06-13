@@ -6,21 +6,21 @@
 			</view>
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
-		<u-toast ref="uToast" />
+		<u-toast ref="uToast"></u-toast>
 		<view class="nav">
 			<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="订单详情" @backClick="backTo">
 			</nav-bar> 
 		</view>
     <!-- 取消原因弹框 -->
     <view class="allocation-box">
-      <u-modal v-model="cancelReasonShow" width="80%" show-cancel-button 
+      <u-modal :show="cancelReasonShow" show-cancel-button 
         confirm-button-color="#2390fe"
-				asyncClose="true"
-        :before-close="beforeCloseCancelReasonDialogEvent"
         @confirm="cancelReasonDialogSure"
         @cancel="cancelReasonDialogCancel"
-        confirm-button-text="确定"
-        cancel-button-text="取消"
+				confirmColor="#fff"
+				cancelColor="#3B9DF9"
+        confirmText="确定"
+        cancelText="取消"
       >
         <view class="dialog-top">
           请选择取消原因
@@ -168,21 +168,21 @@ export default {
     return {
 			infoText: '加载中···',
 			showLoadingHint: false,
-      cancelReasonShow: false,
       currentimageUrl: '',
       imageBoxShow: false,
       transporterValue: null,
       transporterOption: [],
       selectCancelReason: {},
+			cancelReasonShow: false,
       cancelReasonValue: null,
-      cancelReasonOption: [],
+      cancelReasonOption: [{text: "请选择取消原因",value: null},{value:1,text:'萨哒哒'},{value:2,text:'郭德纲'},{value:3,text:'个大概'}],
       repairsCancelReasonOption: [],
     }
   },
 
   onLoad() {
     // 回显取消原因列表
-    this.repairsCancelReasonOption = this.schedulingTaskAboutMessage['repairsCancelReasonOption'];
+    // this.repairsCancelReasonOption = this.schedulingTaskAboutMessage['repairsCancelReasonOption'];
   },
 
   watch: {},
@@ -229,6 +229,18 @@ export default {
       this.currentimageUrl = item;
       this.imageBoxShow = true
     },
+		
+		// 处理维修任务参与者
+		disposeTaskPresent (item) {
+			if (!item) { return };
+			if (item.length == 0) { return };
+			let temporaryArray = [];
+			for (let innerItem of item) {
+				temporaryArray.push(innerItem.name)
+			};
+			return temporaryArray.join('、')
+		},
+
 
     // 优先级转换
     taskPriotityTransition (state) {
@@ -249,42 +261,40 @@ export default {
     },
 		
 		// 修改点击事件
-		editEvent () {},
+		editEvent () {
+			uni.navigateTo({
+				url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationProjectWorkerOrder/modificationProjectWorkerOrder'
+			})
+		},
 
     // 取消点击事件
     cancelReasonEvent(item,index,text) {
       this.cancelReasonShow = true;
-      this.taskId = item.id;
-      if (this.activeName == 'repairsTask') {
-        this.cancelReasonOption = this.repairsCancelReasonOption
-      }
+      // this.cancelReasonValue = null;
+      // this.cancelReasonOption = [{text: "请选择取消原因",value: null},{value:1,text:'萨哒哒'},{value:2,text:'郭德纲'},{value:3,text:'个大概'}];
+			// this.cancelReasonOption = this.repairsCancelReasonOption
+      // this.taskId = item.id;
+      // if (this.activeName == 'repairsTask') {
+      //   this.cancelReasonOption = this.repairsCancelReasonOption
+      // }
     },
 
     // 取消原因弹框下拉框选值变化事件
     cancelReasonOptionChange (item) {
-      this.selectCancelReason = item
-    },
-
-    // 取消原因弹框关闭前事件
-    beforeCloseCancelReasonDialogEvent (action, done) {
-      if (action == 'confirm') {
-        if (this.selectCancelReason.value == null) {
-          this.$toast('请选择取消原因');
-          done(false)
-        } else {
-          done()
-        }
-      } else {
-        done()
-      }
+      this.selectCancelReason = item;
     },
 
     // 取消原因弹框确定事件
     cancelReasonDialogSure () {
-      if (this.selectCancelReason.value == null) { return };
-      this.loadingShow = true;
-      this.overlayShow = true;
-      this.loadingText = '取消中...';
+			this.cancelReasonShow = false;
+      if (this.selectCancelReason.value == null) {
+				this.$refs.uToast.show({
+					message: '请选择取消原因'
+				});
+				return 
+			};
+      this.showLoadingHint = true;
+			this.infoText = '取消中···'
       // 维修任务取消
         cancelRepairsTask({
           taskId: this.schedulingTaskDetails['id'], //任务id
@@ -293,35 +303,35 @@ export default {
           reason: this.selectCancelReason['text'] //取消原因
         })
         .then((res) => {
-          this.loadingShow = false;
-          this.overlayShow = false;
-          this.loadingText = '';
-          this.$refs['cancelOption'].clearSelectValue();
+          this.showLoadingHint = false;
+					this.$refs['cancelOption'].clearSelectValue();
           if (res && res.data.code == 200) {
-            this.$toast('取消成功');
+            this.$refs.uToast.show({
+            	message: '取消成功',
+            	type: 'success',
+            });
             // 返回任务调度页
-            this.onClickLeft()
+            this.backTo()
           } else {
-            this.$toast({
-              type: 'fail',
-              message: res.data.msg
+            this.$refs.uToast.show({
+            	message: res.data.msg,
+            	type: 'error',
             })
           }
         })
         .catch((err) => {
-          this.$refs['cancelOption'].clearSelectValue();
-          this.loadingText = '';
-          this.loadingShow = false;
-          this.overlayShow = false;
-          this.$toast({
-            type: 'fail',
-            message: err
-          })
+					this.$refs.childComponent['cancelOption'].clearSelectValue();
+          this.showLoadingHint = false;
+          this.$refs.uToast.show({
+          	message: `${err}`,
+          	type: 'error',
+          });
       })
     },
 
     // 取消原因弹框取消事件
     cancelReasonDialogCancel () {
+			this.cancelReasonShow = false;
       this.$refs['cancelOption'].clearSelectValue()
     },
 		
@@ -344,12 +354,6 @@ export default {
           return '待签字'
           break
       }
-    },
-
-    // 取消点击事件
-    cancelReasonEvent () {
-			this.cancelReasonShow = true;
-			this.cancelReasonOption = this.repairsCancelReasonOption
     }
   }
 };
@@ -414,6 +418,67 @@ page {
         }
     }
   };
+	/* 取消原因弹框 */
+	.allocation-box {
+	    /deep/ .u-modal {
+	      border-radius: 10px !important;
+	      overflow: inherit !important;
+	      .u-modal__content {
+	          padding: 0 !important;
+	          box-sizing: border-box;
+						display: flex;
+						flex-direction: column;
+	          .dialog-top {
+	            border-top-left-radius: 10px !important;
+	            border-top-right-radius: 10px !important;
+	            height: 40px;
+	            padding-left: 10px;
+	            position: relative;
+	            display: flex;
+	            align-items: center;
+	            font-size: 14px;
+	            color: #fff;
+	            background: #3B9DF9;
+	            text-align: left
+	          };
+	          .dialog-center {
+	            width: 80%;
+	            height: 20vh;
+	            margin: 0 auto;
+	            margin-top: 20px
+	          }
+	      };
+	      .u-modal__button-group {
+	          padding: 20px !important;
+	          box-sizing: border-box;
+	          justify-content: center;
+	          ::after {
+	            content: none
+	          };
+	        .u-modal__button-group__wrapper--cancel {
+	            width: 40%;
+	            height: 40px;
+	            line-height: 40px;
+	            background: #fff;
+	            flex: none !important;
+	            border-radius: 10px;
+	            border: 1px solid #3B9DF9;
+	            margin-right: 30px
+	        };
+	        .u-modal__button-group__wrapper--confirm {
+	            height: 40px;
+	            line-height: 40px;
+	            flex: none !important;
+	            width: 40%;
+	            background: #3B9DF9;
+	            border-radius: 10px;
+	        }
+	      };
+	      .u-hairline--top::after {
+	        border-top-width: 0 !important
+	      }
+	    }  
+	  };
   .nav {
 		width: 100%;
   };

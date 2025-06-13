@@ -50,7 +50,7 @@
 						
 				</view>
 				<view class="location-other-right-other" v-if="cleanTaskDetails.state != 2 && cleanTaskDetails.state != 3 && cleanTaskDetails.state != 8">
-					{{ !this.cleanTaskDetails.workerName ? '未选择' : this.cleanTaskDetails.workerName }}
+					{{ !cleanTaskDetails.workerName ? '未选择' : cleanTaskDetails.workerName }}
 				</view>
       </view>
       <view class="location" v-show="cleanTaskDetails.state != 5 && cleanTaskDetails.state != 6">
@@ -147,7 +147,7 @@ export default {
         done()
       }
     },
-
+		
     // 退回任务确定事件
     backSure () {
     },
@@ -193,14 +193,14 @@ export default {
 
     // 提取即时保洁功能区信息
     extractSpaceMessage (spaces) {
-      if (spaces.length == 0) {
-          return ''
-      };
-      let temporaryArray = [];
-      for (let item of spaces) {
-          temporaryArray.push(item.name);
-      };
-      return temporaryArray.join("、")
+      // if (spaces.length == 0) {
+      //     return ''
+      // };
+      // let temporaryArray = [];
+      // for (let item of spaces) {
+      //     temporaryArray.push(item.name);
+      // };
+      // return temporaryArray.join("、")
     },
 
     // 任务状态转换
@@ -232,11 +232,16 @@ export default {
 
     // 退回订单事件
     backTaskEvent () {
+			console.log(2);
       this.backShow = true
     },
 		
-		// 编辑订单事件
-		editEvent () {},
+		// 修改订单事件
+		editEvent () {
+			uni.navigateTo({
+				url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationEnvironmentWorkerOrder/modificationEnvironmentWorkerOrder'
+			})
+		},
 
     // 格式化时间
     getNowFormatDate(currentDate) {   

@@ -24,8 +24,16 @@ export function getDefaultCommonState() {
 // 工程订单信息store的初始值
 export function getDefaultProjectState() {
 	return {
-		// 暂存创建维修任务的信息
-		temporaryStorageCreateRepairsTaskMessage: {}
+		// 工程订单详情
+		schedulingTaskDetails: {}
+	}	
+}
+
+// 运送订单信息store的初始值
+export function getDefaultTransState() {
+	return {
+		// 运送订单详情
+		dispatchTaskMessage: {}
 	}	
 }
 
@@ -34,6 +42,15 @@ export function getDefaultEnvironmentState() {
 	return {
 		timeMessage: {},
 		ossMessage: {},
-		locationMessage: []
+		locationMessage: [],
+		cleanTaskDetails: {}
+	}	
+}
+
+// 事务订单信息store的初始值
+export function getDefaultAffairState() {
+	return {
+		// 事务订单详情
+		affairTaskMessage: {}
 	}	
 }

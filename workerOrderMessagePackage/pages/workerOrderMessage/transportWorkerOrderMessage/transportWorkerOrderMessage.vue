@@ -7,6 +7,25 @@
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
+		<!-- 取消原因弹框 -->
+		<view class="allocation-box">
+		  <u-modal :show="cancelReasonShow" show-cancel-button 
+		    confirm-button-color="#2390fe"
+		    @confirm="cancelReasonDialogSure"
+		    @cancel="cancelReasonDialogCancel"
+				confirmColor="#fff"
+				cancelColor="#3B9DF9"
+		    confirmText="确定"
+		    cancelText="取消"
+		  >
+		    <view class="dialog-top">
+		      请选择取消原因
+		    </view>
+		    <view class="dialog-center">
+		      <SelectSearch :itemData="cancelReasonOption" ref="cancelOption" :isNeedSearch="false" :curData="cancelReasonValue" @change="cancelReasonOptionChange" />
+		    </view>
+		  </u-modal>
+		</view>
 		<view class="nav">
 			<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="订单详情" @backClick="backTo">
 			</nav-bar> 
@@ -14,7 +33,7 @@
 		<view class="content">
 			<view class="basic-message" ref="basicMessage">
 			<view class="basic-mesage-state">
-				<image :src="stateTransferimage(dispatchTaskMessage.state)" alt="">
+				<image :src="stateTransferimage(dispatchTaskMessage.state)" />
 			</view>
 			<view class="basic-message-title">
 				<text>
@@ -142,10 +161,10 @@
 			</view>
 		</view>
 	</view>
-	<div class="btn-box">
+	<view class="btn-box">
 		<text class="operate-one" @click="editEvent">修改</text>
 		<text class="operate-two" @click="cancelReasonEvent">取消订单</text>
-	</div> 
+	</view> 
 	</view>
 </template>
 
@@ -159,21 +178,26 @@
 		removeAllLocalStorage,
 		mergeMethods
 	} from '@/common/js/utils'
-	import { queryTransportTypeClass, getDispatchTaskMessageById } from '@/api/transport.js'
+	import {getDispatchTaskComplete, queryDispatchTaskCancelReason, updateDispatchTask, getDispatchTaskMessageById} from '@/api/transport.js'
 	import navBar from "@/components/zhouWei-navBar"
+	import SelectSearch from "@/components/selectSearch/selectSearch";
 	// import MyAudio from '@/components/myAudio'
 	export default {
 		components: {
 			navBar,
+			SelectSearch
 			// MyAudio
 		},
 		data() {
 			return {
 				showLoadingHint: false,
-				isShowNoData: false,
 				infoText: '加载中···',
 				transportList: [],
-				dispatchTaskMessage: {},
+				dispatchTaskId: '',
+				selectCancelReason: {},
+				cancelReasonShow: false,
+				cancelReasonValue: null,
+				cancelReasonOption: [{text: "请选择取消原因",value: null}],
 				taskInfoPng: require('@/static/img/basic-message.png'),
 				noEndPng: require('@/static/img/no-end.png'),
 				noReferPng: require('@/static/img/no-refer.png'),
@@ -189,6 +213,7 @@
 				'userInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
+				'dispatchTaskMessage'
 			]),
 			userName() {
 			},
@@ -196,11 +221,12 @@
 				return this.userInfo.extendData.proId
 			}
 		},
-		onLoad() {
-			this.getTransportsType();
+		onLoad(options) {
+			this.dispatchTaskId = '';
 		},
 		methods: {
 			...mapMutations([
+				'changeDispatchTaskMessage'
 			]),
 			
 			// 顶部导航返回事件
@@ -209,7 +235,113 @@
 			},
 			
 			// 修改点击事件
-			editEvent () {},
+			editEvent () {
+				uni.navigateTo({
+					url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/index/index'
+				})
+			},
+			
+			// 获取运送订单取消原因列表
+			getDispatchTaskCancelReason (data) {
+				this.showLoadingHint = true;
+				this.infoText = '查询中···'
+				queryDispatchTaskCancelReason(data).then((res) => {
+					this.showLoadingHint = false;
+					if (res && res.data.code == 200) {
+						this.cancelReasonShow = true;
+						this.cancelReasonOption = [{text: "请选择取消原因",value: null}];
+						for (let item of res.data.data) {
+							let temporaryWorkerMessageArray = [];
+							for (let innerItem in item) {
+								if (innerItem == 'id') {
+									temporaryWorkerMessageArray.push(item[innerItem])
+								};
+								if (innerItem == 'cancelName') {
+									temporaryWorkerMessageArray.push(item[innerItem])
+								}
+							};
+							this.cancelReasonOption.push({text: temporaryWorkerMessageArray[1], value: temporaryWorkerMessageArray[1]})
+						}
+					} else {
+						this.$refs.uToast.show({
+							message: `${res.data.msg}`,
+							type: 'error'
+						})
+					}
+				})
+				.catch((err) => {
+					this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: `${err}`,
+						type: 'error'
+					})
+				})
+			},
+			
+			// 运送订单的取消
+			cancelDispatchTask (data) {
+				this.showLoadingHint = true;
+				this.infoText = '取消中···'
+			  updateDispatchTask(data)
+			  .then((res) => {
+					this.showLoadingHint = false;
+					this.$refs['cancelOption'].clearSelectValue()
+					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							message: `${res.data.msg}`,
+							type: 'success'
+						});
+						this.queryCompleteDispatchTask(
+						{
+						 proId:this.proId, workerId:'',state: -1,
+						 departmentId: this.userInfo.depId
+						})
+					} else {
+					 this.$refs.uToast.show({
+						message: `${res.data.msg}`,
+						type: 'error'
+					 })
+					}
+			  })
+			  .catch((err) => {
+					this.showLoadingHint = false;
+					this.$refs['cancelOption'].clearSelectValue();
+					this.$refs.uToast.show({
+						message: `${err.message}`,
+						type: 'error'
+					})
+			  })
+			},
+			
+			// 运送订单取消原因弹框下拉框选值变化事件
+			cancelReasonOptionChange (item) {
+			  this.selectCancelReason = item;
+			},
+			
+			// 运送订单取消原因弹框确定事件
+			cancelReasonDialogSure () {
+				this.cancelReasonShow = false;
+			  if (this.selectCancelReason.value == null) {
+					this.$refs.uToast.show({
+						message: '请选择取消原因'
+					});
+					return 
+				};
+				
+			  // 运送订单取消
+				this.cancelDispatchTask({
+					proId: this.proId,	//当前项目ID
+					id: this.taskId, //当前任务ID
+					state: 6, //取消后的状态
+					cancelReason: this.selectCancelReason['text'] //取消原因
+				})
+			},
+			
+			// 运送订单取消原因弹框取消事件
+			cancelReasonDialogCancel () {
+				this.cancelReasonShow = false;
+			  this.$refs['cancelOption'].clearSelectValue()
+			},
 			
 			// 取消点击事件
 			cancelReasonEvent(item,index,text) {
@@ -251,7 +383,7 @@
 				.then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
-						this.changeDispatchTaskMessage({DtMsg: res.data.data});
+						this.changeDispatchTaskMessage(res.data.data);
 						this.transportList = mergeMethods(this.dispatchTaskMessage['patientInfoList']);
 					}
 				})
@@ -259,43 +391,6 @@
 					this.showLoadingHint = false;
 					this.$refs.uToast.show({
 						message: `${err.message}`,
-						type: 'error',
-						position: 'bottom'
-					})
-				})
-			},
-			
-			// 查询运送类型分类
-			getTransportsType () {
-				this.showLoadingHint = true;
-				this.transportTypeList = [];
-				let that = this;
-				queryTransportTypeClass({proId: this.proId, state: 0}).then((res) => {
-					this.showLoadingHint = false;
-					if (res && res.data.code == 200) {
-						if (res.data.data.length > 0) {
-							this.isShowNoData = false;
-							for (let item of res.data.data) {
-								this.transportTypeList.push({
-									id: item.id,
-									value: item.typeName
-								})
-							}
-						} else {
-							this.isShowNoData = true;
-						}
-					} else {
-						this.$refs.uToast.show({
-							message: res.data.msg,
-							type: 'error',
-							position: 'bottom'
-						})
-					}
-				})
-				.catch((err) => {
-					this.showLoadingHint = false;
-					this.$refs.uToast.show({
-						message: err.message,
 						type: 'error',
 						position: 'bottom'
 					})
@@ -336,6 +431,67 @@
 			left: 0;
 			z-index: 10
 		};
+		/* 取消原因弹框 */
+		.allocation-box {
+		    /deep/ .u-modal {
+		      border-radius: 10px !important;
+		      overflow: inherit !important;
+		      .u-modal__content {
+		          padding: 0 !important;
+		          box-sizing: border-box;
+							display: flex;
+							flex-direction: column;
+		          .dialog-top {
+		            border-top-left-radius: 10px !important;
+		            border-top-right-radius: 10px !important;
+		            height: 40px;
+		            padding-left: 10px;
+		            position: relative;
+		            display: flex;
+		            align-items: center;
+		            font-size: 14px;
+		            color: #fff;
+		            background: #3B9DF9;
+		            text-align: left
+		          };
+		          .dialog-center {
+		            width: 80%;
+		            height: 20vh;
+		            margin: 0 auto;
+		            margin-top: 20px
+		          }
+		      };
+		      .u-modal__button-group {
+		          padding: 20px !important;
+		          box-sizing: border-box;
+		          justify-content: center;
+		          ::after {
+		            content: none
+		          };
+		        .u-modal__button-group__wrapper--cancel {
+		            width: 40%;
+		            height: 40px;
+		            line-height: 40px;
+		            background: #fff;
+		            flex: none !important;
+		            border-radius: 10px;
+		            border: 1px solid #3B9DF9;
+		            margin-right: 30px
+		        };
+		        .u-modal__button-group__wrapper--confirm {
+		            height: 40px;
+		            line-height: 40px;
+		            flex: none !important;
+		            width: 40%;
+		            background: #3B9DF9;
+		            border-radius: 10px;
+		        }
+		      };
+		      .u-hairline--top::after {
+		        border-top-width: 0 !important
+		      }
+		    }  
+		  };
 		.nav {
 			width: 100%;
 		};

@@ -6,20 +6,20 @@ export default {
   },
 
   getters:{
-		temporaryStorageCreateRepairsTaskMessage:(state) => {
-			state.userInfo = getCache('temporaryStorageCreateRepairsTaskMessage') ? getCache('temporaryStorageCreateRepairsTaskMessage') : {};
-			return state.temporaryStorageCreateRepairsTaskMessage
+		schedulingTaskDetails:(state) => {
+			state.schedulingTaskDetails = getCache('schedulingTaskDetails') ? getCache('schedulingTaskDetails') : {};
+			return state.schedulingTaskDetails
 		}
   },
 
   mutations:{
-    // 保存暂存创建维修任务的信息
-    changeTemporaryStorageCreateRepairsTaskMessage (state, payLoad) {
+		// 保存工程订单详情的信息
+		changeSchedulingTaskDetails (state, payLoad) {
 			if (playLoad && playLoad != 'null') {
-				setCache('temporaryStorageCreateRepairsTaskMessage', playLoad);
-				state.temporaryStorageCreateRepairsTaskMessage = payLoad
+				setCache('schedulingTaskDetails', playLoad);
+				state.schedulingTaskDetails = payLoad
 			}
-    }
+		}
   },
   
   actions:{}

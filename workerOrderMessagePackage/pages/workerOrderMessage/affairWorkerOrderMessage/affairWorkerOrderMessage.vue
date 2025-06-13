@@ -209,7 +209,11 @@ export default {
     },
 		
 		// 修改点击事件
-		editEvent () {},
+		editEvent () {
+			uni.navigateTo({
+				url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationAffairWorkerOrder/modificationAffairWorkerOrder'
+			})
+		},
 
     // 取消点击事件
     cancelReasonEvent(item,index,text) {
