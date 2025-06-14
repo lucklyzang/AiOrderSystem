@@ -6,12 +6,12 @@
         </view>
 		<view class="list-and-search" :class="isShow?'on':''">
 			<view class="search-module clearfix" v-if="isNeedSearch">
-				<input class="search-text" @input='search' :value="searchValue" :placeholder="placeholder" />
-          <u-icon name="search" size="20"></u-icon>
+				<u--input @change='search' v-model="searchValue" :placeholder="placeholder"></u--input>
+				<u-icon name="search" size="20"></u-icon>
 			</view>
 			<view class="list-module">
 				<view v-for ="(item,index) in datalist" @click="clickItem(item,index)" :key="index" 
-				:class="{'liStyle': !multiple ? (item.value == currentFullValue['value']) && currentFullValue['value'] != null : item['selected'],
+				:class="{'liStyle': !multiple ? (item.value == curData) && curData != null : curData.indexOf(item.value)!= -1,
 					'liSelectItemStyle': item.text.indexOf('请选择')!=-1
 					}
 				">
@@ -35,6 +35,9 @@
 <script>
 import { deepClone } from '@/common/js/utils'
  export default {
+ options: {
+	styleIsolation: 'shared'
+ },
   name: 'SelectSearch',
   data(){
 		return {
@@ -52,7 +55,7 @@ import { deepClone } from '@/common/js/utils'
 			type: Boolean,
 			default: false
 		},
-		curData: String | Number | null | Array,	// 当前选中数据
+		curData: String | Number | null | Array,	// 当前选中数据(多选时为Array)
 		itemData:Array,	// 所有选项数据[{text:"",value: ""}]
 		isNeedSearch:{	// 是否需要搜索
 			type: Boolean,
@@ -73,43 +76,34 @@ import { deepClone } from '@/common/js/utils'
 				handler: function(newVal, oldVal) {
 				 //单选
 				 if (!this.multiple) {
-				 if (newVal == null || !isNaN(newVal)) {
-					this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal})[0]['text'] : '';
-					this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal})[0] : null
+					 if (newVal == null || !isNaN(newVal)) {
+						this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal})[0]['text'] : '请选择取消原因';
+						this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal})[0] : {text:'请选择取消原因',value:null};
+					 } else {
+						this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal['value']})[0]['text'] : '请选择取消原因';
+						this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal['value']})[0] : {text:'请选择取消原因',value:null};
+					 }
 				 } else {
-					this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal['value']})[0]['text'] : '';
-					this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal['value']})[0] : null
-				 }
-				 } else {
-						this.datalist = this.itemData;
-						if (newVal == null) {
-						this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal})[0]['text'] : '';
+					if (newVal.length > 0) {
+						for (let itemTwo of this.datalist) {
+							if (newVal.indexOf(itemTwo.value) != -1) {
+								itemTwo['selected'] = true
+							} else {
+								itemTwo['selected'] = false
+							}
+						}
 					} else {
-						let temporarySelectArr = [];
-						if (newVal.length > 0) {
-							for (let item of newVal) {
-								temporarySelectArr.push(item['value'])
-							};
-							for (let itemTwo of this.datalist) {
-								if (temporarySelectArr.indexOf(itemTwo.value) != -1) {
-									itemTwo['selected'] = true
-								} else {
-									itemTwo['selected'] = false
-								}
-							}
-						} else {
-							this.datalist.forEach((item) => {item['selected'] = false})
-						};
-						let temporaryArray = [];
-						this.selectedItem = this.datalist.filter((innerItem) => { return innerItem['selected'] == true });
-						for (let it of this.datalist) {
-							if (it['selected']) {
-								temporaryArray.push(it['text'])
-							}
-						};
-						this.current = newVal.length > 0 ? temporaryArray.join(',') : this.itemData[0]['text'];
-					}
-				 }
+						this.datalist.forEach((item) => {item['selected'] = false})
+					};
+					let temporaryArray = [];
+					this.selectedItem = this.datalist.filter((innerItem) => { return innerItem['selected'] == true });
+					for (let it of this.datalist) {
+						if (it['selected']) {
+							temporaryArray.push(it['text'])
+						}
+					};
+					this.current = newVal.length > 0 ? temporaryArray.join(',') : this.datalist[0]['text'];
+				}
 			},
 			deep: true,
 			immediate: true
@@ -127,7 +121,7 @@ import { deepClone } from '@/common/js/utils'
 			handler: function(newVal, oldVal) {
 				if (this.multiple) {
 					if (this.selectedItem.length == 0) {
-						this.current = this.itemData[0]['text']
+						this.current = this.datalist[0]['text']
 					}
 				}
 			},
@@ -140,25 +134,34 @@ import { deepClone } from '@/common/js/utils'
 		//单选
 		if (!this.multiple) {
 			if (this.curData == null || !isNaN(this.curData)) {
-				this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData})[0]['text'] : '';
-				this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData})[0] : null;
+				this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData})[0]['text'] : '请选择取消原因';
+				this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData})[0] : {text:'请选择取消原因',value:null};
 			} else {
-				this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData['value']})[0]['text'] : '';
-				this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData['value']})[0] : null
-			}
+				this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData['value']})[0]['text'] : '请选择取消原因';
+				this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData['value']})[0] : {text:'请选择取消原因',value:null}
+			};
+			this.$emit('change',this.currentFullValue);
 		} else {
-			if (this.curData == null) {
-					this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData})[0]['text'] : '';
-				} else {
-					let temporaryArray = [];
-					this.selectedItem = this.datalist.filter((innerItem) => { return innerItem['selected'] == true });
-					for (let it of this.itemData) {
-						if (it['selected']) {
-							temporaryArray.push(it['text'])
-						}
-					};
-					this.current = this.curData.length > 0 ? temporaryArray.join(',') : this.itemData[0]['text']
+			if (this.curData.length > 0) {
+				for (let itemTwo of this.datalist) {
+					if (this.curData.indexOf(itemTwo.value) != -1) {
+						itemTwo['selected'] = true
+					} else {
+						itemTwo['selected'] = false
+					}
 				}
+			} else {
+				this.datalist.forEach((item) => {item['selected'] = false})
+			};
+			let temporaryArray = [];
+			this.selectedItem = this.datalist.filter((innerItem) => { return innerItem['selected'] == true });
+			for (let it of this.datalist) {
+				if (it['selected']) {
+					temporaryArray.push(it['text'])
+				}
+			};
+			this.current = this.curData.length > 0 ? temporaryArray.join(',') : this.datalist[0]['text'];
+			this.$emit('change',this.selectedItem);
 		}
   },
 	
@@ -199,7 +202,6 @@ import { deepClone } from '@/common/js/utils'
     },
 
 		search(e){
-			this.searchValue = e.target.value;
 			//单选
 			this.datalist = this.itemData.filter((item)=>{
 				return item.text.indexOf(this.searchValue) != -1
@@ -234,6 +236,7 @@ import { deepClone } from '@/common/js/utils'
 
 		//供父组件调用的清除选择框值的方法
 		clearSelectValue () {
+			this.isShow = false;
 			// 单选
 			if (!this.multiple) {
 				this.current = this.itemData[0]['text'];
@@ -295,22 +298,22 @@ import { deepClone } from '@/common/js/utils'
 		.search-module {
 			position: relative;
 			border-bottom: 1px solid #ccc;
-      box-sizing: border-box;
-			.search-text {
+			box-sizing: border-box;
+			/deep/ .u-input {
 				width: 100%;
 				height: 30px;
 				padding: 0 10px 0 30px;
 				box-shadow: none;
 				outline: none;
-        box-sizing: border-box;
+				box-sizing: border-box;
 				border: none;
 			};
 			::-webkit-input-placeholder { /* WebKit browsers */ color: #dadada; } :-moz-placeholder { /* Mozilla Firefox 4 to 18 */ color: #dadada; } ::-moz-placeholder { /* Mozilla Firefox 19+ */ color: #dadada; } :-ms-input-placeholder { /* Internet Explorer 10+ */ color: #dadada; }
 			/deep/ .u-icon {
 				position: absolute;
 				top: 50%;
-				left: 6px;
-        transform: translateY(-50%);
+				right: 6px;
+				transform: translateY(-50%);
 			}
 		}
 		input::-webkit-input-placeholder {

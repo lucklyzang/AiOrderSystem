@@ -59,9 +59,9 @@
 
 <script>
 export default {
-	options: {
-		styleIsolation: 'shared'
-	},
+options: {
+	styleIsolation: 'shared'
+},
   name: 'UFieldCheckbox',
   model: {
     prop: 'selectValue',
@@ -72,9 +72,9 @@ export default {
 	  return {
 	    show: false,
 	    searchVal: '',
-			allCheckboxValue: [],
-			allCheckboxChecked: false,
-			allCheckboxList: [{name: '全选',value:1}],
+		allCheckboxValue: [],
+		allCheckboxChecked: false,
+		allCheckboxList: [{name: '全选',value:1}],
 	    columnsData: JSON.parse(JSON.stringify(this.columns)),
 	    checkboxValue: JSON.parse(JSON.stringify(this.selectValue)),
 	    resultValue: JSON.parse(JSON.stringify(this.selectValue))
@@ -122,7 +122,7 @@ export default {
 	  resultValue (val) {
 	    this.searchVal = ''
 	    this.columnsData = JSON.parse(JSON.stringify(this.columns));
-			this.change(val);
+		this.change(val);
 	    this.$emit('input', val)
 	  },
 		

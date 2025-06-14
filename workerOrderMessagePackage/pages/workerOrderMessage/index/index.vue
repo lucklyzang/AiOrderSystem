@@ -534,6 +534,7 @@
 			
 			// 运送订单取消原因弹框下拉框选值变化事件
 			cancelReasonOptionChange (item) {
+			  this.cancelReasonValue = item.value;	
 			  this.selectCancelReason = item;
 			},
 			

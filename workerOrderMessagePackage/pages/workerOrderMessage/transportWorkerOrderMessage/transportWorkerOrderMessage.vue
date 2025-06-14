@@ -13,8 +13,10 @@
 		    confirm-button-color="#2390fe"
 		    @confirm="cancelReasonDialogSure"
 		    @cancel="cancelReasonDialogCancel"
-				confirmColor="#fff"
-				cancelColor="#3B9DF9"
+			@close="cancelReasonShow = false"
+			:closeOnClickOverlay="true"
+			confirmColor="#fff"
+			cancelColor="#3B9DF9"
 		    confirmText="确定"
 		    cancelText="取消"
 		  >
@@ -315,6 +317,7 @@
 			
 			// 运送订单取消原因弹框下拉框选值变化事件
 			cancelReasonOptionChange (item) {
+			  this.cancelReasonValue = item.value;	
 			  this.selectCancelReason = item;
 			},
 			
