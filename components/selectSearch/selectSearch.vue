@@ -41,7 +41,7 @@ import { deepClone } from '@/common/js/utils'
 			searchValue: '',
 			current: '',
 			currentFullValue: null,
-			datalist:[],
+			datalist: JSON.parse(JSON.stringify(this.itemData)),
 			selectedItem: [],
 			isShow:false
 		}
@@ -137,7 +137,6 @@ import { deepClone } from '@/common/js/utils'
   },
   
   mounted () {
-		this.datalist = this.itemData;
 		//单选
 		if (!this.multiple) {
 			if (this.curData == null || !isNaN(this.curData)) {
@@ -160,17 +159,7 @@ import { deepClone } from '@/common/js/utils'
 					};
 					this.current = this.curData.length > 0 ? temporaryArray.join(',') : this.itemData[0]['text']
 				}
-		};
-		
-		//点击组件以外的地方，收起
-		// document.addEventListener('click', (e) => {
-		// 	if (!this.$el.contains(e.target)){
-		// 		this.isShow = false;
-		// 		if (this.multiple) {
-		// 			this.$emit('change',this.selectedItem)
-		// 		}
-		// 	}
-		// }, false)
+		}
   },
 	
   methods:{
@@ -328,7 +317,7 @@ import { deepClone } from '@/common/js/utils'
 			font-size: 14px;
 		}
 		.list-module {
-		 max-height: 150px;
+		 max-height: 140px;
 		 overflow: scroll;
 		 >view {
 				word-break: break-all;

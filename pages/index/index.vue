@@ -1,5 +1,5 @@
 <template>
-	<view class="chat" :style="{ 'padding-top': statusBarHeight + 'px' }">
+	<view class="chat" :style="{ 'padding-top': statusBarHeight + 'px' }" @click="wrapperClickEvent">
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 'px' }"></view>
 		<u-toast ref="uToast" />
     <!-- 顶部标题 -->
@@ -14,7 +14,7 @@
       <view class="text">{{ fromName }}</view>
 			<!-- 创建工单图标 -->
 			<view class="create-order-area">
-				<u-icon name="plus" size="22px" color="#fff" @click="creatWorkOrderListShowEvent('show')"></u-icon>
+				<u-icon name="plus" size="22px" color="#fff" @click.native.stop="creatWorkOrderListShowEvent"></u-icon>
 				<!-- 工单类型列表提示框 -->
 				<view class="triangle-rect-list-info" :style="{ 'top': navigationBarHeight + 4 + 'px' }" v-if="triangleRectListInfoShow">
 					<view class="triangle-rect-list-content" v-for="(item,index) in workerOrderTypeList" @click="creatWorkOrderEvent(item,index)" :key="index">
@@ -273,10 +273,14 @@
 			blur(){
 				this.scrollToBottom()
 			},
-			
+			 
+			// 最外层盒子点击事件
+			wrapperClickEvent () {
+				this.triangleRectListInfoShow = false;
+			},
 			
 			// 创建工单列表显示事件
-			creatWorkOrderListShowEvent (str) {
+			creatWorkOrderListShowEvent () {
 				this.triangleRectListInfoShow = !this.triangleRectListInfoShow;
 			},
 			

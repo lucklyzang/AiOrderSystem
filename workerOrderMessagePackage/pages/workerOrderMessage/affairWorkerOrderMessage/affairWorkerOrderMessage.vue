@@ -183,6 +183,17 @@ export default {
         return `${this.$moment(currentTime).diff(transferPlanStartTme, 'minutes')}分钟`
       }
     },
+	
+	// 处理维修任务参与者
+	disposeTaskPresent (item) {
+		if (!item) { return };
+		if (item.length == 0) { return };
+		let temporaryArray = [];
+		for (let innerItem of item) {
+			temporaryArray.push(innerItem.name)
+		};
+		return temporaryArray.join('、')
+	},
 
     // 图片放大事件
     enlareEvent (item) {
