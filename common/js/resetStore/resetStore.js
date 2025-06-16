@@ -17,7 +17,16 @@ export function getDefaultCommonState() {
 		//导航栏栏高度
 		navigationBarHeight: 0,
 		// 胶囊信息
-		capsuleMessage: {}
+		capsuleMessage: {},
+		// 各种类型订单取消原因
+		allOrderCancelReason: {
+			cancelReason: {},
+			environmentCancelReason: {},
+			projectCancelReason: {},
+			affairCancelReason: {}
+		},
+		// 订单列表点击索引
+		currentIndex: 0
 	}	
 }
 

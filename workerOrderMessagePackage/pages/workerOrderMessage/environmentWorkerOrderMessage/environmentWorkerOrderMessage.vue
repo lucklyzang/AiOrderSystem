@@ -70,30 +70,33 @@
     </view>
 		<view class="btn-box">
 			<text class="operate-one" @click="editEvent">修改</text>
-			<text class="operate-two" @click="backTaskEvent">取消订单</text>
+			<text class="operate-two" @click="cancelTaskEvent">取消订单</text>
 		</view> 
-    <!-- 退回任务框-->
-    <view class="back-box">
-       <u-modal :show="backShow"  show-cancel-button width="85%"
-          :beforeClose="beforeClose"
-          @confirm="backSure" confirm-button-text="取消"
-          cancel-button-text="确认"
-        >
-          <view class="dialog-title">
-            退回理由
-          </view>
-          <view class="dialog-center">
-						<u--textarea v-model="backReason" count placeholder="请输入退回理由" rows="3"
-								autosiz :autoHeight="true" maxlength="50"
-								>
-						</u--textarea>
-          </view>
+    <!-- 环境订单取消原因弹框 -->
+    <view class="trans-box">
+      <u-modal :show="environmentCancelReasonShow" show-cancel-button 
+        confirm-button-color="#2390fe"
+        @confirm="environmentCancelReasonDialogSure"
+        @cancel="environmentCancelReasonDialogCancel"
+    		@close="environmentCancelReasonShow = false"
+    		:closeOnClickOverlay="true"
+    		confirmColor="#fff"
+    		cancelColor="#3B9DF9"
+        confirmText="确定"
+        cancelText="取消"
+      >
+        <view class="dialog-top">
+          请选择取消原因
+        </view>
+        <view class="dialog-center">
+          <SelectSearch :itemData="environmentCancelReasonOption" ref="environmentCancelOption" :isNeedSearch="false" :curData="environmentCancelReasonValue" @change="environmentCancelReasonOptionChange" />
+        </view>
       </u-modal>
-    </view>  
+    </view>
   </view>
 </template>
 <script>
-import { returnTask} from "@/api/environment.js";
+import { cancelTask } from "@/api/environment.js";
 import { mapGetters, mapMutations } from "vuex";
 import navBar from "@/components/zhouWei-navBar"
 import { setCache, removeAllLocalStorage } from "@/common/js/utils";
@@ -104,9 +107,13 @@ export default {
   },
   data() {
     return {
+			showLoadingHint: false,
 			infoText: '加载中···',
-      backShow: false,
-      backReason: '',
+			taskId: '',
+      environmentSelectCancelReason: {},
+      environmentCancelReasonShow: false,
+      environmentCancelReasonValue: null,
+      environmentCancelReasonOption: [{text: "请选择取消原因",value: null}],
 			problemPicturesEchoList: []
     }
   },
@@ -114,9 +121,11 @@ export default {
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo","cleanTaskDetails",'statusBarHeight','navigationBarHeight']),
+    ...mapGetters(["userInfo","cleanTaskDetails",'statusBarHeight','navigationBarHeight','storeAllOrderCancelReason']),
   },
-
+	onShow() {
+		this.taskId = this.cleanTaskDetails.id;
+	},
   methods: {
     ...mapMutations([]),
 
@@ -130,65 +139,64 @@ export default {
 			uni.navigateBack()
 		},
 	
-    // 退回框关闭前事件
-    beforeClose(action, done) {
-      if (action == 'cancel') {
-        if (!this.backReason) {
-          this.$toast({
-            message: '退回原因不能为空',
-            type: 'success'
-          });
-          done(false)
-        } else {
-          done();
-          this.backCancel()
-        }
-      } else {
-        done()
-      }
-    },
-		
-    // 退回任务确定事件
-    backSure () {
-    },
-
-    // 退回任务取消事件
-    backCancel () {
-      this.overlayShow = true;
-      this.loadingShow = true;
-      this.loadText = '退回中...';
-      returnTask({
-        id: this.cleanTaskDetails.id,
-        returnReasonByApp: this.backReason,
-        workerName: this.userInfo.name
-      }).then((res) => {
-        this.overlayShow = false;
-        this.loadingShow = false;
-        this.loadText = '';
-        if (res && res.data.code == 200) {
-          this.$toast({
-            message: '退回成功',
-            type: 'success'
-          });
-          this.$router.push({
-            path: "/cleaningTask"
-          })
-        } else {
-          this.$toast({
-            message: `${res.data.msg}`,
-            type: 'fail'
-          })
-        }
+    // 环境订单的取消
+    cancelEnvironmentWorkerOrderMessageTask (data) {
+    	this.showLoadingHint = true;
+    	this.infoText = '取消中···'
+      cancelTask(data)
+      .then((res) => {
+    		this.showLoadingHint = false;
+    		this.$refs['environmentCancelOption'].clearSelectValue()
+    		if (res && res.data.code == 200) {
+    			this.$refs.uToast.show({
+    				message: `${res.data.msg}`,
+    				type: 'success'
+    			});
+					this.backTo();
+    		} else {
+    		 this.$refs.uToast.show({
+    			message: `${res.data.msg}`,
+    			type: 'error'
+    		 })
+    		}
       })
       .catch((err) => {
-        this.overlayShow = false;
-        this.loadingShow = false;
-        this.loadText = '';
-        this.$toast({
-          message: `${err}`,
-          type: 'fail'
-        })
+    		this.showLoadingHint = false;
+    		this.$refs['environmentCancelOption'].clearSelectValue();
+    		this.$refs.uToast.show({
+    			message: `${err.message}`,
+    			type: 'error'
+    		})
       })
+    },
+    
+    // 环境订单取消原因弹框下拉框选值变化事件
+    environmentCancelReasonOptionChange (item) {
+      this.environmentCancelReasonValue = item.value;	
+      this.environmentSelectCancelReason = item;
+    },
+    
+    // 环境订单取消原因弹框确定事件
+    environmentCancelReasonDialogSure () {
+    	this.environmentCancelReasonShow = false;
+      if (this.environmentSelectCancelReason.value == null) {
+    		this.$refs.uToast.show({
+    			message: '请选择取消原因'
+    		});
+    		return 
+    	};
+      // 环境订单取消
+    	this.cancelEnvironmentWorkerOrderMessageTask({
+    		id: this.taskId, //当前任务ID
+    		state: 7, //取消后的状态
+    		cancelReason: this.environmentSelectCancelReason['text'] //取消原因
+    	})
+    },
+    
+    // 环境订单取消原因弹框取消事件
+    environmentCancelReasonDialogCancel () {
+    	this.environmentCancelReasonShow = false;
+      this.$refs['environmentCancelOption'].clearSelectValue()
     },
 
     // 提取即时保洁功能区信息
@@ -230,10 +238,10 @@ export default {
       } 
     },
 
-    // 退回订单事件
-    backTaskEvent () {
-			console.log(2);
-      this.backShow = true
+    // 取消订单事件
+    cancelTaskEvent () {
+			this.environmentCancelReasonOption = this.storeAllOrderCancelReason['environmentCancelReason'];
+			this.environmentCancelReasonShow = true
     },
 		
 		// 修改订单事件
@@ -309,56 +317,70 @@ page {
  .nav {
  	width: 100%;
  };
-.back-box {
-    /deep/ .van-dialog {
-      .van-dialog__content {
-          padding: 10px 16px 0 16px !important;
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          .dialog-title {
-            padding: 10px 0;
-            box-sizing: border-box;
-            text-align: center;
-            color: #101010;
-            font-size: 16px;
-          };
-          .dialog-center {
-            padding: 10px 0;
-            box-sizing: border-box;
-            color: #101010;
-            font-size: 12px;
-            .van-cell {
-              border: 1px solid #dcdcdc
-            }
-          }
-        };
-        .van-dialog__footer {
-          padding: 10px 40px 20px 40px !important;
-          box-sizing: border-box;
-          justify-content: space-between;
-          ::after {
-            content: none
-          };
-        .van-dialog__cancel {
-          height: 40px;
-          background: #3B9DF9;
-          color: #fff !important;
-          border-radius: 8px;
-          margin-right: 20px
-        };
-        .van-dialog__confirm {
-           height: 40px;
-            color: #3B9DF9;
-            border: 1px solid #3B9DF9;
-            border-radius: 8px
-        }
-        };
-        .van-hairline--top::after {
-          border-top-width: 0 !important
-        }
-    }
-  };
+ /* 运送订单取消原因弹框 */
+ .trans-box {
+ 	/deep/ .u-popup__content {
+ 		border-radius: 10px !important;
+ 		.u-modal {
+ 		  border-radius: 10px !important;
+ 		  overflow: inherit !important;
+ 		  .u-modal__content {
+ 			  padding: 0 !important;
+ 			  box-sizing: border-box;
+ 				display: flex;
+ 				flex-direction: column;
+ 			  .dialog-top {
+ 				border-top-left-radius: 10px !important;
+ 				border-top-right-radius: 10px !important;
+ 				height: 40px;
+ 				padding-left: 10px;
+ 				position: relative;
+ 				display: flex;
+ 				align-items: center;
+ 				font-size: 14px;
+ 				color: #fff;
+ 				background: #3B9DF9;
+ 				text-align: left
+ 			  };
+ 			  .dialog-center {
+ 				width: 80%;
+ 				height: 20vh;
+ 				margin: 0 auto;
+ 				margin-top: 20px
+ 			  }
+ 		  };
+ 		  .u-modal__button-group {
+ 			  padding: 20px !important;
+ 			  box-sizing: border-box;
+ 			  justify-content: center;
+ 			  ::after {
+ 				content: none
+ 			  };
+ 			.u-modal__button-group__wrapper--cancel {
+ 				width: 40%;
+ 				height: 40px;
+ 				line-height: 40px;
+ 				background: #fff;
+ 				flex: none !important;
+ 				border-radius: 10px;
+ 				border: 1px solid #3B9DF9;
+ 				margin-right: 30px
+ 			};
+ 			.u-modal__button-group__wrapper--confirm {
+ 				height: 40px;
+ 				line-height: 40px;
+ 				flex: none !important;
+ 				width: 40%;
+ 				background: #3B9DF9;
+ 				border-radius: 10px;
+ 			}
+ 		  };
+ 		  .u-hairline--top::after {
+ 			border-top-width: 0 !important
+ 		  }
+ 		}
+ 	}	  
+ };
   .content {
     flex: 1;
     overflow: auto;

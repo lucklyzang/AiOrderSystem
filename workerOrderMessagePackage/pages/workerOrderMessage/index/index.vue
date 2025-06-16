@@ -7,16 +7,16 @@
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
-		<!-- 取消原因弹框 -->
-		<view class="allocation-box">
+		<!-- 运送订单取消原因弹框 -->
+		<view class="trans-box">
 		  <u-modal :show="cancelReasonShow" show-cancel-button 
 		    confirm-button-color="#2390fe"
 		    @confirm="cancelReasonDialogSure"
 		    @cancel="cancelReasonDialogCancel"
-			@close="cancelReasonShow = false"
-			:closeOnClickOverlay="true"
-			confirmColor="#fff"
-			cancelColor="#3B9DF9"
+				@close="cancelReasonShow = false"
+				:closeOnClickOverlay="true"
+				confirmColor="#fff"
+				cancelColor="#3B9DF9"
 		    confirmText="确定"
 		    cancelText="取消"
 		  >
@@ -28,6 +28,69 @@
 		    </view>
 		  </u-modal>
 		</view>
+		<!-- 环境订单取消原因弹框 -->
+		<view class="trans-box">
+		  <u-modal :show="environmentCancelReasonShow" show-cancel-button 
+		    confirm-button-color="#2390fe"
+		    @confirm="environmentCancelReasonDialogSure"
+		    @cancel="environmentCancelReasonDialogCancel"
+				@close="environmentCancelReasonShow = false"
+				:closeOnClickOverlay="true"
+				confirmColor="#fff"
+				cancelColor="#3B9DF9"
+		    confirmText="确定"
+		    cancelText="取消"
+		  >
+		    <view class="dialog-top">
+		      请选择取消原因
+		    </view>
+		    <view class="dialog-center">
+		      <SelectSearch :itemData="environmentCancelReasonOption" ref="environmentCancelOption" :isNeedSearch="false" :curData="environmentCancelReasonValue" @change="environmentCancelReasonOptionChange" />
+		    </view>
+		  </u-modal>
+		</view>
+		<!-- 工程订单取消原因弹框 -->
+		<view class="trans-box">
+		  <u-modal :show="projectCancelReasonShow" show-cancel-button 
+		    confirm-button-color="#2390fe"
+		    @confirm="projectCancelReasonDialogSure"
+		    @cancel="projectCancelReasonDialogCancel"
+				@close="projectCancelReasonShow = false"
+				:closeOnClickOverlay="true"
+				confirmColor="#fff"
+				cancelColor="#3B9DF9"
+		    confirmText="确定"
+		    cancelText="取消"
+		  >
+		    <view class="dialog-top">
+		      请选择取消原因
+		    </view>
+		    <view class="dialog-center">
+		      <SelectSearch :itemData="projectCancelReasonOption" ref="projectCancelOption" :isNeedSearch="false" :curData="projectCancelReasonValue" @change="projectCancelReasonOptionChange" />
+		    </view>
+		  </u-modal>
+		</view>
+		<!-- 事务订单取消原因弹框 -->
+		<view class="trans-box">
+		  <u-modal :show="affairCancelReasonShow" show-cancel-button 
+		    confirm-button-color="#2390fe"
+		    @confirm="affairCancelReasonDialogSure"
+		    @cancel="affairCancelReasonDialogCancel"
+				@close="affairCancelReasonShow = false"
+				:closeOnClickOverlay="true"
+				confirmColor="#fff"
+				cancelColor="#3B9DF9"
+		    confirmText="确定"
+		    cancelText="取消"
+		  >
+		    <view class="dialog-top">
+		      请选择取消原因
+		    </view>
+		    <view class="dialog-center">
+		      <SelectSearch :itemData="affairCancelReasonOption" ref="affairCancelOption" :isNeedSearch="false" :curData="affairCancelReasonValue" @change="affairCancelReasonOptionChange" />
+		    </view>
+		  </u-modal>
+		</view>
 		<view class="nav">
 			<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="订单" @backClick="backTo">
 			</nav-bar> 
@@ -36,6 +99,7 @@
 			:list="transportTypeList"
 			@change="tabsChange"
 			lineWidth="30"
+			:current="current"
 			lineColor="#1864FF"
 			:activeStyle="{
 				color: '#1864FF',
@@ -112,7 +176,7 @@
 					<view @click.stop="modificationOrderEvent(item,'trans')">
 						修改
 					</view>
-					<view @click.stop="cancelOrderEvent(item,'trans')">
+					<view @click.stop="cancelOrderEvent(item,'trans')" v-if="item.state < 5">
 						取消订单
 					</view>
 				</view>
@@ -120,44 +184,33 @@
 		</view>
 		<view class="transport-order-content environment-order-content" v-if="environmentOrderShow">
 			<u-empty text="暂无环境订单" mode="list" v-if="isShowEnvironmentNoData"></u-empty>
-			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'environment')">
+			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'environment')" v-for="(item,index) in environmentOrderList" :key="index">
 				<view class="list-content-top">
 					<view class="list-content-top-left">
-						<image src="@/static/img/send-icon.png"></image>
+						<image src="@/static/img/ai-create-order-icon.png"></image>
 						<text>Ai下单</text>
-						<text>2025-05-15 22:11</text>
+						<text>{{ item.createTime }}</text>
 					</view>
-					<view class="list-content-top-right">
-						<text>未分配</text>
+					<view class="list-content-top-right" :class="{
+						'underwayStyle' : item.state == 3, 
+						'completeStyle' : item.state == 5,
+						'reviewStyle' : item.state == 4 || item.state == 8,
+						'haveReviewStyle' : item.state == 6
+						}">
+						<text>{{ environmentStausTransfer(item.state) }}</text>
 					</view>
 				</view>
 				<view class="list-content-center">
 					<view class="list-content-center-top">
 						<view>
-							<text>出发地:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>目的地:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>运送类型:</text>
-							<text>急诊</text>
+							<text>地点:</text>
+							<text>{{ `${item.structureName}${item.depName}${item.areaImmediateName}${extractSpaceMessage(item.spaces)}` }}</text>
 						</view>
 					</view>
 					<view class="list-content-center-top list-content-center-bottom">
 						<view>
-							<text>运送员:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>床号:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>病人:</text>
-							<text>急诊</text>
+							<text>问题描述:</text>
+							<text></text>
 						</view>
 					</view>
 				</view>
@@ -165,7 +218,7 @@
 					<view @click.stop="modificationOrderEvent(item,'environment')">
 						修改
 					</view>
-					<view @click.stop="cancelOrderEvent(item,'environment')">
+					<view @click.stop="cancelOrderEvent(item,'environment')" v-if="item.state < 5">
 						取消订单
 					</view>
 				</view>
@@ -173,44 +226,28 @@
 		</view>
 		<view class="transport-order-content project-order-content" v-if="projectOrderShow">
 			<u-empty text="暂无工程订单" mode="list" v-if="isShowProjectNoData"></u-empty>
-			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'project')">
+			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'project')" v-for="(item,index) in projectOrderList" :key="index">
 				<view class="list-content-top">
 					<view class="list-content-top-left">
-						<image src="@/static/img/send-icon.png"></image>
+						<image src="@/static/img/ai-create-order-icon.png"></image>
 						<text>Ai下单</text>
-						<text>2025-05-15 22:11</text>
+						<text>{{ item.createTime }}</text>
 					</view>
-					<view class="list-content-top-right">
-						<text>未分配</text>
+					<view class="list-content-top-right" :class="{'noAllocationStyle':item.state == 0,'noLookupStyle':item.state == 1,'noStartStyle': item.state == 2,'underwayStyle':item.state == 3,'tobeSigned':item.state == 4}">
+						<text>{{ projectTaskStatusTransition(item.state) }}</text>
 					</view>
 				</view>
 				<view class="list-content-center">
 					<view class="list-content-center-top">
 						<view>
-							<text>出发地:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>目的地:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>运送类型:</text>
-							<text>急诊</text>
+							<text>地点:</text>
+							<text>{{ item.depName == '/' ? '' : item.depName }}</text>
 						</view>
 					</view>
 					<view class="list-content-center-top list-content-center-bottom">
 						<view>
-							<text>运送员:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>床号:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>病人:</text>
-							<text>急诊</text>
+							<text>事项:</text>
+							<text>{{ item.taskDesc }}</text>
 						</view>
 					</view>
 				</view>
@@ -218,7 +255,7 @@
 					<view @click.stop="modificationOrderEvent(item,'project')">
 						修改
 					</view>
-					<view @click.stop="cancelOrderEvent(item,'project')">
+					<view @click.stop="cancelOrderEvent(item,'project')" v-if="item.state < 5">
 						取消订单
 					</view>
 				</view>
@@ -226,44 +263,22 @@
 		</view>
 		<view class="transport-order-content affair-order-content" v-if="affairOrderShow">
 			<u-empty text="暂无事务订单" mode="list" v-if="isShowAffairNoData"></u-empty>
-			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'affair')">
+			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'affair')" v-for="(item,index) in affairOrderList" :key="index">
 				<view class="list-content-top">
 					<view class="list-content-top-left">
-						<image src="@/static/img/send-icon.png"></image>
+						<image src="@/static/img/ai-create-order-icon.png"></image>
 						<text>Ai下单</text>
-						<text>2025-05-15 22:11</text>
+						<text>{{ item.createTime }}</text>
 					</view>
 					<view class="list-content-top-right">
-						<text>未分配</text>
+						<text>{{ affairTaskStatusTransition(item.state) }}</text>
 					</view>
 				</view>
 				<view class="list-content-center">
 					<view class="list-content-center-top">
 						<view>
-							<text>出发地:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>目的地:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>运送类型:</text>
-							<text>急诊</text>
-						</view>
-					</view>
-					<view class="list-content-center-top list-content-center-bottom">
-						<view>
-							<text>运送员:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>床号:</text>
-							<text>急诊</text>
-						</view>
-						<view>
-							<text>病人:</text>
-							<text>急诊</text>
+							<text>事项:</text>
+							<text>{{ item.taskDesc }}</text>
 						</view>
 					</view>
 				</view>
@@ -271,7 +286,7 @@
 					<view @click.stop="modificationOrderEvent(item,'affair')">
 						修改
 					</view>
-					<view @click.stop="cancelOrderEvent(item,'affair')">
+					<view @click.stop="cancelOrderEvent(item,'affair')" v-if="item.state < 5">
 						取消订单
 					</view>
 				</view>
@@ -289,8 +304,10 @@
 		setCache,
 		removeAllLocalStorage
 	} from '@/common/js/utils'
-	import {getDispatchTaskComplete, queryDispatchTaskCancelReason, updateDispatchTask} from '@/api/transport.js'
-	import { queryTransportTypeClass } from '@/api/transport.js'
+	import { getDispatchTaskComplete, queryDispatchTaskCancelReason, updateDispatchTask, queryTransportTypeClass} from '@/api/transport.js'
+	import { queryCleaningManageTaskList, cancelTask, cancelTaskReason } from "@/api/environment.js";
+	import { repairsList, cancelRepairsTask, queryRepairsTaskCancelReason } from "@/api/project.js";
+	import { affairList, cancelAffairTask, queryAffairTaskCancelReason } from "@/api/affair.js";
 	import navBar from "@/components/zhouWei-navBar"
 	import SelectSearch from "@/components/selectSearch/selectSearch";
 	export default {
@@ -314,15 +331,28 @@
 				environmentOrderList: [],
 				environmentOrderShow: false,
 				isShowEnvironmentNoData: false,
+				environmentSelectCancelReason: {},
+				environmentCancelReasonShow: false,
+				environmentCancelReasonValue: null,
+				environmentCancelReasonOption: [{text: "请选择取消原因",value: null}],
 				
 				projectOrderList: [],
 				projectOrderShow: false,
 				isShowProjectNoData: false,
+				projectSelectCancelReason: {},
+				projectCancelReasonShow: false,
+				projectCancelReasonValue: null,
+				projectCancelReasonOption: [{text: "请选择取消原因",value: null}],
 				
 				affairOrderList: [],
 				affairOrderShow: false,
 				isShowAffairNoData: false,
+				affairSelectCancelReason: {},
+				affairCancelReasonShow: false,
+				affairCancelReasonValue: null,
+				affairCancelReasonOption: [{text: "请选择取消原因",value: null}],
 				taskId: '',
+				current: 0,
 				transportTypeList: [
 					{
 						name: '运送订单'
@@ -344,7 +374,9 @@
 				'userInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
-				'templateType'
+				'templateType',
+				'allOrderCancelReason',
+				'currentIndex'
 			]),
 			userName() {
 				return this.userInfo.userName
@@ -354,17 +386,51 @@
 			}
 		},
 		onShow() {
-			this.queryCompleteDispatchTask({
-				proId:this.proId, workerId:'',state: -1,
-				departmentId: this.userInfo.depId
-			})
+			this.current = this.currentIndex;
+			if (this.currentIndex == 0) {
+				this.transportOrderShow = true;
+				this.environmentOrderShow = false;
+				this.projectOrderShow = false;
+				this.affairOrderShow = false;
+				this.getTransTaskList({
+					proId:this.proId, 
+					workerId:'',
+					state: -1,
+					departmentId: this.userInfo.depId
+				});
+			} else if (this.currentIndex == 1) {
+				this.transportOrderShow = false;
+				this.environmentOrderShow = true;
+				this.projectOrderShow = false;
+				this.affairOrderShow = false;
+				this.getEnvironmentTaskList({
+					proId : this.proId, // 所属项目id
+					queryDate: '', // 查询时间
+					managerId: this.userInfo.depId,// 保洁主管id    
+					taskType: 0 // 0-即时，1-专项
+				});
+			} else if (this.currentIndex == 2) {
+				this.transportOrderShow = false;
+				this.environmentOrderShow = false;
+				this.projectOrderShow = true;
+				this.affairOrderShow = false;
+				this.getProjectTaskList();
+			} else if (this.currentIndex == 3) {
+				this.transportOrderShow = false;
+				this.environmentOrderShow = false;
+				this.projectOrderShow = false;
+				this.affairOrderShow = true;
+				this.getAffairTaskList()
+			}
 		},
 		methods: {
 			...mapMutations([
 				'changeAffairTaskMessage',
 				'changeCleanTaskDetails',
 				'changeSchedulingTaskDetails',
-				'changeDispatchTaskMessage'
+				'changeDispatchTaskMessage',
+				'storeAllOrderCancelReason',
+				'storeCurrentIndex'
 			]),
 			
 			// 顶部导航返回事件
@@ -374,31 +440,199 @@
 			
 			// 标签索引改变事件
 			tabsChange (item) {
+				this.storeCurrentIndex(item.index);
 				if (item.name === '运送订单') {
 					this.transportOrderShow = true;
 					this.environmentOrderShow = false;
 					this.projectOrderShow = false;
 					this.affairOrderShow = false;
-					this.queryCompleteDispatchTask({
-						proId:this.proId, workerId:'',state: -1,
+					this.getTransTaskList({
+						proId:this.proId, 
+						workerId:'',
+						state: -1,
 						departmentId: this.userInfo.depId
-					})
+					});
 				} else if (item.name === '环境订单') {
 					this.transportOrderShow = false;
 					this.environmentOrderShow = true;
 					this.projectOrderShow = false;
 					this.affairOrderShow = false;
+					this.getEnvironmentTaskList({
+						proId : this.proId, // 所属项目id
+						queryDate: '', // 查询时间
+						managerId: this.userInfo.depId,// 保洁主管id    
+						taskType: 0 // 0-即时，1-专项
+					});
 				} else if (item.name === '工程订单') {
 					this.transportOrderShow = false;
 					this.environmentOrderShow = false;
 					this.projectOrderShow = true;
 					this.affairOrderShow = false;
+					this.getProjectTaskList();
 				} else if (item.name === '事务订单') {
 					this.transportOrderShow = false;
 					this.environmentOrderShow = false;
 					this.projectOrderShow = false;
-					this.affairOrderShow = true
+					this.affairOrderShow = true;
+					this.getAffairTaskList()
 				}
+			},
+			
+			// 查询运送订单取消原因
+			getTransOrderCancelReason () {
+				return new Promise((resolve,reject) => {
+					queryDispatchTaskCancelReason({proId: this.proId, state: 0})
+					.then((res) => {
+						if (res && res.data.code == 200) {
+							resolve(res.data.data)
+						} else {
+							this.$refs.uToast.show({
+								message: `${res.data.msg}`,
+								type: 'error'
+							})
+						}
+					})
+					.catch((err) => {
+						reject(err.message)
+					})
+				})
+			},
+			
+			// 查询环境订单取消原因
+			getEnvironmentOrderCancelReason () {
+				return new Promise((resolve,reject) => {
+					cancelTaskReason({proId: this.proId})
+					.then((res) => {
+						if (res && res.data.code == 200) {
+							resolve(res.data.data)
+						} else {
+							this.$refs.uToast.show({
+								message: `${res.data.msg}`,
+								type: 'error'
+							})
+						}
+					})
+					.catch((err) => {
+						reject(err.message)
+					})
+				})
+			},
+			
+			// 查询工程订单取消原因
+			getProjectOrderCancelReason () {
+				return new Promise((resolve,reject) => {
+					queryRepairsTaskCancelReason(this.proId)
+					.then((res) => {
+						if (res && res.data.code == 200) {
+							resolve(res.data.data)
+						} else {
+							this.$refs.uToast.show({
+								message: `${res.data.msg}`,
+								type: 'error'
+							})
+						}
+					})
+					.catch((err) => {
+						reject(err.message)
+					})
+				})
+			},
+			
+			// 查询事务订单取消原因
+			getAffairOrderCancelReason () {
+				return new Promise((resolve,reject) => {
+					queryAffairTaskCancelReason(this.proId)
+					.then((res) => {
+						if (res && res.data.code == 200) {
+							resolve(res.data.data)
+						} else {
+							this.$refs.uToast.show({
+								message: `${res.data.msg}`,
+								type: 'error'
+							})
+						}
+					})
+					.catch((err) => {
+						reject(err.message)
+					})
+				})
+			},
+			
+			// 并行查询各种类型订单的取消原因
+			parallelQueryCancelReasonFunction () {
+				this.showLoadingHint = true;
+				Promise.all([this.getTransOrderCancelReason(), this.getEnvironmentOrderCancelReason(), this.getProjectOrderCancelReason(), this.getAffairOrderCancelReason()])
+				.then((res) => {
+					this.showLoadingHint = false;
+					if (res && res.length > 0) {
+						this.cancelReasonOption = [{text: "请选择取消原因",value: null}];
+						this.environmentCancelReasonOption = [{text: "请选择取消原因",value: null}];
+						this.projectCancelReasonOption = [{text: "请选择取消原因",value: null}];
+						this.affairCancelReasonOption = [{text: "请选择取消原因",value: null}];
+						let [item1,item2,item3,item4] = res;
+						if (item1) {
+							for (let item of item1) {
+								let temporaryWorkerMessageArray = [];
+								for (let innerItem in item) {
+									if (innerItem == 'id') {
+										temporaryWorkerMessageArray.push(item[innerItem])
+									};
+									if (innerItem == 'cancelName') {
+										temporaryWorkerMessageArray.push(item[innerItem])
+									}
+								};
+								this.cancelReasonOption.push({text: temporaryWorkerMessageArray[1], value: temporaryWorkerMessageArray[1]})
+							};
+							// 保存任务取消原因列表信息
+							let temporaryMessage = this.allOrderCancelReason;
+							temporaryMessage['cancelReason'] = this.cancelReasonOption;
+							this.storeAllOrderCancelReason(temporaryMessage)
+						};
+						if (item2) {
+							for (let i = 0, len = item3.length; i < len; i++) {
+								this.environmentCancelReasonOption.push({
+									text: item3[i]['cancelName'],
+									value: item3[i]['id']
+								})
+							};
+							// 保存任务取消原因列表信息
+							let temporaryMessage = this.allOrderCancelReason;
+							temporaryMessage['environmentCancelReason'] = this.environmentCancelReasonOption;
+							this.storeAllOrderCancelReason(temporaryMessage)
+						};
+						if (item3) {
+						 for (let i = 0, len = item3.length; i < len; i++) {
+								this.projectCancelReasonOption.push({
+									text: item3[i]['cancelName'],
+									value: item3[i]['id']
+								})
+							};
+							// 保存任务取消原因列表信息
+							let temporaryMessage = this.allOrderCancelReason;
+							temporaryMessage['projectCancelReason'] = this.projectCancelReasonOption;
+							this.storeAllOrderCancelReason(temporaryMessage)
+						};
+						if (item4) {
+						 for (let i = 0, len = item3.length; i < len; i++) {
+								this.affairCancelReasonOption.push({
+									text: item3[i]['cancelName'],
+									value: item3[i]['id']
+								})
+							};
+							// 保存任务取消原因列表信息
+							let temporaryMessage = this.allOrderCancelReason;
+							temporaryMessage['affairCancelReason'] = this.affairCancelReasonOption;
+							this.storeAllOrderCancelReason(temporaryMessage)
+						}
+					}
+				})
+				.catch((err) => {
+					this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: `${err}`,
+						type: 'error'
+					})
+				})
 			},
 			
 			// 任务优先级转换
@@ -419,24 +653,108 @@
 				}
 			},
 			
-			// 任务状态转换
-			stateTransfer (state) {
+			// 运送任务状态转换
+			stateTransfer (index) {
+				switch(index) {
+					case 0 :
+						return '未分配'
+						break;
+					case 1 :
+						return '未查阅'
+						break;
+					case 2 :
+						return '未开始'
+						break;
+					case 3 :
+						return '进行中'
+						break;
+					case 4 :
+						return '未结束'
+						break;
+					case 5 :
+						return '已延迟'
+						break;
+					case 6 :
+						return '已取消'
+						break;
+					case 7 :
+						return '已完成'
+						break;
+				}
+			},
+			
+			//环境订单状态转换
+			environmentStausTransfer (num) {
+				switch(num) {
+						case 1:
+								return '未开始'
+								break;
+						case 2:
+								return '未开始'
+								break;
+						case 3:
+								return '进行中'
+								break;
+						case 4:
+								return '待复核'
+								break;
+						case 5:
+								return '已完成'
+								break;
+						case 6:
+								return '已复核'
+								break
+						case 8:
+								return '复核中'
+								break
+				} 
+			},
+			
+			// 工程任务状态转换
+			projectTaskStatusTransition (state) {
 				switch(state) {
-				 case 0 :
-					 return '未分配'
-					 break;
-				 case 1 :
-					 return '未查阅'
-					 break;
-				 case 2 :
-					 return '未开始'
-					 break;
-				 case 3 :
-					 return '进行中'
-					 break;
-				 case 4 :
-					 return '未结束'
-					 break
+					case 0 :
+						return '未分配'
+						break;
+					case 1 :
+						return '未查阅'
+						break;
+					case 2 :
+						return '未开始'
+						break;
+					case 3 :
+						return '进行中'
+						break;
+					case 4 :
+						return '待签字'
+						break;
+					case 5 :
+						return '已完成'
+						break
+				}
+			},
+			
+			// 工程任务状态转换
+			affairTaskStatusTransition (state) {
+				switch(state) {
+					case 0 :
+						return '未分配'
+						break;
+					case 1 :
+						return '未查阅'
+						break;
+					case 2 :
+						return '未开始'
+						break;
+					case 3 :
+						return '进行中'
+						break;
+					case 4 :
+						return '待签字'
+						break;
+					case 5 :
+						return '已完成'
+						break
 				}
 			},
 			
@@ -460,43 +778,6 @@
 				return temporaryArr.join("、")
 			},
 			
-			// 获取运送订单取消原因列表
-			getDispatchTaskCancelReason (data) {
-				this.showLoadingHint = true;
-				this.infoText = '查询中···'
-				queryDispatchTaskCancelReason(data).then((res) => {
-					this.showLoadingHint = false;
-					if (res && res.data.code == 200) {
-						this.cancelReasonShow = true;
-						this.cancelReasonOption = [{text: "请选择取消原因",value: null}];
-						for (let item of res.data.data) {
-							let temporaryWorkerMessageArray = [];
-							for (let innerItem in item) {
-								if (innerItem == 'id') {
-									temporaryWorkerMessageArray.push(item[innerItem])
-								};
-								if (innerItem == 'cancelName') {
-									temporaryWorkerMessageArray.push(item[innerItem])
-								}
-							};
-							this.cancelReasonOption.push({text: temporaryWorkerMessageArray[1], value: temporaryWorkerMessageArray[1]})
-						}
-					} else {
-						this.$refs.uToast.show({
-							message: `${res.data.msg}`,
-							type: 'error'
-						})
-					}
-				})
-				.catch((err) => {
-					this.showLoadingHint = false;
-					this.$refs.uToast.show({
-						message: `${err}`,
-						type: 'error'
-					})
-				})
-			},
-			
 			// 运送订单的取消
 			cancelDispatchTask (data) {
 				this.showLoadingHint = true;
@@ -510,7 +791,7 @@
 							message: `${res.data.msg}`,
 							type: 'success'
 						});
-						this.queryCompleteDispatchTask(
+						this.getTransTaskList(
 						{
 						 proId:this.proId, workerId:'',state: -1,
 						 departmentId: this.userInfo.depId
@@ -547,7 +828,6 @@
 					});
 					return 
 				};
-				
 			  // 运送订单取消
 				this.cancelDispatchTask({
 					tempFlag: this.templateType === 'template_one' ? 1 : 2, //模板(1:旧模板,2:新模板)
@@ -566,20 +846,207 @@
 			  this.$refs['cancelOption'].clearSelectValue()
 			},
 			
-			// 查询运送订单
-			queryCompleteDispatchTask (data) {
+			// 环境订单的取消
+			cancelEnvironmentWorkerOrderMessageTask (data) {
+				this.showLoadingHint = true;
+				this.infoText = '取消中···'
+			  cancelTask(data)
+			  .then((res) => {
+					this.showLoadingHint = false;
+					this.$refs['environmentCancelOption'].clearSelectValue()
+					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							message: `${res.data.msg}`,
+							type: 'success'
+						});
+						this.getEnvironmentTaskList({
+							proId : this.proId, // 所属项目id
+							queryDate: '', // 查询时间
+							managerId: this.userInfo.depId,// 保洁主管id    
+							taskType: 0 // 0-即时，1-专项
+						})
+					} else {
+					 this.$refs.uToast.show({
+						message: `${res.data.msg}`,
+						type: 'error'
+					 })
+					}
+			  })
+			  .catch((err) => {
+					this.showLoadingHint = false;
+					this.$refs['environmentCancelOption'].clearSelectValue();
+					this.$refs.uToast.show({
+						message: `${err.message}`,
+						type: 'error'
+					})
+			  })
+			},
+			
+			// 环境订单取消原因弹框下拉框选值变化事件
+			environmentCancelReasonOptionChange (item) {
+			  this.environmentCancelReasonValue = item.value;	
+			  this.environmentSelectCancelReason = item;
+			},
+			
+			// 环境订单取消原因弹框确定事件
+			environmentCancelReasonDialogSure () {
+				this.environmentCancelReasonShow = false;
+			  if (this.environmentSelectCancelReason.value == null) {
+					this.$refs.uToast.show({
+						message: '请选择取消原因'
+					});
+					return 
+				};
+			  // 环境订单取消
+				this.cancelEnvironmentWorkerOrderMessageTask({
+					id: this.taskId, //当前任务ID
+					state: 7, //取消后的状态
+					cancelReason: this.environmentSelectCancelReason['text'] //取消原因
+				})
+			},
+			
+			// 环境订单取消原因弹框取消事件
+			environmentCancelReasonDialogCancel () {
+				this.environmentCancelReasonShow = false;
+			  this.$refs['environmentCancelOption'].clearSelectValue()
+			},
+			
+			// 工程订单的取消
+			cancelProjectWorkerOrderMessageTask (data) {
+				this.showLoadingHint = true;
+				this.infoText = '取消中···'
+			  cancelRepairsTask(data)
+			  .then((res) => {
+					this.showLoadingHint = false;
+					this.$refs['projectCancelOption'].clearSelectValue()
+					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							message: `${res.data.msg}`,
+							type: 'success'
+						});
+						this.getProjectTaskList()
+					} else {
+					 this.$refs.uToast.show({
+						message: `${res.data.msg}`,
+						type: 'error'
+					 })
+					}
+			  })
+			  .catch((err) => {
+					this.showLoadingHint = false;
+					this.$refs['projectCancelOption'].clearSelectValue();
+					this.$refs.uToast.show({
+						message: `${err.message}`,
+						type: 'error'
+					})
+			  })
+			},
+			
+			// 工程订单取消原因弹框下拉框选值变化事件
+			projectCancelReasonOptionChange (item) {
+			  this.projectCancelReasonValue = item.value;	
+			  this.projectSelectCancelReason = item;
+			},
+			
+			// 工程订单取消原因弹框确定事件
+			projectCancelReasonDialogSure () {
+				this.projectCancelReasonShow = false;
+			  if (this.projectSelectCancelReason.value == null) {
+					this.$refs.uToast.show({
+						message: '请选择取消原因'
+					});
+					return 
+				};
+			  // 工程订单取消
+				this.cancelProjectWorkerOrderMessageTask({
+					taskId: this.taskId, //任务id
+					state: 6,
+					proId: this.proId, // 医院id
+					reason: this.projectSelectCancelReason['text'] //取消原因
+				})
+			},
+			
+			// 工程订单取消原因弹框取消事件
+			environmentCancelReasonDialogCancel () {
+				this.projectCancelReasonShow = false;
+			  this.$refs['projectCancelOption'].clearSelectValue()
+			},
+			
+			// 事务订单的取消
+			cancelAffairWorkerOrderMessageTask (data) {
+				this.showLoadingHint = true;
+				this.infoText = '取消中···'
+			  cancelAffairTask(data)
+			  .then((res) => {
+					this.showLoadingHint = false;
+					this.$refs['affairCancelOption'].clearSelectValue()
+					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							message: `${res.data.msg}`,
+							type: 'success'
+						});
+						this.getAffairTaskList()
+					} else {
+					 this.$refs.uToast.show({
+						message: `${res.data.msg}`,
+						type: 'error'
+					 })
+					}
+			  })
+			  .catch((err) => {
+					this.showLoadingHint = false;
+					this.$refs['affairCancelOption'].clearSelectValue();
+					this.$refs.uToast.show({
+						message: `${err.message}`,
+						type: 'error'
+					})
+			  })
+			},
+			
+			// 事务订单取消原因弹框下拉框选值变化事件
+			affairCancelReasonOptionChange (item) {
+			  this.affairCancelReasonValue = item.value;	
+			  this.affairSelectCancelReason = item;
+			},
+			
+			// 事务订单取消原因弹框确定事件
+			affairCancelReasonDialogSure () {
+				this.affairCancelReasonShow = false;
+			  if (this.affairSelectCancelReason.value == null) {
+					this.$refs.uToast.show({
+						message: '请选择取消原因'
+					});
+					return 
+				};
+			  // 事务订单取消
+				this.cancelAffairWorkerOrderMessageTask({
+					taskId: this.taskId, //任务id
+					state: 6,
+					proId: this.proId, // 医院id
+					reason: this.affairSelectCancelReason['text'] //取消原因
+				})
+			},
+			
+			// 事务订单取消原因弹框取消事件
+			affairCancelReasonDialogCancel () {
+				this.affairCancelReasonShow = false;
+			  this.$refs['affairCancelOption'].clearSelectValue()
+			},
+			
+			// 查询运送订单列表
+			getTransTaskList (data) {
 			  this.isShowTransportNoData = false;
 			  this.showLoadingHint = true;
 			  getDispatchTaskComplete(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
-						this.transOrderList = [];
 						let temporaryDataList = [];
 						if (res.data.data.length > 0) {
 							temporaryDataList = res.data.data;
 							if (temporaryDataList.length > 0) {
 								this.isShowTransportNoData = false;
 							} else {
+								this.transOrderList = [];
 								this.isShowTransportNoData = true;
 							};
 							for (let item of temporaryDataList) {
@@ -628,6 +1095,108 @@
 			  })
 			},
 			
+				// 查询环境订单列表列表
+				getEnvironmentTaskList (data) {
+					this.showLoadingHint = true;
+					this.isShowEnvironmentNoData = false;
+					queryCleaningManageTaskList(data).then((res) => {
+						this.showLoadingHint = false;
+						if (res && res.data.code == 200) {
+							this.environmentOrderList = res.data.data.filter((item) => { return item.state != 7 && item.state != 0});
+							if (this.environmentOrderList.length == 0) {
+								this.isShowEnvironmentNoData = true;
+								this.environmentOrderList = [];
+							}
+						} else {
+							this.$refs.uToast.show({
+								message: `${res.data.msg}`,
+								type: 'error'
+							})
+						}
+        }).catch((err) => {
+            this.$refs.uToast.show({
+            	message: `${err}`,
+            	type: 'error'
+            });
+            this.showLoadingHint = false;
+        })
+    },
+		
+		//查询工程订单列表
+		getProjectTaskList () {
+			this.showLoadingHint = true;
+			this.isShowProjectNoData = false;
+			repairsList(-3,this.proId,1)
+			.then((res) => {
+				this.showLoadingHint = false;
+				if (res && res.data.code == 200) {
+					this.projectOrderList = res.data.data;
+					// 显示未完成(不包括已取消)的任务状态(0-未分配，1-未查阅,2-未开始，3-进行中，4-待签字，5-已完成，6-已取消)
+					this.projectOrderList = this.projectOrderList.filter(( item ) => { return item.state != 5 && item.state != 6});
+					if (this.projectOrderList.length == 0) {
+						this.isShowProjectNoData = true;
+						this.projectOrderList = [];
+					}
+				} else {
+					this.$refs.uToast.show({
+						message: `${res.data.msg}`,
+						type: 'error'
+					})
+				}
+			})
+			.catch((err) => {
+				this.showLoadingHint = false;
+				this.$refs.uToast.show({
+					message: `${err}`,
+					type: 'error'
+				})
+			})
+		},
+		
+		//查询事务订单列表
+		getAffairTaskList () {
+			this.showLoadingHint = true;
+			this.isShowAffairNoData = false;
+			affairList(-3,this.proId,1)
+			.then((res) => {
+				this.showLoadingHint = false;
+				if (res && res.data.code == 200) {
+					this.affairOrderList = res.data.data;
+					// 显示未完成(不包括已取消)的任务状态(0-未分配，1-未查阅,2-未开始，3-进行中，4-待签字，5-已完成，6-已取消)
+					this.affairOrderList = this.affairOrderList.filter(( item ) => { return item.state != 5 && item.state != 6});
+					if (this.affairOrderList.length == 0) {
+						this.isShowAffairNoData = true;
+						this.affairOrderList = [];
+					}
+				} else {
+					this.$refs.uToast.show({
+						message: `${res.data.msg}`,
+						type: 'error'
+					})
+				}
+			})
+			.catch((err) => {
+				this.showLoadingHint = false;
+				this.$refs.uToast.show({
+					message: `${err}`,
+					type: 'error'
+				})
+			})
+		},
+		
+		// 提取环境订单地点信息
+		extractSpaceMessage (spaces) {
+				if (spaces.length == 0) {
+						return ''
+				};
+				let temporaryArray = [];
+				for (let item of spaces) {
+						temporaryArray.push(item.name);
+				};
+				return temporaryArray.join("、")
+		},
+
+		
 			// 进入订单详情事件
 			enterOrderDetailsEvent (item, text) {
 				if (text == 'trans') {
@@ -678,13 +1247,13 @@
 			cancelOrderEvent (item,text) {
 				this.taskId = item.id
 				if (text == 'trans') {
-					this.getDispatchTaskCancelReason({proId: this.proId, state: 0});
+					this.cancelReasonShow = true;
 				} else if (text == 'environment') {
-					
+					this.environmentCancelReasonShow = true;
 				} else if (text == 'project') {
-					
+					this.projectCancelReasonShow = true;
 				} else if (text == 'affair') {
-					
+					this.affairCancelReasonShow = true;
 				}
 			}
 		}
@@ -722,8 +1291,8 @@
 			left: 0;
 			z-index: 10
 		};
-		/* 取消原因弹框 */
-		.allocation-box {
+		/* 运送订单取消原因弹框 */
+		.trans-box {
 			/deep/ .u-popup__content {
 				border-radius: 10px !important;
 				.u-modal {
@@ -732,8 +1301,8 @@
 				  .u-modal__content {
 					  padding: 0 !important;
 					  box-sizing: border-box;
-								display: flex;
-								flex-direction: column;
+						display: flex;
+						flex-direction: column;
 					  .dialog-top {
 						border-top-left-radius: 10px !important;
 						border-top-right-radius: 10px !important;
@@ -861,6 +1430,7 @@
 						background: #E86F50;
 						color: #fff;
 					};
+					// 运送订单
 					.noLookupStyle {
 						background: #E8CB51 !important
 					};
@@ -872,6 +1442,37 @@
 					};
 					.noEndStyle {
 						background: #F2A15F !important
+					};
+					
+					// 环境订单
+					.underwayStyle {
+						background: #289E8E !important
+					};
+					.completeStyle {
+						background: #242424 !important
+					};
+					.reviewStyle {
+						background: #F2A15F !important
+					};
+					.haveReviewStyle {
+						background: #9B7D31 !important
+					};
+					
+					// 工程订单
+					.noAllocationStyle {
+						background: #E86F50 !important
+					};
+					.noLookupStyle {
+						background: #E8CB51 !important
+					};
+					.noStartStyle {
+						background: #174E97 !important
+					};
+					.underwayStyle {
+						background: #289E8E !important
+					};
+					.tobeSigned {
+						background: #40f9e0 !important
 					}
 				};
 				.list-content-center {

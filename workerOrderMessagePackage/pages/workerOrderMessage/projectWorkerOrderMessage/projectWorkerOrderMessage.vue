@@ -12,25 +12,25 @@
 			</nav-bar> 
 		</view>
     <!-- 取消原因弹框 -->
-    <view class="allocation-box">
-      <u-modal :show="cancelReasonShow" show-cancel-button 
-        confirm-button-color="#2390fe"
-        @confirm="cancelReasonDialogSure"
-        @cancel="cancelReasonDialogCancel"
-		@close="cancelReasonShow = false"
-		:closeOnClickOverlay="true"
-		confirmColor="#fff"
-		cancelColor="#3B9DF9"
-        confirmText="确定"
-        cancelText="取消"
-      >
-        <view class="slot-conten dialog-top">
-          请选择取消原因
-        </view>
-        <view class="dialog-center">
-          <SelectSearch :itemData="cancelReasonOption" ref="cancelOption" :isNeedSearch="false" :curData="cancelReasonValue" @change="cancelReasonOptionChange" />
-        </view>
-      </u-modal>
+    <view class="trans-box">
+     <u-modal :show="projectCancelReasonShow" show-cancel-button
+       confirm-button-color="#2390fe"
+       @confirm="projectCancelReasonDialogSure"
+       @cancel="projectCancelReasonDialogCancel"
+     	@close="projectCancelReasonShow = false"
+     	:closeOnClickOverlay="true"
+     	confirmColor="#fff"
+     	cancelColor="#3B9DF9"
+       confirmText="确定"
+       cancelText="取消"
+     >
+       <view class="dialog-top">
+         请选择取消原因
+       </view>
+       <view class="dialog-center">
+         <SelectSearch :itemData="projectCancelReasonOption" ref="projectCancelOption" :isNeedSearch="false" :curData="projectCancelReasonValue" @change="projectCancelReasonOptionChange" />
+       </view>
+     </u-modal>
     </view>
     <!-- 图片放大弹框  -->
     <view class="image-dislog-box">
@@ -157,7 +157,7 @@
 </template>
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import { cancelRepairsTask } from '@/api/project.js'
+import { cancelRepairsTask } from "@/api/project.js";
 import { setCache, removeAllLocalStorage, } from '@/common/js/utils'
 import SelectSearch from "@/components/selectSearch/selectSearch";
 import navBar from "@/components/zhouWei-navBar"
@@ -168,29 +168,21 @@ export default {
   },
   data() {
     return {
-	infoText: '加载中···',
-	showLoadingHint: false,
+			infoText: '加载中···',
+			showLoadingHint: false,
       currentimageUrl: '',
       imageBoxShow: false,
-      transporterValue: null,
-      transporterOption: [],
-      selectCancelReason: {},
-	  cancelReasonShow: false,
-      cancelReasonValue: null,
-      cancelReasonOption: [{text: "请选择取消原因",value: null},{value:1,text:'萨哒哒'},{value:2,text:'郭德纲'},{value:3,text:'个大概'}],
-      repairsCancelReasonOption: [],
+			projectSelectCancelReason: {},
+			projectCancelReasonShow: false,
+			projectCancelReasonValue: null,
+			projectCancelReasonOption: [{text: "请选择取消原因",value: null}],
     }
-  },
-
-  onLoad() {
-    // 回显取消原因列表
-    // this.repairsCancelReasonOption = this.schedulingTaskAboutMessage['repairsCancelReasonOption'];
   },
 
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo","schedulingTaskDetails",'statusBarHeight','navigationBarHeight',]),
+    ...mapGetters(["userInfo","schedulingTaskDetails",'statusBarHeight','navigationBarHeight','storeAllOrderCancelReason']),
     proId () {
       return this.userInfo.extendData.proId
     }
@@ -268,74 +260,72 @@ export default {
 				url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationProjectWorkerOrder/modificationProjectWorkerOrder'
 			})
 		},
-
-    // 取消点击事件
-    cancelReasonEvent(item,index,text) {
-      this.cancelReasonShow = true;
-      // this.cancelReasonValue = null;
-      // this.cancelReasonOption = [{text: "请选择取消原因",value: null},{value:1,text:'萨哒哒'},{value:2,text:'郭德纲'},{value:3,text:'个大概'}];
-			// this.cancelReasonOption = this.repairsCancelReasonOption
-      // this.taskId = item.id;
-      // if (this.activeName == 'repairsTask') {
-      //   this.cancelReasonOption = this.repairsCancelReasonOption
-      // }
-    },
-
-    // 取消原因弹框下拉框选值变化事件
-    cancelReasonOptionChange (item) {
-	  this.cancelReasonValue = item.value;	
-      this.selectCancelReason = item;
-    },
-
-    // 取消原因弹框确定事件
-    cancelReasonDialogSure () {
-			this.cancelReasonShow = false;
-      if (this.selectCancelReason.value == null) {
+		
+		// 工程订单的取消
+		cancelProjectWorkerOrderMessageTask (data) {
+			this.showLoadingHint = true;
+			this.infoText = '取消中···'
+		  cancelRepairsTask(data)
+		  .then((res) => {
+				this.showLoadingHint = false;
+				this.$refs['projectCancelOption'].clearSelectValue()
+				if (res && res.data.code == 200) {
+					this.$refs.uToast.show({
+						message: `${res.data.msg}`,
+						type: 'success'
+					});
+					this.backTo();
+				} else {
+				 this.$refs.uToast.show({
+					message: `${res.data.msg}`,
+					type: 'error'
+				 })
+				}
+		  })
+		  .catch((err) => {
+				this.showLoadingHint = false;
+				this.$refs['projectCancelOption'].clearSelectValue();
+				this.$refs.uToast.show({
+					message: `${err.message}`,
+					type: 'error'
+				})
+		  })
+		},
+		
+		// 工程订单取消原因弹框下拉框选值变化事件
+		projectCancelReasonOptionChange (item) {
+		  this.projectCancelReasonValue = item.value;	
+		  this.projectSelectCancelReason = item;
+		},
+		
+		// 工程订单取消原因弹框确定事件
+		projectCancelReasonDialogSure () {
+			this.projectCancelReasonShow = false;
+		  if (this.projectSelectCancelReason.value == null) {
 				this.$refs.uToast.show({
 					message: '请选择取消原因'
 				});
 				return 
 			};
-      this.showLoadingHint = true;
-			this.infoText = '取消中···'
-      // 维修任务取消
-        cancelRepairsTask({
-          taskId: this.schedulingTaskDetails['id'], //任务id
-          state: 6,
-          proId: this.proId, // 医院id
-          reason: this.selectCancelReason['text'] //取消原因
-        })
-        .then((res) => {
-          this.showLoadingHint = false;
-					this.$refs['cancelOption'].clearSelectValue();
-          if (res && res.data.code == 200) {
-            this.$refs.uToast.show({
-            	message: '取消成功',
-            	type: 'success',
-            });
-            // 返回任务调度页
-            this.backTo()
-          } else {
-            this.$refs.uToast.show({
-            	message: res.data.msg,
-            	type: 'error',
-            })
-          }
-        })
-        .catch((err) => {
-					this.$refs.childComponent['cancelOption'].clearSelectValue();
-          this.showLoadingHint = false;
-          this.$refs.uToast.show({
-          	message: `${err}`,
-          	type: 'error',
-          });
-      })
-    },
+			this.cancelProjectWorkerOrderMessageTask({
+				taskId: this.schedulingTaskDetails['id'], //任务id
+				state: 6,
+				proId: this.proId, // 医院id
+				reason: this.projectSelectCancelReason['text'] //取消原因
+			})
+		},
+		
+		// 工程订单取消原因弹框取消事件
+		environmentCancelReasonDialogCancel () {
+			this.projectCancelReasonShow = false;
+		  this.$refs['projectCancelOption'].clearSelectValue()
+		},
+		
 
-    // 取消原因弹框取消事件
-    cancelReasonDialogCancel () {
-	 this.cancelReasonShow = false;
-      this.$refs['cancelOption'].clearSelectValue()
+    // 取消点击事件
+    cancelReasonEvent() {
+			this.projectSelectCancelReason = this.storeAllOrderCancelReason['projectCancelReason'];
+      this.projectCancelReasonShow = true;
     },
 		
     // 任务状态转换
@@ -355,7 +345,10 @@ export default {
           break;
         case 4 :
           return '待签字'
-          break
+          break;
+				case 5 :
+					return '已完成'
+					break
       }
     }
   }
@@ -421,9 +414,9 @@ page {
         }
     }
   };
-	/* 取消原因弹框 */
-	.allocation-box {
-	    /deep/ .u-popup__content {
+	/* 运送订单取消原因弹框 */
+	.trans-box {
+		/deep/ .u-popup__content {
 			border-radius: 10px !important;
 			.u-modal {
 			  border-radius: 10px !important;
@@ -431,8 +424,8 @@ page {
 			  .u-modal__content {
 				  padding: 0 !important;
 				  box-sizing: border-box;
-							display: flex;
-							flex-direction: column;
+					display: flex;
+					flex-direction: column;
 				  .dialog-top {
 					border-top-left-radius: 10px !important;
 					border-top-right-radius: 10px !important;

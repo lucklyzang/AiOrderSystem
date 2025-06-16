@@ -11,22 +11,24 @@
 			<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="订单详情" @backClick="backTo">
 			</nav-bar> 
 		</view>
-    <!-- 取消原因弹框 -->
-    <view class="allocation-box">
-      <u-modal v-model="cancelReasonShow" width="80%" show-cancel-button 
+    <!-- 事务订单取消原因弹框 -->
+    <view class="trans-box">
+      <u-modal :show="affairCancelReasonShow" show-cancel-button 
         confirm-button-color="#2390fe"
-				asyncClose="true"
-        :before-close="beforeCloseCancelReasonDialogEvent"
-        @confirm="cancelReasonDialogSure"
-        @cancel="cancelReasonDialogCancel"
-        confirm-button-text="确定"
-        cancel-button-text="取消"
+        @confirm="affairCancelReasonDialogSure"
+        @cancel="affairCancelReasonDialogCancel"
+    		@close="affairCancelReasonShow = false"
+    		:closeOnClickOverlay="true"
+    		confirmColor="#fff"
+    		cancelColor="#3B9DF9"
+        confirmText="确定"
+        cancelText="取消"
       >
         <view class="dialog-top">
           请选择取消原因
         </view>
         <view class="dialog-center">
-          <SelectSearch :itemData="cancelReasonOption" ref="cancelOption" :isNeedSearch="false" :curData="cancelReasonValue" @change="cancelReasonOptionChange" />
+          <SelectSearch :itemData="affairCancelReasonOption" ref="affairCancelOption" :isNeedSearch="false" :curData="affairCancelReasonValue" @change="affairCancelReasonOptionChange" />
         </view>
       </u-modal>
     </view>
@@ -41,10 +43,10 @@
 					<view class="message-one">
 							<view class="message-one-left">
 									<text>编号:</text>
-									<text>{{ schedulingTaskDetails.taskNumber }}</text>
+									<text>{{ affairTaskMessage.taskNumber }}</text>
 							</view>
-							<view class="message-one-right" :class="{'noAllocationStyle':schedulingTaskDetails.state == 0,'noLookupStyle':schedulingTaskDetails.state == 1,'noStartStyle': schedulingTaskDetails.state == 2,'underwayStyle':schedulingTaskDetails.state == 3,'tobeSigned':schedulingTaskDetails.state == 4}">
-									{{ taskStatusTransition(schedulingTaskDetails.state) }}
+							<view class="message-one-right" :class="{'noAllocationStyle':affairTaskMessage.state == 0,'noLookupStyle':affairTaskMessage.state == 1,'noStartStyle': affairTaskMessage.state == 2,'underwayStyle':affairTaskMessage.state == 3,'tobeSigned':affairTaskMessage.state == 4}">
+									{{ taskStatusTransition(affairTaskMessage.state) }}
 							</view>
 					</view>
 					<view class="message-one message-two message-six">
@@ -53,13 +55,13 @@
 							</view>
 							<view class="message-two-right" 
 							:class="{
-									'priorityNormalStyle' : schedulingTaskDetails.priority == 1,
-									'priorityUrgencyStyle' : schedulingTaskDetails.priority == 2,
-									'priorityImportanceStyle' : schedulingTaskDetails.priority == 3,
-									'priorityUrgentImportanceStyle' : schedulingTaskDetails.priority == 4,
+									'priorityNormalStyle' : affairTaskMessage.priority == 1,
+									'priorityUrgencyStyle' : affairTaskMessage.priority == 2,
+									'priorityImportanceStyle' : affairTaskMessage.priority == 3,
+									'priorityUrgentImportanceStyle' : affairTaskMessage.priority == 4,
 							 
 							 }">
-									{{ taskPriotityTransition(schedulingTaskDetails.priority) }}
+									{{ taskPriotityTransition(affairTaskMessage.priority) }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -67,7 +69,7 @@
 									<text>具体事项</text>
 							</view>
 							<view class="message-two-right">
-									{{ schedulingTaskDetails.depName == '/' ? '' : schedulingTaskDetails.depName }}
+									{{ affairTaskMessage.depName == '/' ? '' : affairTaskMessage.depName }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -75,7 +77,7 @@
 									<text>目的建筑</text>
 							</view>
 							<view class="message-two-right">
-								 {{ disposeCheckType(schedulingTaskDetails.spaces) }}
+								 {{ disposeCheckType(affairTaskMessage.spaces) }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -83,7 +85,7 @@
 									<text>目的科室</text>
 							</view>
 							<view class="message-two-right">
-									{{ schedulingTaskDetails.workerName }}
+									{{ affairTaskMessage.workerName }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -91,15 +93,15 @@
 									<text>负责人</text>
 							</view>
 							<view class="message-two-right">
-									{{ disposeTaskPresent(schedulingTaskDetails.present) }}
+									{{ disposeTaskPresent(affairTaskMessage.present) }}
 							</view>
 					</view>
 					<view class="issue-image">
 							<view class="issue-image-left">
 									<text>图片</text>
 							</view>
-							<view class="issue-image-list" v-if="schedulingTaskDetails.images && schedulingTaskDetails.images.length > 0">
-									<text v-for="(innerItem,innerIndex) in schedulingTaskDetails.images" :key="innerIndex" >
+							<view class="issue-image-list" v-if="affairTaskMessage.images && affairTaskMessage.images.length > 0">
+									<text v-for="(innerItem,innerIndex) in affairTaskMessage.images" :key="innerIndex" >
 											<image alt="" :src="innerItem.path" @click="enlareEvent(innerItem.path)"
 											>
 									</text>
@@ -115,7 +117,7 @@
 </template>
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import { cancelRepairsTask } from '@/api/project.js'
+import { cancelAffairTask } from "@/api/affair.js";
 import { setCache, removeAllLocalStorage } from '@/common/js/utils'
 import SelectSearch from "@/components/selectSearch/selectSearch";
 import navBar from "@/components/zhouWei-navBar"
@@ -127,28 +129,25 @@ export default {
   data() {
     return {
 			infoText: '加载中···',
+			taskId: '',
 			showLoadingHint: false,
-      cancelReasonShow: false,
       currentimageUrl: '',
       imageBoxShow: false,
-      transporterValue: null,
-      transporterOption: [],
-      selectCancelReason: {},
-      cancelReasonValue: null,
-      cancelReasonOption: [],
-      repairsCancelReasonOption: [],
+      affairSelectCancelReason: {},
+      affairCancelReasonShow: false,
+      affairCancelReasonValue: null,
+      affairCancelReasonOption: [{text: "请选择取消原因",value: null}]
     }
   },
 
-  onLoad() {
-    // 回显取消原因列表
-    this.repairsCancelReasonOption = this.schedulingTaskAboutMessage['repairsCancelReasonOption'];
+  onShow() {
+    this.taskId = this.affairTaskMessage.id;
   },
 
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo","schedulingTaskDetails",'statusBarHeight','navigationBarHeight']),
+    ...mapGetters(["userInfo","affairTaskMessage",'statusBarHeight','navigationBarHeight']),
     proId () {
       return this.userInfo.extendData.proId
     }
@@ -227,78 +226,71 @@ export default {
 		},
 
     // 取消点击事件
-    cancelReasonEvent(item,index,text) {
-      this.cancelReasonShow = true;
-      this.taskId = item.id;
-      if (this.activeName == 'repairsTask') {
-        this.cancelReasonOption = this.repairsCancelReasonOption
-      }
+    cancelReasonEvent() {
+     this.affairSelectCancelReason = this.storeAllOrderCancelReason['affairCancelReason'];
+     this.projectCancelReasonShow = true;
     },
 
-    // 取消原因弹框下拉框选值变化事件
-    cancelReasonOptionChange (item) {
-      this.selectCancelReason = item
-    },
-
-    // 取消原因弹框关闭前事件
-    beforeCloseCancelReasonDialogEvent (action, done) {
-      if (action == 'confirm') {
-        if (this.selectCancelReason.value == null) {
-          this.$toast('请选择取消原因');
-          done(false)
-        } else {
-          done()
-        }
-      } else {
-        done()
-      }
-    },
-
-    // 取消原因弹框确定事件
-    cancelReasonDialogSure () {
-      if (this.selectCancelReason.value == null) { return };
-      this.loadingShow = true;
-      this.overlayShow = true;
-      this.loadingText = '取消中...';
-      // 维修任务取消
-        cancelRepairsTask({
-          taskId: this.schedulingTaskDetails['id'], //任务id
-          state: 6,
-          proId: this.proId, // 医院id
-          reason: this.selectCancelReason['text'] //取消原因
-        })
-        .then((res) => {
-          this.loadingShow = false;
-          this.overlayShow = false;
-          this.loadingText = '';
-          this.$refs['cancelOption'].clearSelectValue();
-          if (res && res.data.code == 200) {
-            this.$toast('取消成功');
-            // 返回任务调度页
-            this.onClickLeft()
-          } else {
-            this.$toast({
-              type: 'fail',
-              message: res.data.msg
-            })
-          }
-        })
-        .catch((err) => {
-          this.$refs['cancelOption'].clearSelectValue();
-          this.loadingText = '';
-          this.loadingShow = false;
-          this.overlayShow = false;
-          this.$toast({
-            type: 'fail',
-            message: err
-          })
-      })
-    },
-
-    // 取消原因弹框取消事件
-    cancelReasonDialogCancel () {
-      this.$refs['cancelOption'].clearSelectValue()
-    },
+   // 事务订单的取消
+   cancelAffairWorkerOrderMessageTask (data) {
+   	this.showLoadingHint = true;
+   	this.infoText = '取消中···'
+     cancelAffairTask(data)
+     .then((res) => {
+   		this.showLoadingHint = false;
+   		this.$refs['affairCancelOption'].clearSelectValue()
+   		if (res && res.data.code == 200) {
+   			this.$refs.uToast.show({
+   				message: `${res.data.msg}`,
+   				type: 'success'
+   			});
+   			this.backTo()
+   		} else {
+   		 this.$refs.uToast.show({
+   			message: `${res.data.msg}`,
+   			type: 'error'
+   		 })
+   		}
+     })
+     .catch((err) => {
+   		this.showLoadingHint = false;
+   		this.$refs['affairCancelOption'].clearSelectValue();
+   		this.$refs.uToast.show({
+   			message: `${err.message}`,
+   			type: 'error'
+   		})
+     })
+   },
+   
+   // 事务订单取消原因弹框下拉框选值变化事件
+   affairCancelReasonOptionChange (item) {
+     this.affairCancelReasonValue = item.value;	
+     this.affairSelectCancelReason = item;
+   },
+   
+   // 事务订单取消原因弹框确定事件
+   affairCancelReasonDialogSure () {
+   	this.affairCancelReasonShow = false;
+     if (this.affairSelectCancelReason.value == null) {
+   		this.$refs.uToast.show({
+   			message: '请选择取消原因'
+   		});
+   		return 
+   	};
+    // 事务订单取消
+   	this.cancelAffairWorkerOrderMessageTask({
+   		taskId: this.taskId, //任务id
+   		state: 6,
+   		proId: this.proId, // 医院id
+   		reason: this.affairSelectCancelReason['text'] //取消原因
+   	})
+   },
+   
+   // 事务订单取消原因弹框取消事件
+   affairCancelReasonDialogCancel () {
+   	this.affairCancelReasonShow = false;
+     this.$refs['affairCancelOption'].clearSelectValue()
+   },
 		
     // 任务状态转换
     taskStatusTransition (state) {
@@ -317,7 +309,10 @@ export default {
           break;
         case 4 :
           return '待签字'
-          break
+          break;
+    		case 5 :
+    			return '已完成'
+    			break
       }
     },
 
@@ -360,35 +355,70 @@ page {
   	left: 0;
   	z-index: 10
   };
-  /deep/ .van-popup--right {
-    padding: 20px 0 80px 0;
-    box-sizing: border-box;
-    .top-icon {
-        padding-left: 10px;
-        box-sizing: border-box
-    };
-    .center-content {
-        margin-top: 20px;
-        .function-list {
-            width: 153px;
-            height: 40px;
-            line-height: 40px;
-            text-align: center;
-            margin: 0 auto;
-            border: 1px solid #3B9DF9;
-            box-sizing: border-box;
-            font-size: 16px;
-            color: #3B9DF9;
-            border-radius: 8px;
-            margin-bottom: 20px
-        };
-        .functionListStyle {
-            color: #fff !important;
-            border: none !important;
-            background: #3B9DF9 !important
-        }
-    }
-  };
+ /* 订单取消原因弹框 */
+ 		.trans-box {
+ 			/deep/ .u-popup__content {
+ 				border-radius: 10px !important;
+ 				.u-modal {
+ 				  border-radius: 10px !important;
+ 				  overflow: inherit !important;
+ 				  .u-modal__content {
+ 					  padding: 0 !important;
+ 					  box-sizing: border-box;
+ 						display: flex;
+ 						flex-direction: column;
+ 					  .dialog-top {
+ 						border-top-left-radius: 10px !important;
+ 						border-top-right-radius: 10px !important;
+ 						height: 40px;
+ 						padding-left: 10px;
+ 						position: relative;
+ 						display: flex;
+ 						align-items: center;
+ 						font-size: 14px;
+ 						color: #fff;
+ 						background: #3B9DF9;
+ 						text-align: left
+ 					  };
+ 					  .dialog-center {
+ 						width: 80%;
+ 						height: 20vh;
+ 						margin: 0 auto;
+ 						margin-top: 20px
+ 					  }
+ 				  };
+ 				  .u-modal__button-group {
+ 					  padding: 20px !important;
+ 					  box-sizing: border-box;
+ 					  justify-content: center;
+ 					  ::after {
+ 						content: none
+ 					  };
+ 					.u-modal__button-group__wrapper--cancel {
+ 						width: 40%;
+ 						height: 40px;
+ 						line-height: 40px;
+ 						background: #fff;
+ 						flex: none !important;
+ 						border-radius: 10px;
+ 						border: 1px solid #3B9DF9;
+ 						margin-right: 30px
+ 					};
+ 					.u-modal__button-group__wrapper--confirm {
+ 						height: 40px;
+ 						line-height: 40px;
+ 						flex: none !important;
+ 						width: 40%;
+ 						background: #3B9DF9;
+ 						border-radius: 10px;
+ 					}
+ 				  };
+ 				  .u-hairline--top::after {
+ 					border-top-width: 0 !important
+ 				  }
+ 				}
+ 			}	  
+ 		};
   .nav {
 		width: 100%;
   };

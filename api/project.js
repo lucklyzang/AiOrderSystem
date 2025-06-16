@@ -3,11 +3,28 @@ import Qs from 'qs'
 
 // 维修任务列表查询
 export function repairsList (state,proId,flag) {
-    return request({
-      url: `project/bxTask/new/queryTask?state=${state}&proId=${proId}&flag=${flag}`,
-      method: 'get'
-    })
-  };
+	return request({
+		url: `project/bxTask/new/queryTask?state=${state}&proId=${proId}&flag=${flag}`,
+		method: 'get'
+	})
+};
+
+// 维修任务取消
+export function cancelRepairsTask (data) {
+  return request({
+    url: 'project/bxTask/cancelTask',
+    method: 'put',
+    data
+  })
+};
+
+// 维修任务取消原因查询
+export function queryRepairsTaskCancelReason(proId) {
+  return request({
+    url: `project/cancel/queryAll?proId=${proId}`,
+    method: 'get'
+  })
+};
 
 // 维修任务详情查询
 export function repairsDetails (id) {
@@ -34,30 +51,12 @@ export function createRepairsTask (data) {
   })
 };
 
-
-// 维修任务取消
-export function cancelRepairsTask (data) {
-  return request({
-    url: 'project/bxTask/cancelTask',
-    method: 'put',
-    data
-  })
-};
-
 // 维修任务编辑
 export function editRepairsTask (data) {
   return request({
     url: 'project/bxTask/update',
     method: 'put',
     data
-  })
-};
-
-// 维修任务取消原因查询
-export function queryRepairsTaskCancelReason(proId) {
-  return request({
-    url: `project/cancel/queryAll?proId=${proId}`,
-    method: 'get'
   })
 };
 

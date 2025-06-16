@@ -8,15 +8,15 @@
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
 		<!-- 取消原因弹框 -->
-		<view class="allocation-box">
+		<view class="trans-box">
 		  <u-modal :show="cancelReasonShow" show-cancel-button 
 		    confirm-button-color="#2390fe"
 		    @confirm="cancelReasonDialogSure"
 		    @cancel="cancelReasonDialogCancel"
-			@close="cancelReasonShow = false"
-			:closeOnClickOverlay="true"
-			confirmColor="#fff"
-			cancelColor="#3B9DF9"
+				@close="cancelReasonShow = false"
+				:closeOnClickOverlay="true"
+				confirmColor="#fff"
+				cancelColor="#3B9DF9"
 		    confirmText="确定"
 		    cancelText="取消"
 		  >
@@ -180,7 +180,7 @@
 		removeAllLocalStorage,
 		mergeMethods
 	} from '@/common/js/utils'
-	import {getDispatchTaskComplete, queryDispatchTaskCancelReason, updateDispatchTask, getDispatchTaskMessageById} from '@/api/transport.js'
+	import { updateDispatchTask, getDispatchTaskMessageById } from '@/api/transport.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import SelectSearch from "@/components/selectSearch/selectSearch";
 	// import MyAudio from '@/components/myAudio'
@@ -195,7 +195,7 @@
 				showLoadingHint: false,
 				infoText: '加载中···',
 				transportList: [],
-				dispatchTaskId: '',
+				taskId: '',
 				selectCancelReason: {},
 				cancelReasonShow: false,
 				cancelReasonValue: null,
@@ -215,7 +215,8 @@
 				'userInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
-				'dispatchTaskMessage'
+				'dispatchTaskMessage',
+				'storeAllOrderCancelReason'
 			]),
 			userName() {
 			},
@@ -223,8 +224,8 @@
 				return this.userInfo.extendData.proId
 			}
 		},
-		onLoad(options) {
-			this.dispatchTaskId = '';
+		onShow() {
+			this.taskId = this.dispatchTaskMessage.id;
 		},
 		methods: {
 			...mapMutations([
@@ -243,43 +244,6 @@
 				})
 			},
 			
-			// 获取运送订单取消原因列表
-			getDispatchTaskCancelReason (data) {
-				this.showLoadingHint = true;
-				this.infoText = '查询中···'
-				queryDispatchTaskCancelReason(data).then((res) => {
-					this.showLoadingHint = false;
-					if (res && res.data.code == 200) {
-						this.cancelReasonShow = true;
-						this.cancelReasonOption = [{text: "请选择取消原因",value: null}];
-						for (let item of res.data.data) {
-							let temporaryWorkerMessageArray = [];
-							for (let innerItem in item) {
-								if (innerItem == 'id') {
-									temporaryWorkerMessageArray.push(item[innerItem])
-								};
-								if (innerItem == 'cancelName') {
-									temporaryWorkerMessageArray.push(item[innerItem])
-								}
-							};
-							this.cancelReasonOption.push({text: temporaryWorkerMessageArray[1], value: temporaryWorkerMessageArray[1]})
-						}
-					} else {
-						this.$refs.uToast.show({
-							message: `${res.data.msg}`,
-							type: 'error'
-						})
-					}
-				})
-				.catch((err) => {
-					this.showLoadingHint = false;
-					this.$refs.uToast.show({
-						message: `${err}`,
-						type: 'error'
-					})
-				})
-			},
-			
 			// 运送订单的取消
 			cancelDispatchTask (data) {
 				this.showLoadingHint = true;
@@ -293,11 +257,7 @@
 							message: `${res.data.msg}`,
 							type: 'success'
 						});
-						this.queryCompleteDispatchTask(
-						{
-						 proId:this.proId, workerId:'',state: -1,
-						 departmentId: this.userInfo.depId
-						})
+						this.backTo();
 					} else {
 					 this.$refs.uToast.show({
 						message: `${res.data.msg}`,
@@ -347,12 +307,9 @@
 			},
 			
 			// 取消点击事件
-			cancelReasonEvent(item,index,text) {
-			  this.cancelReasonShow = true;
-			  this.taskId = item.id;
-			  if (this.activeName == 'repairsTask') {
-			    this.cancelReasonOption = this.repairsCancelReasonOption
-			  }
+			cancelReasonEvent() {
+				this.cancelReasonOption = this.storeAllOrderCancelReason['cancelReason'];
+			  this.cancelReasonShow = true
 			},
 			
 			// 任务状态转换图片
@@ -382,7 +339,7 @@
 			// 获取任务详情
 			getTaskMessage () {
 				this.showLoadingHint = true;
-				getDispatchTaskMessageById(this.dispatchTaskId,this.dispatchTaskMessage.tempFlag)
+				getDispatchTaskMessageById(this.taskId,this.dispatchTaskMessage.tempFlag)
 				.then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
@@ -434,67 +391,70 @@
 			left: 0;
 			z-index: 10
 		};
-		/* 取消原因弹框 */
-		.allocation-box {
-		    /deep/ .u-modal {
-		      border-radius: 10px !important;
-		      overflow: inherit !important;
-		      .u-modal__content {
-		          padding: 0 !important;
-		          box-sizing: border-box;
-							display: flex;
-							flex-direction: column;
-		          .dialog-top {
-		            border-top-left-radius: 10px !important;
-		            border-top-right-radius: 10px !important;
-		            height: 40px;
-		            padding-left: 10px;
-		            position: relative;
-		            display: flex;
-		            align-items: center;
-		            font-size: 14px;
-		            color: #fff;
-		            background: #3B9DF9;
-		            text-align: left
-		          };
-		          .dialog-center {
-		            width: 80%;
-		            height: 20vh;
-		            margin: 0 auto;
-		            margin-top: 20px
-		          }
-		      };
-		      .u-modal__button-group {
-		          padding: 20px !important;
-		          box-sizing: border-box;
-		          justify-content: center;
-		          ::after {
-		            content: none
-		          };
-		        .u-modal__button-group__wrapper--cancel {
-		            width: 40%;
-		            height: 40px;
-		            line-height: 40px;
-		            background: #fff;
-		            flex: none !important;
-		            border-radius: 10px;
-		            border: 1px solid #3B9DF9;
-		            margin-right: 30px
-		        };
-		        .u-modal__button-group__wrapper--confirm {
-		            height: 40px;
-		            line-height: 40px;
-		            flex: none !important;
-		            width: 40%;
-		            background: #3B9DF9;
-		            border-radius: 10px;
-		        }
-		      };
-		      .u-hairline--top::after {
-		        border-top-width: 0 !important
-		      }
-		    }  
-		  };
+		/* 运送订单取消原因弹框 */
+		.trans-box {
+			/deep/ .u-popup__content {
+				border-radius: 10px !important;
+				.u-modal {
+				  border-radius: 10px !important;
+				  overflow: inherit !important;
+				  .u-modal__content {
+					  padding: 0 !important;
+					  box-sizing: border-box;
+						display: flex;
+						flex-direction: column;
+					  .dialog-top {
+						border-top-left-radius: 10px !important;
+						border-top-right-radius: 10px !important;
+						height: 40px;
+						padding-left: 10px;
+						position: relative;
+						display: flex;
+						align-items: center;
+						font-size: 14px;
+						color: #fff;
+						background: #3B9DF9;
+						text-align: left
+					  };
+					  .dialog-center {
+						width: 80%;
+						height: 20vh;
+						margin: 0 auto;
+						margin-top: 20px
+					  }
+				  };
+				  .u-modal__button-group {
+					  padding: 20px !important;
+					  box-sizing: border-box;
+					  justify-content: center;
+					  ::after {
+						content: none
+					  };
+					.u-modal__button-group__wrapper--cancel {
+						width: 40%;
+						height: 40px;
+						line-height: 40px;
+						background: #fff;
+						flex: none !important;
+						border-radius: 10px;
+						border: 1px solid #3B9DF9;
+						margin-right: 30px
+					};
+					.u-modal__button-group__wrapper--confirm {
+						height: 40px;
+						line-height: 40px;
+						flex: none !important;
+						width: 40%;
+						background: #3B9DF9;
+						border-radius: 10px;
+					}
+				  };
+				  .u-hairline--top::after {
+					border-top-width: 0 !important
+				  }
+				}
+			}	  
+		};
 		.nav {
 			width: 100%;
 		};

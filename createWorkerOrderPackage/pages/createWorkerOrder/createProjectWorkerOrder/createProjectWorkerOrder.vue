@@ -719,17 +719,17 @@
 
 				// 查询任务类型
 				getTaskType () {
-				return new Promise((resolve,reject) => {
-					getRepairsTaskType(this.proId, this.workerId)
-					.then((res) => {
-						if (res && res.data.code == 200) {
-							resolve(res.data.data)
-						}
+					return new Promise((resolve,reject) => {
+						getRepairsTaskType(this.proId, this.workerId)
+						.then((res) => {
+							if (res && res.data.code == 200) {
+								resolve(res.data.data)
+							}
+						})
+						.catch((err) => {
+							reject(err.message)
+						})
 					})
-					.catch((err) => {
-						reject(err.message)
-					})
-				})
 				},
 
 				// 使用工具下拉选择框确认事件

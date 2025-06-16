@@ -63,12 +63,21 @@ export function getFunctionAreaMessage(data) {
     })
 }
 
-// 退回任务(即时保洁和专项保洁)
-export function returnTask(data) {
+// 取消任务(即时保洁和专项保洁)
+export function cancelTask(data) {
     return request({
-        url: 'clean/cleanTask/returnTask',
+        url: 'clean/cleanTask/cancel',
         method: 'put',
         data
+    })
+}
+
+// 取消原因(即时保洁和专项保洁)
+export function cancelTaskReason(data) {
+    return request({
+        url: 'clean/cancel/queryAll',
+        method: 'get',
+				params: data
     })
 }
 
@@ -79,3 +88,12 @@ export function getAliyunSign() {
 	    method: 'get'
 	})
 }
+
+// 查询保洁管理任务列表
+export function queryCleaningManageTaskList(data) {
+    return request({
+        url: 'clean/cleanTask/app/listAll',
+        method: 'get',
+        params: data
+    })
+};
