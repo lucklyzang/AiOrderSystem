@@ -1,5 +1,5 @@
 <template>
-  <view class="content-box" ref="wrapper">
+  <view class="content-box">
    <u-transition :show="showLoadingHint" mode="fade-down">
    	<view class="loading-box" v-if="showLoadingHint">
    		<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
@@ -131,225 +131,225 @@
     <view class="transport-rice-box" v-if="showGender">
       <ScrollSelection :columns="genderList" title="性别" @sure="genderSureEvent" @cancel="genderCancelEvent" @close="genderCloseEvent" />
     </view>
-		<view class="message-box">
-			<view class="message-one">
-				<view class="message-one-left">
-					优先级
-				</view>
-				<view class="message-one-right">
-					<u-radio-group v-model="priorityRadioValue" direction="horizontal">
-						<u-radio name="1" activeColor="#8af08a" labelColor="#8af08a" label="正常"></u-radio>
-						<u-radio name="2" activeColor="#fcd388" labelColor="#fcd388" label="重要"></u-radio>
-						<u-radio name="3" activeColor="#ea7171" labelColor="#ea7171" label="紧急"></u-radio>
-						<u-radio name="4" activeColor="#b62b2b" labelColor="#b62b2b" label="紧急重要"></u-radio>
-					</u-radio-group>
-				</view>
+	<view class="message-box">
+		<view class="message-one">
+			<view class="message-one-left">
+				优先级
 			</view>
-			<view class="select-box">
-				<view class="select-box-left">
-					<text>*</text>
-					<text>运送大类</text>
-				</view>
-				<view class="select-box-right" @click="transportPartentClickEvent">
-					<text :class="{'selectBoxRightStyle': !transportPartentSelected}">{{ currentTransportRice }}</text>
-					<u-icon name="arrow-right" :color="transportPartentSelected ? '#989999' : '#d6d6d6'" size="20"></u-icon>
-				</view>
-			</view>
-			<view class="transport-type" v-if="templateType === 'template_one'">
-				<view class="transport-type-left">
-					<text>运送类型</text>
-				</view>
-				<view class="transport-type-right">
-					<text class="transport-type-list" :class="{'transportTypeListStyle': transportTypeIndex == index}" 
-						v-for="(item,index) in transportTypeList"
-						@click="transportTypeEvent(item,index)" 
-						:key="index"
-						>
-						{{ item.text }}
-					</text>
-				</view>
-			</view>
-			<view class="select-box">
-				<view class="select-box-left">
-					<text>*</text>
-					<text>起点科室</text>
-				</view>
-				<view class="select-box-right" @click="showStartDepartment = true">
-					<text>{{ currentStartDepartment }}</text>
-					<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
-				</view>
-			</view>
-			<view class="message-one is-back task-total" v-if="templateType === 'template_two'">
-				<view class="trans-total-title">
-					该任务运送总数
-				</view>
-				<view class="trans-total-content">
-					<u-input v-model="taskTransportTotal" type="digit" readonly border="none" />
-				</view>
-			</view>
-			<view class="select-box end-select-box">
-				<view class="select-box-left">
-					<text>终点科室</text>
-				</view>
-				<view class="select-box-right" @click="templateType === 'template_one' ? showEndDepartment = true : showGoalSpaces = true">
-					<text>{{ templateType === 'template_one' ? currentEndDepartment : disposeTaskPresent(currentGoalSpaces)}}</text>
-					<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
-				</view>
-			</view>
-			<view class="select-box end-select-box">
-				<view class="select-box-left">
-					<text>运送员</text>
-				</view>
-				<view class="select-box-right" @click="showTransporter = true">
-					<text>{{ currentTransporter }}</text>
-					<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
-				</view>
-			</view>
-			<view class="select-box end-select-box">
-				<view class="select-box-left">
-					<text>转运工具</text>
-				</view>
-				<view class="select-box-right" @click="showTransportTool = true">
-					<text>{{ currentTransportTool }}</text>
-					<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
-				</view>
-			</view>
-			<view class="patient-message-box" v-if="templateType === 'template_one'">
-				<view class="patient-message-top">
-					<view class="patient-message-top-left">
-						<text>床号</text>
-						<u-input :value="patientNumberValue" placeholder="请输入" />
-					</view>
-					<view class="patient-message-top-right">
-						<text>姓名</text>
-						<u-input :value="patientNameValue" placeholder="请输入" />
-					</view>
-				</view>
-				<view class="patient-message-bottom">
-					<view class="patient-message-bottom-left">
-						<text>住院号</text>
-						<u-input :value="admissionNumberValue" placeholder="请输入" />
-					</view>
-					<view class="patient-message-bottom-right">
-						<text>年龄</text>
-						<u-input :value="patientAgeValue" type="digit" placeholder="请输入" />
-					</view>
-				</view>
-				<view class="patient-message-bottom-age">
-					<view class="patient-message-bottom-right">
-						<text>运送数量</text>
-						<u-input :value="transportNumberValue" type="digit" placeholder="请输入运输数量" border="none" />
-					</view>
-					<view class="contact-isolation-box">
-						<view>接触隔离</view>
-						<view>
-							<u-radio-group v-model="isContactisolationValue">
-								<u-radio name="1" activeColor="#3B9DF9" label="是"></u-radio>
-								<u-radio name="0" activeColor="#3B9DF9" label="否"></u-radio>
-							</u-radio-group>
-						</view>
-					</view>
-				</view>
-			</view>
-			<view class="field-box-wrapper" v-if="templateType === 'template_two'">
-				<view class="field-box-two" v-for="(item,index) in templatelistTwo" :key="item">
-					<view class="field-title">
-						<view class="patient-name">病人{{index+1}}</view>
-						<view class="icon-area">
-							<u-icon name="trash" v-if="index > 0" @click="deletetMessage(index)" color="#E86F50"  size="22" /></u-icon>
-							<u-icon name="edit-pen" @click="editMessage(index)" color="#3B9DF9" size="22"></u-icon>
-						</view>
-					</view>
-					<view class="field-wrapper">
-						<view class="field-four">
-							<view class="contact-isolation-box">
-								<view>接触隔离:</view>
-								<view>
-								 {{ item.isContactisolationValue == 1 ? '是' : item.isContactisolationValue === null ? '' : '否' }}
-								</view>
-							</view>
-						</view>
-						<view class="field-one">
-							<view class="creat-form-field">
-								<text>床号</text>
-								<u-input :value="item.bedNumber"  border="none" disabled :clearable="false">
-								</u-input>
-							</view>
-							<view class="creat-form-field">
-								<text>姓名</text>
-								<u-input :value="item.patientName"  border="none" disabled :clearable="false">
-								</u-input>
-							</view>
-							<view class="creat-form-field">
-								<text>性别</text>
-								<u-input :value="item.genderValue" border="none" disabled :clearable="false">
-								</u-input>
-							</view>
-						</view>
-						<view class="field-two">
-							<view class="creat-form-field">
-								<text>住院号</text>
-								<u-input :value="item.patientNumber" border="none" disabled :clearable="false">
-								</u-input>
-							</view>
-							<view class="creat-form-field">
-								<text>运送数量</text>
-								<u-input disabled :value="item.actualData" type="text" border="none" disabled :clearable="false">
-								</u-input>
-							</view>
-							<view class="creat-form-field">
-								<text>年龄</text>
-								<u-input :value="item.patientAgeValue" border="none" disabled :clearable="false" type="number">
-								</u-input>
-							</view>
-						</view>
-						<view class="field-three">
-							<view class="sample-box">
-								<view>运送类型:</view>
-								<view>
-									{{item.sampleValue}}
-								</view>
-								<view>
-								{{jointTransportMessage(index)}}
-								</view>
-							</view>
-						</view>
-					</view>
-				</view>
-				<view class="add-message" @click="addMessageEvent" v-if="templateType === 'template_two'">
-						<u-icon name="plus" color="#43c3f3" size="16"></u-icon>
-						添加病人信息
-				</view>
-			</view>
-			<view class="select-box end-select-box" v-if="templateType === 'template_one'">
-				<view class="select-box-left">
-					<text>性别</text>
-				</view>
-				<view class="select-box-right" @click="showGender = true">
-					<text>{{ currentGender }}</text>
-					<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
-				</view>
-			</view>
-			<view class="message-one is-back">
-				<view class="message-one-left">
-					运送员是否返回
-				</view>
-				<view class="transport-isBack">
-					<u-radio-group v-model="isBackRadioValue">
-						<u-radio name="0" activeColor="#2c9af1" label="否"></u-radio>
-						<u-radio name="1" activeColor="#2c9af1" label="是"></u-radio>
-					</u-radio-group>
-				</view>
-			</view>
-			<view class="task-describe">
-				<text>任务描述</text>
-				<u--textarea v-model="taskDescribe" placeholder="请输入任务描述" height="140" :autoHeight="true" border="none"></u--textarea>
+			<view class="message-one-right">
+				<u-radio-group v-model="priorityRadioValue" direction="horizontal">
+					<u-radio name="1" activeColor="#8af08a" labelColor="#8af08a" label="正常"></u-radio>
+					<u-radio name="2" activeColor="#fcd388" labelColor="#fcd388" label="重要"></u-radio>
+					<u-radio name="3" activeColor="#ea7171" labelColor="#ea7171" label="紧急"></u-radio>
+					<u-radio name="4" activeColor="#b62b2b" labelColor="#b62b2b" label="紧急重要"></u-radio>
+				</u-radio-group>
 			</view>
 		</view>
-		<view class="btn-box">
-		  <text class="operate-one" @click="getTransConfig">确认</text>
-		  <text class="operate-two" @click="cancelEvent">取消</text>
+		<view class="select-box">
+			<view class="select-box-left">
+				<text>*</text>
+				<text>运送大类</text>
+			</view>
+			<view class="select-box-right" @click="transportPartentClickEvent">
+				<text :class="{'selectBoxRightStyle': !transportPartentSelected}">{{ currentTransportRice }}</text>
+				<u-icon name="arrow-right" :color="transportPartentSelected ? '#989999' : '#d6d6d6'" size="20"></u-icon>
+			</view>
 		</view>
+		<view class="transport-type" v-if="templateType === 'template_one'">
+			<view class="transport-type-left">
+				<text>运送类型</text>
+			</view>
+			<view class="transport-type-right">
+				<text class="transport-type-list" :class="{'transportTypeListStyle': transportTypeIndex == index}" 
+					v-for="(item,index) in transportTypeList"
+					@click="transportTypeEvent(item,index)" 
+					:key="index"
+					>
+					{{ item.text }}
+				</text>
+			</view>
+		</view>
+		<view class="select-box">
+			<view class="select-box-left">
+				<text>*</text>
+				<text>起点科室</text>
+			</view>
+			<view class="select-box-right" @click="showStartDepartment = true">
+				<text>{{ currentStartDepartment }}</text>
+				<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
+			</view>
+		</view>
+		<view class="message-one is-back task-total" v-if="templateType === 'template_two'">
+			<view class="trans-total-title">
+				该任务运送总数
+			</view>
+			<view class="trans-total-content">
+				<u-input v-model="taskTransportTotal" type="digit" readonly border="none" />
+			</view>
+		</view>
+		<view class="select-box end-select-box">
+			<view class="select-box-left">
+				<text>终点科室</text>
+			</view>
+			<view class="select-box-right" @click="templateType === 'template_one' ? showEndDepartment = true : showGoalSpaces = true">
+				<text>{{ templateType === 'template_one' ? currentEndDepartment : disposeTaskPresent(currentGoalSpaces)}}</text>
+				<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
+			</view>
+		</view>
+		<view class="select-box end-select-box">
+			<view class="select-box-left">
+				<text>运送员</text>
+			</view>
+			<view class="select-box-right" @click="showTransporter = true">
+				<text>{{ currentTransporter }}</text>
+				<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
+			</view>
+		</view>
+		<view class="select-box end-select-box">
+			<view class="select-box-left">
+				<text>转运工具</text>
+			</view>
+			<view class="select-box-right" @click="showTransportTool = true">
+				<text>{{ currentTransportTool }}</text>
+				<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
+			</view>
+		</view>
+		<view class="patient-message-box" v-if="templateType === 'template_one'">
+			<view class="patient-message-top">
+				<view class="creat-form-field">
+					<text>床号</text>
+					<u-input :value="patientNumberValue" border="bottom" placeholder="请输入" />
+				</view>
+				<view class="creat-form-field">
+					<text>姓名</text>
+					<u-input :value="patientNameValue" border="bottom" placeholder="请输入" />
+				</view>
+			</view>
+			<view class="patient-message-top patient-message-bottom">
+				<view class="creat-form-field">
+					<text>住院号</text>
+					<u-input :value="admissionNumberValue" border="bottom" placeholder="请输入" />
+				</view>
+				<view class="creat-form-field">
+					<text>年龄</text>
+					<u-input :value="patientAgeValue" type="digit" border="bottom" placeholder="请输入" />
+				</view>
+			</view>
+			<view class="patient-message-bottom-age">
+				<view class="patient-message-bottom-right">
+					<text>运送数量</text>
+					<u-input :value="transportNumberValue" border="bottom" type="digit" placeholder="请输入运输数量" />
+				</view>
+				<view class="contact-isolation-box">
+					<view>接触隔离</view>
+					<view>
+						<u-radio-group v-model="isContactisolationValue">
+							<u-radio name="1" activeColor="#3B9DF9" label="是"></u-radio>
+							<u-radio name="0" activeColor="#3B9DF9" label="否"></u-radio>
+						</u-radio-group>
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="field-box-wrapper" v-if="templateType === 'template_two'">
+			<view class="field-box-two" v-for="(item,index) in templatelistTwo" :key="item">
+				<view class="field-title">
+					<view class="patient-name">病人{{index+1}}</view>
+					<view class="icon-area">
+						<u-icon name="trash" v-if="index > 0" @click="deletetMessage(index)" color="#E86F50"  size="22" /></u-icon>
+						<u-icon name="edit-pen" @click="editMessage(index)" color="#3B9DF9" size="22"></u-icon>
+					</view>
+				</view>
+				<view class="field-wrapper">
+					<view class="field-four">
+						<view class="contact-isolation-box">
+							<view>接触隔离:</view>
+							<view>
+							 {{ item.isContactisolationValue == 1 ? '是' : item.isContactisolationValue === null ? '' : '否' }}
+							</view>
+						</view>
+					</view>
+					<view class="field-one">
+						<view class="creat-form-field">
+							<text>床号</text>
+							<u-input :value="item.bedNumber"  border="none" disabled :clearable="false">
+							</u-input>
+						</view>
+						<view class="creat-form-field">
+							<text>姓名</text>
+							<u-input :value="item.patientName"  border="none" disabled :clearable="false">
+							</u-input>
+						</view>
+						<view class="creat-form-field">
+							<text>性别</text>
+							<u-input :value="item.genderValue" border="none" disabled :clearable="false">
+							</u-input>
+						</view>
+					</view>
+					<view class="field-two">
+						<view class="creat-form-field">
+							<text>住院号</text>
+							<u-input :value="item.patientNumber" border="none" disabled :clearable="false">
+							</u-input>
+						</view>
+						<view class="creat-form-field">
+							<text>运送数量</text>
+							<u-input disabled :value="item.actualData" type="text" border="none" disabled :clearable="false">
+							</u-input>
+						</view>
+						<view class="creat-form-field">
+							<text>年龄</text>
+							<u-input :value="item.patientAgeValue" border="none" disabled :clearable="false" type="number">
+							</u-input>
+						</view>
+					</view>
+					<view class="field-three">
+						<view class="sample-box">
+							<view>运送类型:</view>
+							<view>
+								{{item.sampleValue}}
+							</view>
+							<view>
+							{{jointTransportMessage(index)}}
+							</view>
+						</view>
+					</view>
+				</view>
+			</view>
+			<view class="add-message" @click="addMessageEvent" v-if="templateType === 'template_two'">
+					<u-icon name="plus" color="#43c3f3" size="16"></u-icon>
+					添加病人信息
+			</view>
+		</view>
+		<view class="select-box end-select-box" v-if="templateType === 'template_one'">
+			<view class="select-box-left">
+				<text>性别</text>
+			</view>
+			<view class="select-box-right" @click="showGender = true">
+				<text>{{ currentGender }}</text>
+				<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
+			</view>
+		</view>
+		<view class="message-one is-back">
+			<view class="message-one-left">
+				运送员是否返回
+			</view>
+			<view class="transport-isBack">
+				<u-radio-group v-model="isBackRadioValue">
+					<u-radio name="0" activeColor="#2c9af1" label="否"></u-radio>
+					<u-radio name="1" activeColor="#2c9af1" label="是"></u-radio>
+				</u-radio-group>
+			</view>
+		</view>
+		<view class="task-describe">
+			<text>任务描述</text>
+			<u--textarea v-model="taskDescribe" placeholder="请输入任务描述" height="140" :autoHeight="true" border="none"></u--textarea>
+		</view>
+	</view>
+	<view class="btn-box">
+	  <text class="operate-one" @click="getTransConfig">确认</text>
+	  <text class="operate-two" @click="cancelEvent">取消</text>
+	</view>
   </view>
 </template>
 <script>
@@ -927,39 +927,6 @@ export default {
       })
     },
 
-
-    // 注册滑动事件  
-    registerSlideEvent () {
-      this.$refs.wrapper.addEventListener('touchstart',this.touchstartHandle,false);
-      this.$refs.wrapper.addEventListener('touchmove',this.touchmoveHandle,false)
-    },
-
-    // 滑动开始
-    touchstartHandle() {
-        //判断是否在滑动区域内滑动
-        let e = e || window.event;
-        if (e.targetTouches.length == 1) {
-            this.moveInfo.startX = parseInt(e.targetTouches[0].clientX)
-        }    
-    },
-
-    // 滑动中
-    touchmoveHandle() {
-        let e = e || window.event;
-        if (e.targetTouches.length == 1) {
-        // 滑动距离
-        let moveX = parseInt((e.targetTouches[0].clientX - this.moveInfo.startX));
-        //左滑(根据左右滑动来控制右侧菜单的显示与隐藏,滑动距离大于10才判定为滑动)
-        if (moveX < -50) {
-          if(this.rightMenuShow) {return};
-          this.rightMenuShow = true
-        } else if (moveX > 50) {
-          if(!this.rightMenuShow) {return};
-          this.rightMenuShow = false
-        }
-        }        
-    },
-
     // 运送大类点击显示下拉框事件
     transportPartentClickEvent () {
       if (this.transportPartentSelected) {
@@ -1522,6 +1489,7 @@ export default {
 	};
   .content-box {
 		@include content-wrapper;
+		height: 100vh !important;
 		box-sizing: border-box;
 		background: #f7f7f7;
 		::v-deep .u-popup {
@@ -1545,7 +1513,7 @@ export default {
 			left: 0;
 			z-index: 10
 		};
-		// 病人信息模态框样式
+		/* 病人信息模态框样式 */
 		.u-modal-center-box {
 			/deep/ .u-modal {
 				padding: 16px;
@@ -1934,73 +1902,42 @@ export default {
 				margin-top: 6px;
 				.patient-message-top {
 					display: flex;
-					.patient-message-top-left {
+					width: 100%;
+					flex-direction: row;
+					flex-wrap: wrap;
+					justify-content: space-between;
+					align-content: flex-start;
+					margin: 4px 0;
+					.creat-form-field {
+						&:first-child {
+							margin: 0 6px 0 10px;
+						};
 						flex: 1;
-						/deep/ .van-cell {
-							padding: 10px !important;
-							.van-field__label {
-								width: 60px !important;
-								color: #9E9E9A !important
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+						> text {
+							width: 32%;
+							margin-right: 4px;
+							font-size: 14px;
+							color: #9E9E9A;
+						};
+						/deep/ .u-input {
+							flex: 1;
+							padding: 4px 2px;
+							.u-label-text {
+								font-size: 14px;
+								color: #9E9E9A;
 							};
-							.van-cell__value {
-								background: #F9F9F9 !important;
-								color: #101010 !important;
-								font-size: 14px !important;
-								padding-left: 4px !important
-							}
-						}
-					};
-					.patient-message-top-right {
-						flex: 1;
-						/deep/ .van-cell {
-							padding: 10px !important;
-							.van-field__label {
-								width: 60px !important;
-								color: #9E9E9A !important
-							};
-							.van-cell__value {
-								background: #F9F9F9 !important;
-								color: #101010 !important;
-								font-size: 14px !important;
-								padding-left: 4px !important
+							.fild-body {
+								.uni-input-input {
+									color: #9E9E9A !important
+								}
 							}
 						}
 					}
 				};
 				.patient-message-bottom {
-					display: flex;
-					.patient-message-bottom-left {
-						flex: 1;
-						/deep/ .van-cell {
-							padding: 10px !important;
-							.van-field__label {
-								width: 60px !important;
-								color: #9E9E9A !important
-							};
-							.van-cell__value {
-								background: #F9F9F9 !important;
-								color: #101010 !important;
-								font-size: 14px !important;
-								padding-left: 4px !important
-							}
-						}
-					};
-					.patient-message-bottom-right {
-						flex: 1;
-						/deep/ .van-cell {
-							padding: 10px !important;
-							.van-field__label {
-								width: 60px !important;
-								color: #9E9E9A !important
-							};
-							.van-cell__value {
-								background: #F9F9F9 !important;
-								color: #101010 !important;
-								font-size: 14px !important;
-								padding-left: 4px !important
-							}
-						}
-					}
 				};
 				.patient-message-bottom-age {
 					display: flex;
@@ -2145,9 +2082,7 @@ export default {
 			.field-box-wrapper {
 				width: 100%;
 				margin: 10px 0;
-				flex:1;
 				background: #fff;
-				overflow: scroll;
 				.field-box-two {
 					width: 100%;
 					padding: 0 12px;
