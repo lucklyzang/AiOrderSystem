@@ -48,16 +48,6 @@
 					}
 				},
 				{
-					"path": "pages/createWorkerOrder/index/chooseTransportType",
-					"style": {
-						"navigationBarTitleText": "",
-						"navigationBarBackgroundColor": "#ffffff",
-						"backgroundColorTop": "#fff,",
-						"backgroundColorBottom": "#fff",
-						"navigationStyle" : "custom"
-					}
-				},
-				{
 					"path": "pages/createWorkerOrder/createEnvironmentWorkerOrder/createEnvironmentWorkerOrder",
 					"style": {
 						"navigationBarTitleText": "",

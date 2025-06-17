@@ -289,7 +289,7 @@
 				this.triangleRectListInfoShow = false;
 				if (item == '运送') {
 					uni.navigateTo({
-						url: '/createWorkerOrderPackage/pages/createWorkerOrder/index/chooseTransportType'
+						url: '/createWorkerOrderPackage/pages/createWorkerOrder/index/index'
 					})
 				} else if (item == '工程') {
 					uni.navigateTo({

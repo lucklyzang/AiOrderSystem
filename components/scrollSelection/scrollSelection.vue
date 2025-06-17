@@ -70,7 +70,7 @@
 			  type: Boolean,
 			  default: false
 			},
-			// 滚动展示的数据 格式[{id: '',text:''}]
+			// 滚动展示的数据 格式[{id: '',text:'',value:''}]
 			columns: {
 				type: Array,
 				default: []
@@ -123,7 +123,8 @@
 				this.list.forEach((item, index) => {
 					if (value == index) {
 						this.form.id = item.id;
-						this.form.text = item.text
+						this.form.text = item.text;
+						this.form.value = item.value;
 					}
 				});
 			},
@@ -135,27 +136,29 @@
 				if (this.form.id == '' && this.list.length > 0) {
 					this.form = {
 						id: this.list[0].id,
-						text: this.list[0].text
-					}
-				}
-				this.hiddeDatePicker()
-				this.$emit('sure', this.form.text);
+						text: this.list[0].text,
+						value: this.list[0].value
+					};
+				};
+				this.hiddeDatePicker();
+				this.$emit('sure', this.form.text,this.form.value);
 			},
 			// 搜索查询
 			async searchChange(e) {
-				// ，调模糊查询然后 把返回的结果传给this.list数组
-				let findList = this.columns.filter(item => item.text.includes(e))
-				this.list = findList
+				// 调模糊查询然后 把返回的结果传给this.list数组
+				let findList = this.columns.filter(item => item.text.includes(e));
+				this.list = findList;
 				if (e == '') {
 					this.list = this.columns
-				}
+				};
 				this.reset()
 			},
 			
 			reset() { //重置
 				this.form = {
 					id: '',
-					text: ''
+					text: '',
+					value: ''
 				}
 			},
 			
@@ -172,7 +175,7 @@
 			},
 			
 			clearSearch() { //清空搜索内容
-				this.searchValue = ''
+				this.searchValue = '';
 				this.list = this.columns
 			}
 		},

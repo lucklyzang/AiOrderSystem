@@ -105,3 +105,11 @@ export function queryTransConfig (proId, key) {
     method: 'get'
   })
 };
+
+// 查询运送员
+export function getTransporter(proId,workerId) {
+    return request({
+      url: `trans/worker/assignWorker/${proId}?workerId=${workerId}`,
+      method: 'get'
+    })
+  };

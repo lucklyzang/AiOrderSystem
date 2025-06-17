@@ -11,7 +11,7 @@
 			<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="修改订单" @backClick="backTo">
 			</nav-bar> 
 		</view>
-		<view class="creat-box template-one" :class="{'creatStyle':isShowModal}" v-if="templateType === 'template_one'">
+		<view class="create-box template-one" :class="{'creatStyle':isShowModal}" v-if="templateType === 'template_one'">
 			<view class="creat-priority priority-box-one">
 				<view class="creat-priority-title">优先级</view>
 				<view class="creat-priority-content">
@@ -145,7 +145,7 @@
 				<u--textarea v-model="taskDescribe" placeholder="请输入任务描述" height="120" :autoHeight="true" border="none"></u--textarea>
 			</view>
 		</view>
-		<view class="creat-box template-two" :class="{'creatStyle':isShowModal}" v-else-if="templateType === 'template_two'">
+		<view class="create-box template-two" :class="{'creatStyle':isShowModal}" v-else-if="templateType === 'template_two'">
 			<view class="creat-priority priority-box">
 				<view class="creat-priority-title">优先级</view>
 				<view class="creat-priority-content">
@@ -1475,7 +1475,7 @@
 		.nav {
 			width: 100%;
 		};
-		.creat-box {
+		.create-box {
 			position: relative;
 			width: 100%;
 			flex: 1;
@@ -1906,7 +1906,7 @@
 						border: none;
 						background: #f9f9f9
 					}
-				};
+				}
 			}
 			.patient-box {
 				border-top: 12px solid #f6f6f6;
