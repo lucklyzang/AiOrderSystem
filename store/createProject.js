@@ -6,18 +6,18 @@ export default {
   },
 
   getters:{
-		schedulingTaskDetails:(state) => {
-			state.schedulingTaskDetails = getCache('schedulingTaskDetails') ? getCache('schedulingTaskDetails') : {};
-			return state.schedulingTaskDetails
+		projectTaskMessage:(state) => {
+			state.schedulingTaskMessage = getCache('projectTaskMessage') ? getCache('projectTaskMessage') : {};
+			return state.projectTaskMessage
 		}
   },
 
   mutations:{
 		// 保存工程订单详情的信息
-		changeSchedulingTaskDetails (state, payLoad) {
+		changeProjectTaskMessage (state, payLoad) {
 			if (playLoad && playLoad != 'null') {
-				setCache('schedulingTaskDetails', playLoad);
-				state.schedulingTaskDetails = payLoad
+				setCache('projectTaskMessage', playLoad);
+				state.projectTaskMessage = payLoad
 			}
 		}
   },

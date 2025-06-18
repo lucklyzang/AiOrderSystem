@@ -19,43 +19,43 @@
 		</view>
     <view class="content">
       <view class="forthwith-task-number">
-        <text>即时保洁编号{{cleanTaskDetails.num}}</text>
+        <text>即时保洁编号{{environmentTaskMessage.num}}</text>
         <text :class="{
-            'underwayStyle' : cleanTaskDetails.state == 3, 
-            'completeStyle' : cleanTaskDetails.state == 5,
-            'reviewStyle' : cleanTaskDetails.state == 4 || cleanTaskDetails.state == 8,
-            'haveReviewStyle' : cleanTaskDetails.state == 6
+            'underwayStyle' : environmentTaskMessage.state == 3, 
+            'completeStyle' : environmentTaskMessage.state == 5,
+            'reviewStyle' : environmentTaskMessage.state == 4 || environmentTaskMessage.state == 8,
+            'haveReviewStyle' : environmentTaskMessage.state == 6
           }">
-            {{stausTransfer(cleanTaskDetails.state)}}
+            {{stausTransfer(environmentTaskMessage.state)}}
         </text>
       </view>
       <view class="location">
         <text>位置</text>
-        <text>{{ `${cleanTaskDetails.structureName}${cleanTaskDetails.depName}${cleanTaskDetails.areaImmediateName}${extractSpaceMessage(cleanTaskDetails.spaces)}` }}</text>
+        <text>{{ `${environmentTaskMessage.structureName}${environmentTaskMessage.depName}${environmentTaskMessage.areaImmediateName}${extractSpaceMessage(environmentTaskMessage.spaces)}` }}</text>
       </view>
       <view class="location">
         <text>创建时间</text>
-        <text>{{cleanTaskDetails.createTime }}</text>
+        <text>{{environmentTaskMessage.createTime }}</text>
       </view>
       <view class="location">
         <text>检查主管</text>
-        <text>{{ cleanTaskDetails.managerName }}</text>
+        <text>{{ environmentTaskMessage.managerName }}</text>
       </view>
       <view class="location-other">
         <view class="location-other-left">
-          <text v-show="cleanTaskDetails.state == 3 || cleanTaskDetails.state == 8" class="sign">*</text>
+          <text v-show="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 8" class="sign">*</text>
           <text class="cleaner">保洁员</text>
         </view>
-				<view class="location-other-right" v-if="cleanTaskDetails.state == 2 || cleanTaskDetails.state == 3 || cleanTaskDetails.state == 8">
+				<view class="location-other-right" v-if="environmentTaskMessage.state == 2 || environmentTaskMessage.state == 3 || environmentTaskMessage.state == 8">
 						
 				</view>
-				<view class="location-other-right-other" v-if="cleanTaskDetails.state != 2 && cleanTaskDetails.state != 3 && cleanTaskDetails.state != 8">
-					{{ !cleanTaskDetails.workerName ? '未选择' : cleanTaskDetails.workerName }}
+				<view class="location-other-right-other" v-if="environmentTaskMessage.state != 2 && environmentTaskMessage.state != 3 && environmentTaskMessage.state != 8">
+					{{ !environmentTaskMessage.workerName ? '未选择' : environmentTaskMessage.workerName }}
 				</view>
       </view>
-      <view class="location" v-show="cleanTaskDetails.state != 5 && cleanTaskDetails.state != 6">
+      <view class="location" v-show="environmentTaskMessage.state != 5 && environmentTaskMessage.state != 6">
         <text>预计耗时</text>
-        <text>{{ cleanTaskDetails.planUseTime ? `${cleanTaskDetails.planUseTime}分钟` : '无'}}</text>
+        <text>{{ environmentTaskMessage.planUseTime ? `${environmentTaskMessage.planUseTime}分钟` : '无'}}</text>
       </view>
       <view class="issue-picture">
         <view>问题图片</view>
@@ -65,7 +65,7 @@
       </view>
       <view class="location problem-description">
         <text>问题描述</text>
-        <text>{{ cleanTaskDetails.taskRemark}}</text>
+        <text>{{ environmentTaskMessage.taskRemark}}</text>
       </view>
     </view>
 		<view class="btn-box">
@@ -121,17 +121,17 @@ export default {
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo","cleanTaskDetails",'statusBarHeight','navigationBarHeight','storeAllOrderCancelReason']),
+    ...mapGetters(["userInfo","environmentTaskMessage",'statusBarHeight','navigationBarHeight','storeAllOrderCancelReason']),
   },
 	onShow() {
-		this.taskId = this.cleanTaskDetails.id;
+		this.taskId = this.environmentTaskMessage.id;
 	},
   methods: {
     ...mapMutations([]),
 
     // 回显图片
     echoImage () {
-      this.problemPicturesEchoList = this.cleanTaskDetails.images.filter((item) => { return item.imageType == 0});
+      this.problemPicturesEchoList = this.environmentTaskMessage.images.filter((item) => { return item.imageType == 0});
     },
 
 		// 顶部导航返回事件
@@ -291,6 +291,7 @@ page {
 };
 .content-box {
  @include content-wrapper;
+ height: 100vh !important;
  box-sizing: border-box;
  background: #f6f6f6;
  ::v-deep .u-popup {

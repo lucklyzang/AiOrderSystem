@@ -149,6 +149,7 @@
 				'statusBarHeight',
 				'navigationBarHeight',
 				"templateType",
+				'affairTaskMessage'
 			]),
 			proId () {
 				return this.userInfo.extendData.proId
@@ -386,10 +387,17 @@
 					queryStructure(this.proId).then((res) => {
 						if (res && res.data.code == 200) {
 							resolve(res.data.data)
-						}
+						} else {
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
 					})
 					.catch((err) => {
-						reject(err.message)
+						reject({message:err.message})
 					})
 				})
 			},
@@ -401,10 +409,17 @@
 					.then((res) => {
 						if (res && res.data.code == 200) {
 							resolve(res.data.data)
-						}
+						} else {
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
 					})
 					.catch((err) => {
-						reject(err.message)
+						reject({message:err.message})
 					})
 				})
 			},
@@ -514,13 +529,13 @@
 						type: 'success',
 						position: 'center'
 					});
-					this.commonIsTemporaryStorageMethods();
+					this.backTo();
 				} else {
 					this.$refs.uToast.show({
 						message: res.data.msg,
 						type: 'error',
 					})
-				};
+				}
 			})
 			.catch((err) => {
 				this.showLoadingHint = false;
@@ -547,6 +562,7 @@
 	};
 	.content-box {
 		@include content-wrapper;
+		height: 100vh !important;
 		box-sizing: border-box;
 		background: #fff;
 		::v-deep .u-popup {
@@ -591,7 +607,7 @@
 				transform: translate(-50%,-50%)
 			};
 			.message-box {
-				flex: 1;
+				height: 100%;
 				width: 100%;
 				overflow: scroll;
 				.message-one {
@@ -771,23 +787,25 @@
 			align-items: center;
 			justify-content: center;
 			>text {
-				width: 40%;
+				width: 35%;
 				display: inline-block;
 				height: 45px;
-				font-size: 18px;
+				font-size: 14px;
 				line-height: 45px;
 				background: #fff;
 				text-align: center;
-				border-radius: 30px;
+				border-radius: 4px;
 				&:nth-child(1) {
 					color: #fff;
-					background: linear-gradient(to right, #6cd2f8, #2390fe);
-					box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
+					background: #2B98FE;
+					box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
 					margin-right: 30px
 				};
-				&:last-child {
-					color: #1864FF;
-					box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1)
+				&:nth-child(2) {
+					color: #2B98FE;
+					border: 1px solid #2B98FE;
+					box-sizing: border-box;
+					box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
 				}
 			}
 		}

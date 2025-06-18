@@ -182,7 +182,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="transport-order-content environment-order-content" v-if="environmentOrderShow">
+		<view class="order-commom environment-order-content" v-if="environmentOrderShow">
 			<u-empty text="暂无环境订单" mode="list" v-if="isShowEnvironmentNoData"></u-empty>
 			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'environment')" v-for="(item,index) in environmentOrderList" :key="index">
 				<view class="list-content-top">
@@ -224,7 +224,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="transport-order-content project-order-content" v-if="projectOrderShow">
+		<view class="order-commom project-order-content" v-if="projectOrderShow">
 			<u-empty text="暂无工程订单" mode="list" v-if="isShowProjectNoData"></u-empty>
 			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'project')" v-for="(item,index) in projectOrderList" :key="index">
 				<view class="list-content-top">
@@ -261,7 +261,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="transport-order-content affair-order-content" v-if="affairOrderShow">
+		<view class="order-commom affair-order-content" v-if="affairOrderShow">
 			<u-empty text="暂无事务订单" mode="list" v-if="isShowAffairNoData"></u-empty>
 			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'affair')" v-for="(item,index) in affairOrderList" :key="index">
 				<view class="list-content-top">
@@ -383,6 +383,9 @@
 			},
 			proId() {
 				return this.userInfo.extendData.proId
+			},
+			workerId() {
+				return this.userInfo.extendData.userId
 			}
 		},
 		onShow() {
@@ -394,7 +397,7 @@
 				this.affairOrderShow = false;
 				this.getTransTaskList({
 					proId:this.proId, 
-					workerId:'',
+					workerId: this.workerId,
 					state: -1,
 					departmentId: this.userInfo.depId
 				});
@@ -426,9 +429,9 @@
 		methods: {
 			...mapMutations([
 				'changeAffairTaskMessage',
-				'changeCleanTaskDetails',
-				'changeSchedulingTaskDetails',
-				'changeDispatchTaskMessage',
+				'changeEnvironmentTaskMessage',
+				'changeProjectTaskMessage',
+				'changeTransTaskMessage',
 				'storeAllOrderCancelReason',
 				'storeCurrentIndex'
 			]),
@@ -448,7 +451,7 @@
 					this.affairOrderShow = false;
 					this.getTransTaskList({
 						proId:this.proId, 
-						workerId:'',
+						workerId:this.workerId,
 						state: -1,
 						departmentId: this.userInfo.depId
 					});
@@ -486,14 +489,16 @@
 						if (res && res.data.code == 200) {
 							resolve(res.data.data)
 						} else {
-							this.$refs.uToast.show({
-								message: `${res.data.msg}`,
-								type: 'error'
-							})
-						}
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
 					})
 					.catch((err) => {
-						reject(err.message)
+						reject({message:err.message})
 					})
 				})
 			},
@@ -506,14 +511,16 @@
 						if (res && res.data.code == 200) {
 							resolve(res.data.data)
 						} else {
-							this.$refs.uToast.show({
-								message: `${res.data.msg}`,
-								type: 'error'
-							})
-						}
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
 					})
 					.catch((err) => {
-						reject(err.message)
+						reject({message:err.message})
 					})
 				})
 			},
@@ -526,14 +533,16 @@
 						if (res && res.data.code == 200) {
 							resolve(res.data.data)
 						} else {
-							this.$refs.uToast.show({
-								message: `${res.data.msg}`,
-								type: 'error'
-							})
-						}
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
 					})
 					.catch((err) => {
-						reject(err.message)
+						reject({message:err.message})
 					})
 				})
 			},
@@ -546,14 +555,16 @@
 						if (res && res.data.code == 200) {
 							resolve(res.data.data)
 						} else {
-							this.$refs.uToast.show({
-								message: `${res.data.msg}`,
-								type: 'error'
-							})
-						}
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
 					})
 					.catch((err) => {
-						reject(err.message)
+						reject({message:err.message})
 					})
 				})
 			},
@@ -793,7 +804,7 @@
 						});
 						this.getTransTaskList(
 						{
-						 proId:this.proId, workerId:'',state: -1,
+						 proId:this.proId, workerId:this.workerId,state: -1,
 						 departmentId: this.userInfo.depId
 						})
 					} else {
@@ -1076,7 +1087,8 @@
 								})
 							}
 						} else {
-							this.isShowTransportNoData = true
+							this.isShowTransportNoData = true;
+							this.transOrderList = [];
 						}
 					} else {
 						this.$refs.uToast.show({
@@ -1200,17 +1212,17 @@
 			// 进入订单详情事件
 			enterOrderDetailsEvent (item, text) {
 				if (text == 'trans') {
-					this.changeDispatchTaskMessage(item);
+					this.changeTransTaskMessage(item);
 					uni.navigateTo({
 						url: '/workerOrderMessagePackage/pages/workerOrderMessage/transportWorkerOrderMessage/transportWorkerOrderMessage'
 					})
 				} else if (text == 'environment') {
-					// this.changeCleanTaskDetails(item);
+					// this.changeEnvironmentTaskMessage(item);
 					uni.navigateTo({
 						url: '/workerOrderMessagePackage/pages/workerOrderMessage/environmentWorkerOrderMessage/environmentWorkerOrderMessage'
 					})
 				} else if (text == 'project') {
-					// this.changeSchedulingTaskDetails(item);
+					// this.changeProjectTaskMessage(item);
 					uni.navigateTo({
 						url: '/workerOrderMessagePackage/pages/workerOrderMessage/projectWorkerOrderMessage/projectWorkerOrderMessage'
 					});
@@ -1225,18 +1237,22 @@
 			// 修改订单事件
 			modificationOrderEvent (item,text) {
 				if (text == 'trans') {
+					this.changeTransTaskMessage(item);
 					uni.navigateTo({
 						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/index/index'
 					})
 				} else if (text == 'environment') {
+					this.changeEnvironmentTaskMessage(item);
 					uni.navigateTo({
 						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationEnvironmentWorkerOrder/modificationEnvironmentWorkerOrder'
 					})
 				} else if (text == 'project') {
+					this.changeProjectTaskMessage(item);
 					uni.navigateTo({
 						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationProjectWorkerOrder/modificationProjectWorkerOrder'
 					})
 				} else if (text == 'affair') {
+					this.changeAffairTaskMessage(item);
 					uni.navigateTo({
 						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationAffairWorkerOrder/modificationAffairWorkerOrder'
 					})
@@ -1268,6 +1284,7 @@
 	};
 	.content-box {
 		@include content-wrapper;
+		height: 100vh !important;
 		box-sizing: border-box;
 		background: #fff;
 		::v-deep .u-popup {
@@ -1384,9 +1401,7 @@
 				top: 50%;
 				left: 50%;
 				transform: translate(-50%,-50%)
-			}
-		};
-		.transport-order-content {
+			};
 			.transport-order-list {
 				padding: 0 4px;
 				box-sizing: border-box;

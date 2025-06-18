@@ -6,18 +6,18 @@ export default {
   },
 
   getters:{
-		dispatchTaskMessage:(state) => {
-			state.dispatchTaskMessage = getCache('dispatchTaskMessage') ? getCache('dispatchTaskMessage') : {};
-			return state.dispatchTaskMessage
+		transTaskMessage:(state) => {
+			state.transTaskMessage = getCache('transTaskMessage') ? getCache('transTaskMessage') : {};
+			return state.transTaskMessage
 		}
   },
 
   mutations:{
 		// 保存运送任务的信息
-		changeDispatchTaskMessage (state, payLoad) {
+		changeTransTaskMessage (state, payLoad) {
 			if (playLoad && playLoad != 'null') {
-				setCache('dispatchTaskMessage', playLoad);
-				state.dispatchTaskMessage = payLoad
+				setCache('transTaskMessage', playLoad);
+				state.transTaskMessage = payLoad
 			}
 		}
   },

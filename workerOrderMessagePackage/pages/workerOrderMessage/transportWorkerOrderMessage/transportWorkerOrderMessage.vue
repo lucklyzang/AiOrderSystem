@@ -35,7 +35,7 @@
 		<view class="content">
 			<view class="basic-message" ref="basicMessage">
 			<view class="basic-mesage-state">
-				<image :src="stateTransferimage(dispatchTaskMessage.state)" />
+				<image :src="stateTransferimage(transTaskMessage.state)" />
 			</view>
 			<view class="basic-message-title">
 				<text>
@@ -48,25 +48,25 @@
 					<view class="handle-message-line-wrapper" v-if="templateType === 'template_one'">
 						<view>
 							<text class="message-tit">任务类型 :&nbsp;</text>
-							<text class="message-tit-real">{{dispatchTaskMessage.taskTypeName}}</text>
+							<text class="message-tit-real">{{transTaskMessage.taskTypeName}}</text>
 						</view>
 					</view>
 					 <view class="handle-message-line-wrapper">
 						 <view>
-							 <text class="message-tit" :class="{'priorityTwoStyle' : dispatchTaskMessage.priority != 1}">优&nbsp;&nbsp;先&nbsp;级 :&nbsp;</text>
-							 <text class="message-tit-real" :class="[dispatchTaskMessage.priority==1 ? 'priorityOneStyle' : 'priorityTwoStyle']">{{priorityTransfer(dispatchTaskMessage.priority)}}</text>
+							 <text class="message-tit" :class="{'priorityTwoStyle' : transTaskMessage.priority != 1}">优&nbsp;&nbsp;先&nbsp;级 :&nbsp;</text>
+							 <text class="message-tit-real" :class="[transTaskMessage.priority==1 ? 'priorityOneStyle' : 'priorityTwoStyle']">{{priorityTransfer(transTaskMessage.priority)}}</text>
 						 </view>
 					 </view>
 					<view class="handle-message-line-wrapper handle-message-line-wrapper-other">
 						<view>
 							<text class="message-tit">任务起点 :&nbsp;</text>
-							<text class="message-tit-real">{{dispatchTaskMessage.setOutPlaceName}}</text>
+							<text class="message-tit-real">{{transTaskMessage.setOutPlaceName}}</text>
 						</view>
 					</view>
 					<view class="handle-message-line-wrapper handle-message-line-wrapper-other" v-if="templateType === 'template_one'">
 						<view>
 							<text class="message-tit">任务终点 :&nbsp;</text>
-							<text class="message-tit-real">{{dispatchTaskMessage.destinationName}}</text>
+							<text class="message-tit-real">{{transTaskMessage.destinationName}}</text>
 						</view>
 					</view>
 				 <view class="handle-message-line-wrapper-other-two" v-else-if="templateType === 'template_two'">
@@ -74,55 +74,55 @@
 						 <text class="message-tit">任务终点 :&nbsp;</text>
 					 </view>
 					 <view>
-						 <text class="message-tit-real message-tit-real-destinationList" v-for="(innerItem,innerindex) in dispatchTaskMessage.destinations" :key="innerindex">{{innerItem.destinationName}}</text>
+						 <text class="message-tit-real message-tit-real-destinationList" v-for="(innerItem,innerindex) in transTaskMessage.destinations" :key="innerindex">{{innerItem.destinationName}}</text>
 					 </view>
 				 </view>
 					<view class="handle-message-line-wrapper handle-message-line-wrapper-other">
 						<view>
 							<text class="message-tit">任务时间 :&nbsp;</text>
-							<text class="message-tit-real">{{dispatchTaskMessage.planStartTime}}</text>
+							<text class="message-tit-real">{{transTaskMessage.planStartTime}}</text>
 						</view>
 					</view>
 				 </view>
 				 <view class="wait-handle-message-middle">
 						<view class="handle-message-line-wrapper message-name" v-if="templateType === 'template_one'">
 							<view>
-								<text class="message-tit" :class="{'textStyle' : dispatchTaskMessage.quarantine == 1}">病人姓名 :&nbsp;</text>
-								<text class="message-tit-real" :class="{'textStyle' : dispatchTaskMessage.quarantine == 1}">{{dispatchTaskMessage.patientName == "" ? '无' : dispatchTaskMessage.patientName}}</text>
-								<image :src="contactIsolationPng" v-if="dispatchTaskMessage.quarantine == 1">
+								<text class="message-tit" :class="{'textStyle' : transTaskMessage.quarantine == 1}">病人姓名 :&nbsp;</text>
+								<text class="message-tit-real" :class="{'textStyle' : transTaskMessage.quarantine == 1}">{{transTaskMessage.patientName == "" ? '无' : transTaskMessage.patientName}}</text>
+								<image :src="contactIsolationPng" v-if="transTaskMessage.quarantine == 1">
 							</view>
 						</view>
 					 <view class="handle-message-line-wrapper" v-if="templateType === 'template_one'">
 						 <view>
-							 <text class="message-tit" :class="{'textStyle' : dispatchTaskMessage.quarantine == 1}">床&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号 :&nbsp;</text>
-							 <text class="message-tit-real" :class="{'textStyle' : dispatchTaskMessage.quarantine == 1}">{{dispatchTaskMessage.bedNumber == "" ? '无' : dispatchTaskMessage.bedNumber}}</text>
+							 <text class="message-tit" :class="{'textStyle' : transTaskMessage.quarantine == 1}">床&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号 :&nbsp;</text>
+							 <text class="message-tit-real" :class="{'textStyle' : transTaskMessage.quarantine == 1}">{{transTaskMessage.bedNumber == "" ? '无' : transTaskMessage.bedNumber}}</text>
 						 </view>
 					 </view>
 					 <view class="handle-message-line-wrapper" v-if="templateType === 'template_one'">
 						 <view>
 							 <text class="message-tit">年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;龄 :&nbsp;</text>
-							 <text class="message-tit-real">{{dispatchTaskMessage.age == "" ? '无' : dispatchTaskMessage.age}}</text>
+							 <text class="message-tit-real">{{transTaskMessage.age == "" ? '无' : transTaskMessage.age}}</text>
 						 </view>
 					 </view>
 					<view class="handle-message-line-wrapper">
 							<view>
 								<text class="message-tit">数&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;量 :&nbsp;</text>
-								<text class="message-tit-real">{{dispatchTaskMessage.actualCount == "" ? "无" : dispatchTaskMessage.actualCount}}</text>
+								<text class="message-tit-real">{{transTaskMessage.actualCount == "" ? "无" : transTaskMessage.actualCount}}</text>
 							</view>
 						</view>
 					 <view class="handle-message-line-wrapper">
 						 <view>
 							 <text class="message-tit">转运工具 :&nbsp;</text>
-							 <text class="message-tit-real">{{dispatchTaskMessage.toolName == "" ? '无' : dispatchTaskMessage.toolName}}</text>
+							 <text class="message-tit-real">{{transTaskMessage.toolName == "" ? '无' : transTaskMessage.toolName}}</text>
 						 </view>
 					 </view>
 						<view class="handle-message-line-wrapper">
 							<view class="describe-line-wrapper">
 								<text class="message-tit">语音备注 :&nbsp;</text>
 								<text class="message-tit-real-audio" v-if="showChildrenComponent">
-									<MyAudio v-if="!dispatchTaskMessage.recordTime != true" :src="`http://show.blinktech.cn/trans/${dispatchTaskMessage.taskNumber}.mp3`"></MyAudio>
+									<MyAudio v-if="!transTaskMessage.recordTime != true" :src="`http://show.blinktech.cn/trans/${transTaskMessage.taskNumber}.mp3`"></MyAudio>
 								</text>
-								<text class="message-tit-real" v-show="!dispatchTaskMessage.recordTime">
+								<text class="message-tit-real" v-show="!transTaskMessage.recordTime">
 									无语音信息
 								</text>
 							</view>
@@ -156,7 +156,7 @@
 						<view class="handle-message-line-wrapper">
 						 <view class="describe-line-wrapper">
 							 <text class="message-tit">任务描述 :&nbsp;</text>
-							 <text class="message-tit-real">{{dispatchTaskMessage.taskRemark ? dispatchTaskMessage.taskRemark : '无'}}</text>
+							 <text class="message-tit-real">{{transTaskMessage.taskRemark ? transTaskMessage.taskRemark : '无'}}</text>
 						 </view>
 						</view>
 				 </view>
@@ -215,7 +215,7 @@
 				'userInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
-				'dispatchTaskMessage',
+				'transTaskMessage',
 				'storeAllOrderCancelReason'
 			]),
 			userName() {
@@ -225,11 +225,11 @@
 			}
 		},
 		onShow() {
-			this.taskId = this.dispatchTaskMessage.id;
+			this.taskId = this.transTaskMessage.id;
 		},
 		methods: {
 			...mapMutations([
-				'changeDispatchTaskMessage'
+				'changeTransTaskMessage'
 			]),
 			
 			// 顶部导航返回事件
@@ -339,12 +339,12 @@
 			// 获取任务详情
 			getTaskMessage () {
 				this.showLoadingHint = true;
-				getDispatchTaskMessageById(this.taskId,this.dispatchTaskMessage.tempFlag)
+				getDispatchTaskMessageById(this.taskId,this.transTaskMessage.tempFlag)
 				.then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
-						this.changeDispatchTaskMessage(res.data.data);
-						this.transportList = mergeMethods(this.dispatchTaskMessage['patientInfoList']);
+						this.changeTransTaskMessage(res.data.data);
+						this.transportList = mergeMethods(this.transTaskMessage['patientInfoList']);
 					}
 				})
 				.catch((err) => {
@@ -368,6 +368,7 @@
 	};
 	.content-box {
 		@include content-wrapper;
+		height: 100vh !important;
 		background: #f6f6f6;
 		box-sizing: border-box;
 		::v-deep .u-popup {

@@ -8,7 +8,7 @@
    <view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
    <u-toast ref="uToast" />
    <view class="nav">
-   	<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="修改订单" @backClick="backTo">
+   	<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="创建订单" @backClick="backTo">
    	</nav-bar> 
    </view>
     <!-- 病人编辑弹框 -->
@@ -37,25 +37,25 @@
 					<view class="bedNumberBox scroll-view-item">
 						<view>床号</view>
 						<view>
-							<u-input :value="patienModalMessage.bedNumber" border="none" placeholder="请输入床号" />
+							<u-input v-model="patienModalMessage.bedNumber" border="none" placeholder="请输入床号" />
 						</view>
 					</view>
 					<view class="bedNumberBox scroll-view-item">
 						<view>姓名</view>
 						<view>
-							<u-input :value="patienModalMessage.patientName" border="none" placeholder="请输入姓名" />
+							<u-input v-model="patienModalMessage.patientName" border="none" placeholder="请输入姓名" />
 						</view>
 					</view>
 					<view class="bedNumberBox scroll-view-item">
 						<view>住院号</view>
 						<view>
-							<u-input :value="patienModalMessage.patientNumber" border="none" placeholder="请输入住院号" />
+							<u-input v-model="patienModalMessage.patientNumber" border="none" placeholder="请输入住院号" />
 						</view>
 					</view>
 					<view class="genderBox scroll-view-item">
 						<view>性别</view>
 						<view>
-							<u-radio-group v-model="patienModalMessage.genderValue" @change="genderChange" activeColor="#101010">
+							<u-radio-group v-model="patienModalMessage.genderValue" activeColor="#101010">
 								<u-radio name="0" label="未知" labelColor="#101010"></u-radio>
 								<u-radio name="1" label="男" labelColor="#101010"></u-radio>
 								<u-radio name="2" label="女" labelColor="#101010"></u-radio>
@@ -65,13 +65,13 @@
 					<view class="bedNumberBox scroll-view-item transport-number">
 						<view>运送数量</view>
 						<view>
-							<u-input :value="patienModalMessage.actualData" disabled border="none" type="number" />
+							<u-input v-model="patienModalMessage.actualData" disabled border="none" type="number" />
 						</view>
 					</view>
 					<view class="bedNumberBox scroll-view-item transport-number">
 						<view>年龄</view>
 						<view>
-							<u-input :value="patienModalMessage.patientAgeValue" type="digit" placeholder="请输入年龄" />
+							<u-input v-model="patienModalMessage.patientAgeValue" type="digit" placeholder="请输入年龄" />
 						</view>
 					</view>
 					<view class="transportBox scroll-view-item">
@@ -105,31 +105,31 @@
 		</view>
     <!-- 运送大类 -->
     <view class="transport-rice-box" v-if="showTransportRice">
-      <ScrollSelection :columns="transportRiceList" title="运送大类" @sure="transportRiceSureEvent" @cancel="transportRiceCancelEvent" @close="transportRiceCloseEvent" />
+      <ScrollSelection v-model="showTransportRice" :columns="transportRiceList" title="运送大类" @sure="transportRiceSureEvent" @cancel="transportRiceCancelEvent" @close="transportRiceCloseEvent" />
     </view>
     <!-- 起点科室 -->
     <view class="transport-rice-box" v-if="showStartDepartment">
-      <ScrollSelection :columns="startDepartmentList" title="起点科室" @sure="startDepartmentSureEvent" @cancel="startDepartmentCancelEvent" @close="startDepartmentCloseEvent" :isShowSearch="true"/>
+      <ScrollSelection v-model="showStartDepartment" :columns="startDepartmentList" title="起点科室" @sure="startDepartmentSureEvent" @cancel="startDepartmentCancelEvent" @close="startDepartmentCloseEvent" :isShowSearch="true"/>
     </view>
     <!-- 终点科室(模板一单选) -->
     <view class="transport-rice-box" v-if="showEndDepartment">
-      <ScrollSelection :columns="endDepartmentList" title="终点科室" @sure="endDepartmentSureEvent" @cancel="endDepartmentCancelEvent" @close="endDepartmentCloseEvent" :isShowSearch="true" />
+      <ScrollSelection v-model="showEndDepartment" :columns="endDepartmentList" title="终点科室" @sure="endDepartmentSureEvent" @cancel="endDepartmentCancelEvent" @close="endDepartmentCloseEvent" :isShowSearch="true" />
     </view>
     <!-- 终点科室(模板二多选) -->
     <view class="transport-rice-box" v-if="showGoalSpaces">
-      <BottomSelect :columns="goalSpacesOption" title="终点科室" :currentSelectData="currentGoalSpaces" @sure="goalSpacesSureEvent" @cancel="goalSpacesCancelEvent" @close="goalSpacesCloseEvent" :isShowSearch="true"/>
+      <BottomSelect v-model="showGoalSpaces" :columns="goalSpacesOption" title="终点科室" :currentSelectData="currentGoalSpaces" @sure="goalSpacesSureEvent" @cancel="goalSpacesCancelEvent" @close="goalSpacesCloseEvent" />
     </view>
     <!-- 运送员 -->
     <view class="transport-rice-box" v-if="showTransporter">
-      <ScrollSelection :columns="transporterList" title="运送员" @sure="transporterSureEvent" @cancel="transporterCancelEvent" @close="transporterCloseEvent" />
+      <ScrollSelection v-model="showTransporter" :columns="transporterList" title="运送员" @sure="transporterSureEvent" @cancel="transporterCancelEvent" @close="transporterCloseEvent" />
     </view>
     <!-- 转运工具 -->
     <view class="transport-rice-box" v-if="showTransportTool">
-      <ScrollSelection :columns="transportToolList" title="转运工具" @sure="transportToolSureEvent" @cancel="transportToolCancelEvent" @close="transportToolCloseEvent" />
+      <ScrollSelection v-model="showTransportTool" :columns="transportToolList" title="转运工具" @sure="transportToolSureEvent" @cancel="transportToolCancelEvent" @close="transportToolCloseEvent" />
     </view>
      <!-- 性别 -->
     <view class="transport-rice-box" v-if="showGender">
-      <ScrollSelection :columns="genderList" title="性别" @sure="genderSureEvent" @cancel="genderCancelEvent" @close="genderCloseEvent" />
+      <ScrollSelection v-model="showTransportTool" :columns="genderList" title="性别" @sure="genderSureEvent" @cancel="genderCancelEvent" @close="genderCloseEvent" />
     </view>
 	<view class="message-box">
 		<view class="message-one">
@@ -138,10 +138,10 @@
 			</view>
 			<view class="message-one-right">
 				<u-radio-group v-model="priorityRadioValue" direction="horizontal">
-					<u-radio name="1" activeColor="#8af08a" labelColor="#8af08a" label="正常"></u-radio>
-					<u-radio name="2" activeColor="#fcd388" labelColor="#fcd388" label="重要"></u-radio>
-					<u-radio name="3" activeColor="#ea7171" labelColor="#ea7171" label="紧急"></u-radio>
-					<u-radio name="4" activeColor="#b62b2b" labelColor="#b62b2b" label="紧急重要"></u-radio>
+					<u-radio name="1" activeColor="#289E8E" labelColor="#289E8E" label="正常"></u-radio>
+					<u-radio name="2" activeColor="#E8CB51" labelColor="#E8CB51" label="紧急"></u-radio>
+					<u-radio name="3" activeColor="#F2A15F" labelColor="#F2A15F" label="重要"></u-radio>
+					<u-radio name="4" activeColor="#E86F50" labelColor="#E86F50" label="紧急重要"></u-radio>
 				</u-radio-group>
 			</view>
 		</view>
@@ -218,27 +218,27 @@
 			<view class="patient-message-top">
 				<view class="creat-form-field">
 					<text>床号</text>
-					<u-input :value="patientNumberValue" border="bottom" placeholder="请输入" />
+					<u-input v-model="patientNumberValue" border="bottom" placeholder="请输入" />
 				</view>
 				<view class="creat-form-field">
 					<text>姓名</text>
-					<u-input :value="patientNameValue" border="bottom" placeholder="请输入" />
+					<u-input v-model="patientNameValue" border="bottom" placeholder="请输入" />
 				</view>
 			</view>
 			<view class="patient-message-top patient-message-bottom">
 				<view class="creat-form-field">
 					<text>住院号</text>
-					<u-input :value="admissionNumberValue" border="bottom" placeholder="请输入" />
+					<u-input v-model="admissionNumberValue" border="bottom" placeholder="请输入" />
 				</view>
 				<view class="creat-form-field">
 					<text>年龄</text>
-					<u-input :value="patientAgeValue" type="digit" border="bottom" placeholder="请输入" />
+					<u-input v-model="patientAgeValue" type="digit" border="bottom" placeholder="请输入" />
 				</view>
 			</view>
 			<view class="patient-message-bottom-age">
 				<view class="patient-message-bottom-right">
 					<text>运送数量</text>
-					<u-input :value="transportNumberValue" border="bottom" type="digit" placeholder="请输入运输数量" />
+					<u-input v-model="transportNumberValue" border="bottom" type="digit" placeholder="请输入运输数量" />
 				</view>
 				<view class="contact-isolation-box">
 					<view>接触隔离</view>
@@ -272,34 +272,34 @@
 					<view class="field-one">
 						<view class="creat-form-field">
 							<text>床号</text>
-							<u-input :value="item.bedNumber"  border="none" disabled :clearable="false">
+							<u-input v-model="item.bedNumber"  border="none" disabled :clearable="false">
 							</u-input>
 						</view>
 						<view class="creat-form-field">
 							<text>姓名</text>
-							<u-input :value="item.patientName"  border="none" disabled :clearable="false">
+							<u-input v-model="item.patientName"  border="none" disabled :clearable="false">
 							</u-input>
 						</view>
 						<view class="creat-form-field">
 							<text>性别</text>
-							<u-input :value="item.genderValue" border="none" disabled :clearable="false">
+							<u-input v-model="item.genderValue" border="none" disabled :clearable="false">
 							</u-input>
 						</view>
 					</view>
 					<view class="field-two">
 						<view class="creat-form-field">
 							<text>住院号</text>
-							<u-input :value="item.patientNumber" border="none" disabled :clearable="false">
+							<u-input v-model="item.patientNumber" border="none" disabled :clearable="false">
 							</u-input>
 						</view>
 						<view class="creat-form-field">
 							<text>运送数量</text>
-							<u-input disabled :value="item.actualData" type="text" border="none" disabled :clearable="false">
+							<u-input disabled v-model="item.actualData" type="text" border="none" disabled :clearable="false">
 							</u-input>
 						</view>
 						<view class="creat-form-field">
 							<text>年龄</text>
-							<u-input :value="item.patientAgeValue" border="none" disabled :clearable="false" type="number">
+							<u-input v-model="item.patientAgeValue" border="none" disabled :clearable="false" type="number">
 							</u-input>
 						</view>
 					</view>
@@ -367,7 +367,7 @@ import {
 		queryTransportType,
 		queryAllDestination,
 		generateDispatchTask,
-		generateDispatchTaskMany,
+		generateDispatchTaskManyNew,
 		queryTransConfig,
 		getTransporter
 } from '@/api/transport.js'
@@ -385,8 +385,8 @@ export default {
   },
   data() {
     return {
-      loadingText: '加载中...',
-      loadingShow: false,
+			showLoadingHint: false,
+			infoText: '加载中···',
       taskDescribe: '',
       patientNumberValue: '',
       patientNameValue: '',
@@ -484,7 +484,7 @@ export default {
   },
 
   mounted() {
-    // this.parallelFunction();
+    this.parallelFunction();
   },
 
   watch: {
@@ -507,7 +507,6 @@ export default {
   computed: {
     ...mapGetters([
 			"userInfo",
-			"schedulingTaskDetails",
 			"templateType",
 			'statusBarHeight',
 			'navigationBarHeight'
@@ -527,7 +526,12 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["changetransportTypeMessage"]),
+    ...mapMutations(["storeCurrentIndex"]),
+		
+		// 顶部导航返回事件
+		backTo () {
+			uni.navigateBack()
+		},
 		
     // 添加病人信息事件
     addMessageEvent () {
@@ -566,7 +570,9 @@ export default {
     editMessage(index) {
       // 没有选择运送大类时禁止编辑
       if (this.currentTransportRice == '请选择' || !this.currentTransportRice) {
-        this.$toast({message: '请选择运送大类',type: 'fail'});
+				this.$refs.uToast.show({
+					message: '请选择运送大类',
+				});
         return
       };
       this.updateIndex = index;
@@ -673,18 +679,15 @@ export default {
     
     // 根据运送类型大类查询运送类型小类
     querytransportChildByTransportParent (index,id, flag) {
-      this.loadingText = '加载中...';
-      this.loadingShow = true;
-      this.overlayShow = true;
+      this.infoText = '加载中...';
+      this.showLoadingHint = true;
       this.commonTransportList = [];
       queryTransportType({
         proId: this.proId,
         state: 0,
         parentId: id
       }).then((res) => {
-      this.loadingText = '';
-      this.loadingShow = false;
-      this.overlayShow = false;
+      this.showLoadingHint = false;
         if (res && res.data.code == 200) {
           if (flag == 'template_two') {
             this.patienModalMessage['transportList'] = [];
@@ -715,16 +718,19 @@ export default {
               this.transportTypeIndex = this.transportTypeList.findIndex((innerItem) => { return innerItem.value == this.temporaryStorageCreateDispathTaskMessage['currentTransportType']['value']});
             }
           }
-        }
+        } else {
+					this.$refs.uToast.show({
+						message: `${res.data.msg}`,
+						type: 'error'
+					})
+				}
       })
       .catch((err) => {
-        this.loadingText = '';
-        this.loadingShow = false;
-        this.overlayShow = false;
-        this.$dialog.alert({
-          message: `${err.message}`,
-          closeOnPopstate: true
-        }).then(() => {})
+        this.showLoadingHint = false;
+				this.$refs.uToast.show({
+					message: `${err.message}`,
+					type: 'error'
+				})
       })
     },
 
@@ -735,10 +741,17 @@ export default {
         .then((res) => {
           if (res && res.data.code == 200) {
             resolve(res.data.data)
-          }
+          } else {
+						reject({message:res.data.msg});
+						this.showLoadingHint = false;
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+						})
+					}
         })
         .catch((err) => {
-          reject(err.message)
+          reject({message:err.message})
         })
       })
     },
@@ -751,13 +764,23 @@ export default {
             if (res.data.data.length > 0) {
               resolve(res.data.data)
             }
-          }
+          } else {
+						reject({message:res.data.msg});
+						this.showLoadingHint = false;
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+						})
+					}
         })
           .catch((err) => {
-            reject(err.message)
+            reject({message:err.message})
           })
       })
     },
+		
+		//运送类型子类步进器失去焦点事件 
+		inputBlurEvent () {},
 
     // 运送类型子类步进器值改变事件
     stepperValChange(msg) {
@@ -787,14 +810,11 @@ export default {
 
     // 并行查询目的地、转运工具、运送类型大类、运送员
     parallelFunction (type) {
-        this.loadingText = '加载中...';
-        this.loadingShow = true;
-        this.overlayShow = true;
+       this.infoText = '加载中...';
+       this.showLoadingHint = true;
         Promise.all([this.getAllDestination(),this.getTransportTools(),this.getTransportsTypeParent(),this.queryTransporter()])
         .then((res) => {
-          this.loadingText = '';
-          this.loadingShow = false;
-          this.overlayShow = false;
+          this.showLoadingHint = false;
           if (res && res.length > 0) {
             this.transportRiceList = [];
             this.startDepartmentList = [];
@@ -873,13 +893,11 @@ export default {
           }
         })
         .catch((err) => {
-          this.loadingText = '';
-          this.loadingShow = false;
-          this.overlayShow = false;
-          this.$dialog.alert({
-            message: `${err}`,
-            closeOnPopstate: true
-          }).then(() => {})
+          this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: `${err.message}`,
+						type: 'error'
+					})
         })
       },
 
@@ -889,10 +907,17 @@ export default {
           queryAllDestination(this.proId).then((res) => {
             if (res && res.data.code == 200) {
               resolve(res.data.data)
-            }
+            } else {
+							reject({message:res.data.msg});
+							this.showLoadingHint = false;
+							this.$refs.uToast.show({
+								message: res.data.msg,
+								type: 'error',
+							})
+						}
           })
           .catch((err) => {
-            reject(err.message)
+            reject({message:err.message})
           })
         })
       },
@@ -904,10 +929,17 @@ export default {
         .then((res) => {
           if (res && res.data.code == 200) {
             resolve(res.data.data)
-          }
+          } else {
+						reject({message:res.data.msg});
+						this.showLoadingHint = false;
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+						})
+					}
         })
         .catch((err) => {
-          reject(err.message)
+          reject({message:err.message})
         })
       })
     },
@@ -919,10 +951,17 @@ export default {
         .then((res) => {
           if (res && res.data.code == 200) {
             resolve(res.data.data)
-          }
+          } else {
+						reject({message:res.data.msg});
+						this.showLoadingHint = false;
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+						})
+					}
         })
         .catch((err) => {
-          reject(err.message)
+          reject({message:err.message})
         })
       })
     },
@@ -1107,81 +1146,6 @@ export default {
       this.currentTransportType = item
     },
 
-    // 切换显示右侧菜单事件
-    onClickRight () {
-      this.rightMenuShow = true
-    },
-
-    // 切换隐藏右侧菜单事件
-    switchHiddenEvent () {
-      this.rightMenuShow = false
-    },
-
-    // 右侧菜单任务列表点击事件
-    taskRouterSkip (name, index) {
-        this.functionListIndex = index;
-        if (name === '调度任务') {
-          this.$router.push({path:'/dispatchTask'});
-          this.changeTitleTxt({tit:'调度任务'});
-          setStore('currentTitle','调度任务')
-        } else if (name === '循环任务') {
-          this.$router.push({path:'/circulationTask'})
-          this.changeTitleTxt({tit:'循环任务'});
-          setStore('currentTitle','循环任务')
-        } else if (name === '预约任务') {
-          this.$router.push({path:'/appointTask'});
-          this.changeTitleTxt({tit:'预约任务'});
-          setStore('currentTitle','预约任务')
-        } else if (name === '调度管理') {
-          this.$router.push({path:'/taskScheduling'});
-          this.changeTitleTxt({tit:'中央运送任务管理'});
-          setStore('currentTitle','中央运送任务管理')
-        }
-      },
-
-      // 下班签退事件
-      signOutEvent () {
-          this.$dialog.alert({
-            message: '确定签退?',
-            closeOnPopstate: true,
-            showCancelButton: true
-          }).then(() => {
-            this.userLoginOut(this.proId, this.userInfo.userName)
-          })
-          .catch(() => {
-          })
-      },
-
-      // 用户签退
-      userLoginOut (proId,workerId) {
-        this.changeOverDueWay(true);
-        setStore('storeOverDueWay',true);
-        userSignOut(proId,workerId).then((res) => {
-          if (res && res.data.code == 200) {
-            removeAllLocalStorage();
-            this.changeCatchComponent([]);
-            this.$router.push({path:'/'})
-          } else {
-            this.$dialog.alert({
-              message: `${res.data.msg}`,
-              closeOnPopstate: true
-            }).then(() => {
-            });
-            this.changeOverDueWay(false);
-            setStore('storeOverDueWay',false);
-          }
-        }).
-        catch((err) => {
-          this.changeOverDueWay(false);
-          setStore('storeOverDueWay',false);
-          this.$dialog.alert({
-            message: `${err.message}`,
-            closeOnPopstate: true
-          }).then(() => {
-          });
-        })
-      },
-
       // 根据科室名称获取科室id
       getDepartmentIdByName(text) {
         return this.startDepartmentList.filter((item) => {return item['text'] == text })[0]['value']
@@ -1196,45 +1160,58 @@ export default {
     getTransConfig () {
       if (this.templateType === 'template_one') {
         if (this.currentTransportRice == '请选择' || !this.currentTransportRice) {
-          this.$toast({message: '请选择运送大类',type: 'fail'});
+          this.$refs.uToast.show({
+          	message: '请选择运送大类',
+          });
           return
         };
         if (this.currentStartDepartment == '请选择' || !this.currentStartDepartment) {
-          this.$toast({message: '请选择起点科室',type: 'fail'});
+					this.$refs.uToast.show({
+						message: '请选择起点科室',
+					});
           return
         };
         // 起始地与目的地不能相同
         if (this.currentStartDepartment == this.currentEndDepartment) {
-          this.$toast({message: '起点科室与终点科室不能相同',type: 'fail'});
+					this.$refs.uToast.show({
+						message: '起点科室与终点科室不能相同',
+					});
           return
         }
       } else if (this.templateType === 'template_two') {
         if (this.currentTransportRice == '请选择' || !this.currentTransportRice) {
-          this.$toast({message: '请选择运送大类',type: 'fail'});
+					this.$refs.uToast.show({
+						message: '请选择运送大类',
+					});
           return
         };
         if (this.currentStartDepartment == '请选择' || !this.currentStartDepartment) {
-          this.$toast({message: '请选择起点科室',type: 'fail'});
+					this.$refs.uToast.show({
+						message: '请选择起点科室',
+					});
           return
         }
         // 终点科室不能包含起点科室
         if (this.currentGoalSpaces.length > 0) {
           if (this.currentGoalSpaces.filter((item) => { return item.text == this.currentStartDepartment}).length > 0) {
-            this.$toast({message: '终点科室不能包含起点科室',type: 'fail'});
+						this.$refs.uToast.show({
+							message: '终点科室不能包含起点科室',
+						});
             return
           }
         }
       };  
-      this.loadingShow = true;
-      this.overlayShow = true;
-      this.loadingText = '查询中...';
+			this.infoText = '查询中...';
+			this.showLoadingHint = true;
       queryTransConfig(this.proId,'TRANS_QUARANTINE').then((res) => {
         if (res && res.data.code == 200) {
           if (JSON.parse(res.data.data)[0]['value'] == 1) {
             if (this.templateType === 'template_one') {
               if (this.currentTransportRice == '检查') {
                 if (this.isContactisolationValue === null) {
-                  this.$toast('请确认病人是否需要接触隔离!')
+									this.$refs.uToast.show({
+										message: '请确认病人是否需要接触隔离'
+									})
                 } else {
                   this.sureEvent(true)
                 }
@@ -1245,7 +1222,9 @@ export default {
               if (this.currentTransportRice == '检查') {
                 let temporaryFlag = this.templatelistTwo.some((item) => { return item.isContactisolationValue === null });
                 if (temporaryFlag) {
-                  this.$toast('请确认病人是否需要接触隔离!')
+									this.$refs.uToast.show({
+										message: '请确认病人是否需要接触隔离'
+									})
                 } else {
                   this.sureEvent(true)
                 }
@@ -1257,25 +1236,19 @@ export default {
             this.sureEvent(false)
           }
         } else {
-          this.$dialog.alert({
-            message: `${res.data.msg}`,
-            closeOnPopstate: true
-          }).then(() => {
+          this.$refs.uToast.show({
+          	message: res.data.msg,
+          	type: 'error',
           })
         };
-        this.loadingShow = false;
-        this.overlayShow = false;
-        this.loadingText = ''
+        this.showLoadingHint = false;
       })
       .catch((err) => {
-        this.$dialog.alert({
-          message: `${err.message}`,
-          closeOnPopstate: true
-        }).then(() => {
-        });
-        this.loadingShow = false;
-        this.overlayShow = false;
-        this.loadingText = ''
+				this.showLoadingHint = false;
+        this.$refs.uToast.show({
+        	message: `${err}`,
+        	type: 'error'
+        })
       })
     },
 
@@ -1409,74 +1382,67 @@ export default {
 
     // 生成调度任务(一个病人)
     postGenerateDispatchTask (data) {
-      this.loadingText = '创建中...';
-      this.loadingShow = true;
-      this.overlayShow = true;
+			this.infoText = '创建中...';
+			this.showLoadingHint = true;
       generateDispatchTask(data).then((res) => {
         if (res && res.data.code == 200) {
-          this.commonIsTemporaryStorageMethods();
-          this.$toast({message: '创建成功',type: 'success'});
-          this.$router.push({ path: "/taskScheduling"})
-        } else {
-          this.$dialog.alert({
-            message: `${res.data.msg}`,
-            closeOnPopstate: true
-          }).then(() => {
+					this.$refs.uToast.show({
+						message: '创建成功',
+					});
+					this.storeCurrentIndex(0);
+          uni.navigateTo({
+          	url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
           });
+        } else {
+          this.$refs.uToast.show({
+          	message: res.data.msg,
+          	type: 'error',
+          })
         };
-        this.loadingShow = false;
-        this.overlayShow = false;
-        this.loadingText = ''
+        this.showLoadingHint = false;
       })
       .catch((err) => {
-        this.$dialog.alert({
-          message: `${err.message}`,
-          closeOnPopstate: true
-        }).then(() => {
-        });
-        this.loadingShow = false;
-        this.overlayShow = false;
-        this.loadingText = ''
+        this.showLoadingHint = false;
+        this.$refs.uToast.show({
+        	message: `${err.message}`,
+        	type: 'error'
+        })
       })
     },
 
     //生成调度任务(多个病人)
     postGenerateDispatchTaskMany(data) {
-      this.loadingText = '创建中...';
-      this.loadingShow = true;
-      this.overlayShow = true;
+			this.infoText = '创建中...';
+			this.showLoadingHint = true;
       generateDispatchTaskManyNew(data).then((res) => {
         if (res && res.data.code == 200) {
-          this.commonIsTemporaryStorageMethods();
-          this.$toast({message: '创建成功',type: 'success'});
-          this.$router.push({ path: "/taskScheduling"})
+					this.$refs.uToast.show({
+						message: '创建成功',
+					});
+					this.storeCurrentIndex(0);
+					uni.navigateTo({
+						url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
+					});
         } else {
-          this.$dialog.alert({
-            message: `${res.data.msg}`,
-            closeOnPopstate: true
-          }).then(() => {
-          });
+          this.$refs.uToast.show({
+          	message: res.data.msg,
+          	type: 'error',
+          })
         };
-        this.loadingText = '';
-        this.loadingShow = false;
-        this.overlayShow = false
+        this.showLoadingHint = false;
       })
       .catch((err) => {
-        this.$dialog.alert({
-          message: `${err.message}`,
-          closeOnPopstate: true
-        }).then(() => {
-        });
-        this.loadingText = '';
-        this.loadingShow = false;
-        this.overlayShow = false
+        this.showLoadingHint = false;
+        this.$refs.uToast.show({
+        	message: `${err.message}`,
+        	type: 'error'
+        })
       })
     },
 
     // 取消事件
     cancelEvent () {
-      this.commonIsTemporaryStorageMethods();
-      this.$router.push({ path: "/taskScheduling"})
+      this.backTo()
     }
   }
 };
@@ -2356,28 +2322,30 @@ export default {
 		.btn-box {
 			width: 90%;
 			margin: 0 auto;
-			height: 60px;
+			height: 100px;
 			display: flex;
 			align-items: center;
-			justify-content: space-between;
+			justify-content: center;
 			>text {
-				width: 40%;
+				width: 35%;
 				display: inline-block;
 				height: 45px;
-				font-size: 18px;
+				font-size: 14px;
 				line-height: 45px;
 				background: #fff;
 				text-align: center;
-				border-radius: 30px;
+				border-radius: 4px;
 				&:nth-child(1) {
 					color: #fff;
-					background: linear-gradient(to right, #6cd2f8, #2390fe);
-					box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
+					background: #2B98FE;
+					box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
 					margin-right: 30px
 				};
 				&:nth-child(2) {
-					color: #1864FF;
-					box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
+					color: #2B98FE;
+					border: 1px solid #2B98FE;
+					box-sizing: border-box;
+					box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
 				}
 			}
 		}	

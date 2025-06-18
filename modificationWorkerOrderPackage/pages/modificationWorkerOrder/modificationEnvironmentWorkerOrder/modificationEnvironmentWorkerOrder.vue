@@ -264,7 +264,8 @@
 				'navigationBarHeight',
 				"timeMessage",
 				"ossMessage",
-				"locationMessage"
+				"locationMessage",
+				'environmentMessage'
 			]),
 			userName() {
 			},
@@ -780,6 +781,7 @@
 	};
 	.content-box {
 		@include content-wrapper;
+		height: 100vh !important;
 		box-sizing: border-box;
 		background: #fff;
 		::v-deep .u-popup {
@@ -1050,23 +1052,25 @@
 				align-items: center;
 				justify-content: center;
 				>text {
-					width: 40%;
+					width: 35%;
 					display: inline-block;
 					height: 45px;
-					font-size: 18px;
+					font-size: 14px;
 					line-height: 45px;
 					background: #fff;
 					text-align: center;
-					border-radius: 30px;
+					border-radius: 4px;
 					&:nth-child(1) {
 						color: #fff;
-						background: linear-gradient(to right, #6cd2f8, #2390fe);
-						box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
+						background: #2B98FE;
+						box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
 						margin-right: 30px
 					};
-					&:last-child {
-						color: #1864FF;
-						box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1)
+					&:nth-child(2) {
+						color: #2B98FE;
+						border: 1px solid #2B98FE;
+						box-sizing: border-box;
+						box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
 					}
 				}
 			}

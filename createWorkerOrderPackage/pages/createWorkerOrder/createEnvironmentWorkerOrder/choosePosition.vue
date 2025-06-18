@@ -298,6 +298,7 @@
 	};
 	.content-box {
 		@include content-wrapper;
+		height: 100vh !important;
 		box-sizing: border-box;
 		background: #fff;
 		::v-deep .u-popup {

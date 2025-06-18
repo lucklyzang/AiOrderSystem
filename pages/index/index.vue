@@ -163,7 +163,6 @@
 			...mapGetters([
 				'userInfo',
 				'socketOpen',
-				'userBasicInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
 				'capsuleMessage'
@@ -258,8 +257,7 @@
 		
 		methods: {
 			...mapMutations([
-				'changeSocketOpen',
-				'changeUserBasicInfo',
+				'changeSocketOpen'
 			]),
 			
       goback() {
@@ -754,6 +752,10 @@
 </script>
 <style lang="scss" scoped>
 	@import "~@/common/stylus/variable.scss";
+	page {
+		width: 100%;
+		height: 100%;
+	};
 	$chatContentbgc: #1E86FD;
 	$sendBtnbgc: #4F7DF5;
 	view,button,text,input,textarea {
@@ -763,6 +765,9 @@
 	};
 	/* 聊天消息 */
 	.chat {
+		@include content-wrapper;
+		height: 100vh !important;
+		box-sizing: border-box;
 		position: relative;
 		::v-deep .u-popup {
 			flex: none !important
@@ -851,6 +856,7 @@
 			justify-content: center
 		};
 		.scroll-view {
+			flex: 1;
 			::-webkit-scrollbar {
 				display: none;
 				width: 0 !important;
@@ -865,6 +871,7 @@
 				display: flex;
 				flex-direction: column;
 				padding-top: 23rpx;
+				height: 100%;
 				// background-color:skyblue;
 				.send-time-box {
 					height: 40px;

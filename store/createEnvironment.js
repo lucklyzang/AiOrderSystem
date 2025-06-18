@@ -18,9 +18,9 @@ export default {
 			state.ossMessage = getCache('ossMessage') ? getCache('ossMessage') : {};
 			return state.ossMessage
 		},
-		cleanTaskDetails:(state) => {
-			state.cleanTaskDetails = getCache('cleanTaskDetails') ? getCache('cleanTaskDetails') : {};
-			return state.cleanTaskDetails
+		environmentTaskMessage:(state) => {
+			state.environmentTaskDetails = getCache('environmentTaskMessage') ? getCache('environmentTaskMessage') : {};
+			return state.environmentTaskMessage
 		}
   },
 
@@ -47,10 +47,10 @@ export default {
 			}
 		},
 		//保存环境订单详情
-		changeCleanTaskDetails (state, playLoad) {
+		changeEnvironmentTaskMessage (state, playLoad) {
 			if (playLoad && playLoad != 'null') {
-				setCache('cleanTaskDetails', playLoad);
-				state.cleanTaskDetails = playLoad
+				setCache('environmentTaskDetails', playLoad);
+				state.environmentTaskMessage = playLoad
 			}
 		}
   },

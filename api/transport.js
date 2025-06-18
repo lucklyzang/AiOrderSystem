@@ -89,6 +89,15 @@ export function updateDispatchTask(data) {
   })
 };
 
+// 生成调度任务(多个病人)
+export function generateDispatchTaskManyNew(data) {
+  return request({
+      url: 'trans/dispatch/saveTransDispatchTaskForApp',
+      method: 'post',
+      data
+  })
+};
+
 // 根据科室查询房间信息
 export function departmentRoom(data) {
   return request({
@@ -112,4 +121,22 @@ export function getTransporter(proId,workerId) {
       url: `trans/worker/assignWorker/${proId}?workerId=${workerId}`,
       method: 'get'
     })
-  };
+};
+
+// 运送任务编辑(单病人)
+export function editDispathTaskSingle (data) {
+  return request({
+    url: 'trans/task/updateTransForApp',
+    method: 'post',
+    data
+  })
+};
+
+// 编辑运送任务(多个病人)
+export function editDispatchTaskManyNew(data) {
+  return request({
+      url: 'trans/dispatch/updateTransDispatchTaskForApp',
+      method: 'post',
+      data
+  })
+};

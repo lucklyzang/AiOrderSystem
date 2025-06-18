@@ -5,7 +5,8 @@ export function getDefaultLoginState() {
 		token: null, //请求token,
 		isLogin: false,
 		overDueWay: false,
-		templateType: ''
+		templateType: '',
+		socketOpen: false
 	}	
 }
 
@@ -34,7 +35,7 @@ export function getDefaultCommonState() {
 export function getDefaultProjectState() {
 	return {
 		// 工程订单详情
-		schedulingTaskDetails: {}
+		projectTaskMessage: {}
 	}	
 }
 
@@ -42,7 +43,7 @@ export function getDefaultProjectState() {
 export function getDefaultTransState() {
 	return {
 		// 运送订单详情
-		dispatchTaskMessage: {}
+		transTaskMessage: {}
 	}	
 }
 
@@ -52,7 +53,7 @@ export function getDefaultEnvironmentState() {
 		timeMessage: {},
 		ossMessage: {},
 		locationMessage: [],
-		cleanTaskDetails: {}
+		environmentMessage: {}
 	}	
 }
 

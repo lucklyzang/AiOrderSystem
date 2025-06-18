@@ -1,277 +1,17 @@
 <template>
-	<view class="content-box">
-		<u-transition :show="showLoadingHint" mode="fade-down">
-			<view class="loading-box" v-if="showLoadingHint">
-				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
-			</view>
-		</u-transition>
-		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
-		<u-toast ref="uToast" />
-		<view class="nav">
-			<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="修改订单" @backClick="backTo">
-			</nav-bar> 
-		</view>
-		<view class="create-box template-one" :class="{'creatStyle':isShowModal}" v-if="templateType === 'template_one'">
-			<view class="creat-priority priority-box-one">
-				<view class="creat-priority-title">优先级</view>
-				<view class="creat-priority-content">
-					<u-radio-group v-model="priorityValue" @change="radioGroupChange">
-						<u-radio name="1" activeColor="#8af08a" labelColor="#8af08a" label="正常"></u-radio>
-						<u-radio name="2" activeColor="#fcd388" labelColor="#fcd388" label="重要"></u-radio>
-						<u-radio name="3" activeColor="#ea7171" labelColor="#ea7171" label="紧急"></u-radio>
-						<u-radio name="4" activeColor="#b62b2b" labelColor="#b62b2b" label="紧急重要"></u-radio>
-					</u-radio-group>
-				</view>
-			</view>
-			<view class="creat-chooseHospital creat-chooseHospital-one">
-				<view class="creat-chooseHospital-title">科室选择</view>
-				<view class="creat-chooseHospital-content creat-chooseHospital-content-two">
-					<ld-select :list="hospitalList"
-						@ldShow="ldSelectShow"
-						@ldHide="ldSelectHide"
-						label-key="value" value-key="id"
-						clearable
-						placeholder="请选择"
-						color="#333"
-						selectColor="#43c3f3"
-						bgColor="#f9f9f9"
-						v-model="hospitalListValue"
-						@change="listChangeEvent">
-					</ld-select>
-				  <!-- <xfl-select 
-					  :list="hospitalList"
-					  :clearable="false"
-					  :showItemNum="5" 
-					  :isCanInput="true"
-					  :showList="controlListShow"
-					  :style_Container="'height: 50px; font-size: 16px;'"
-					  :initValue="depName"
-					  @change="listChangeEvent"
-					  @input="inputEvent"
-					  @visible-change="visibleChange"
-				  >
-				  </xfl-select> -->
-				</view>
-			</view>
-			<view class="creat-transport-type">
-				<view class="creat-transport-type-title">
-					<text class="creat-transport-type-title-name">运送类型</text>
-				</view>
-				<view class="creat-transport-type-content">
-					<view class="creat-transport-type-content-list" v-for="(item,index) in transportList" :class="{'transTypeListStyle': typeIndex === index}" @click="typeEvent(item,index)" :key="index">{{item.text}}</view>
-				</view>
-			</view>
-			<view class="creat-form">
-				<view class="creat-form-top">
-					<view class="creat-form-field">
-						<text>床号</text>
-						<u-input
-							:value="bedNumber"
-							 border="bottom"
-							placeholder="请输入床号"
-						>
-						</u-input>
-					</view>
-					<view class="creat-form-field">
-						<text>姓名</text>
-						<u-input
-							:value="patientName"
-							 border="bottom"
-							placeholder="请输入姓名"
-						>
-						</u-input>
-					</view>
-				</view>
-				<view class="creat-form-top creat-form-bottom">
-					<view class="creat-form-field">
-						<text>住院号</text>
-						<u-input
-							border="bottom"
-							:value="patientNumber"
-							placeholder="请输入住院号"
-						>
-						</u-input>
-					</view>
-					<view class="creat-form-field">
-						<text>运送数量</text>
-						<u-input
-							:value="actualData"
-							 border="bottom"
-							placeholder="请输入运送数量"
-							type="number"
-						>
-						</u-input>
-					</view>
-				</view>
-			</view>
-			<view class="field-four">
-				<view class="contact-isolation-box">
-					<view>接触隔离</view>
-					<view>
-						<u-radio-group v-model="isContactisolationValue" activeColor="#3B9DF9">
-							<u-radio name="1" label="是"></u-radio>
-							<u-radio name="0" label="否"></u-radio>
-						</u-radio-group>
-					</view>
-				</view>
-			</view>
-			<view class="tool-box">
-				<view class="creat-priority-title">转运工具</view>
-				<view class="creat-priority-content">
-					<u-radio-group v-model="toolValue" @change="toolGroupChange">
-						<u-radio
-							@change="toolChange"
-							activeColor="#333"
-							shape="circle"
-							v-for="(item, index) in toolList" :key="index"
-							:name="item.value"
-						>
-							{{item.text}}
-						</u-radio>
-					</u-radio-group>
-				</view>
-			</view>
-			<view class="creat-priority creat-is-back">
-				<view class="creat-priority-title">运送员是否返回</view>
-				<view class="transport-isBack">
-					<u-radio-group v-model="isBackValue" @change="isBackGroupChange">
-						<u-radio name="0" activeColor="#2c9af1" label="否"></u-radio>
-						<u-radio name="1" activeColor="#2c9af1" label="是"></u-radio>
-					</u-radio-group>
-				</view>
-			</view>
-			<view class="task-describe task-describe-one">
-				<text>任务描述</text>
-				<u--textarea v-model="taskDescribe" placeholder="请输入任务描述" height="120" :autoHeight="true" border="none"></u--textarea>
-			</view>
-		</view>
-		<view class="create-box template-two" :class="{'creatStyle':isShowModal}" v-else-if="templateType === 'template_two'">
-			<view class="creat-priority priority-box">
-				<view class="creat-priority-title">优先级</view>
-				<view class="creat-priority-content">
-					<u-radio-group v-model="priorityValue" @change="radioGroupChange">
-						<u-radio name="1" activeColor="#8af08a" labelColor="#8af08a" label="正常"></u-radio>
-						<u-radio name="2" activeColor="#fcd388" labelColor="#fcd388" label="重要"></u-radio>
-						<u-radio name="3" activeColor="#ea7171" labelColor="#ea7171" label="紧急"></u-radio>
-						<u-radio name="4" activeColor="#b62b2b" labelColor="#b62b2b" label="紧急重要"></u-radio>
-					</u-radio-group>
-				</view>
-			</view>
-			<view class="tool-box">
-				<view class="creat-priority-title">转运工具</view>
-				<view class="creat-priority-content">
-					<u-radio-group v-model="toolValue" @change="toolGroupChange">
-						<u-radio @change="toolChange" activeColor="#2c9af1" shape="circle" v-for="(item, index) in toolList" :key="index"
-						 :name="item.value">
-							{{item.text}}
-						</u-radio>
-					</u-radio-group>
-				</view>
-			</view>
-			<view class="creat-priority creat-is-back">
-				<view class="creat-priority-title">运送员是否返回</view>
-				<view class="transport-isBack">
-					<u-radio-group v-model="isBackValue" @change="isBackGroupChange">
-						<u-radio name="0" activeColor="#2c9af1" label="否"></u-radio>
-						<u-radio name="1" activeColor="#2c9af1" label="是"></u-radio>
-					</u-radio-group>
-				</view>
-			</view>
-			<view class="creat-priority creat-is-back trans-total">
-				<view class="trans-total-title">该任务运送总数</view>
-				<view class="trans-total-content">
-					<u-input disabled :value="taskTotal" type="text" :border="true" />
-				</view>
-			</view>
-			<view class="creat-chooseHospital">
-				<view class="creat-chooseHospital-title">科室选择</view>
-				<view class="creat-chooseHospital-content-two">
-					 <ld-select :list="hospitalList"
-						label-key="value" value-key="id"
-						@ldShow="ldSelectShow"
-						@ldHide="ldSelectHide"
-						clearable
-						placeholder="请选择"
-						color="#333"
-						selectColor="#43c3f3"
-						bgColor="#f9f9f9"
-						v-model="hospitalListTwovalue"
-						@change="hospitalListTwoSelectChange">
-					</ld-select>
-				</view>
-			</view>
-			<view class="patient-box">
-				<view class="patient-box-list" v-for="(item,index) in templateTwoMessage" :key="index">
-					<view class="patient-title">
-						<view class="patient-name">病人{{index+1}}</view>
-						<fa-icon type="edit" @click="editMessage(index)"></fa-icon>
-						<fa-icon type="trash-o" v-show="index > 0" @click="deletetMessage(index)"></fa-icon>
-					</view>
-					<view class="creat-form">
-						<view class="field-four">
-							<view class="contact-isolation-box">
-								<view>接触隔离:</view>
-								<view>
-									{{ item.isContactisolationValue == 1 ? '是' : item.isContactisolationValue === null ? '' : '否' }}
-								</view>
-							</view>
-						</view>
-						<view class="creat-form-top">
-							<view class="creat-form-field">
-								<text>床号</text>
-								<u-input :value="templateTwoMessage[index].bedNumber"  border="none" disabled :clearable="false">
-								</u-input>
-							</view>
-							<view class="creat-form-field">
-								<text>姓名</text>
-								<u-input :value="templateTwoMessage[index].patientName"  border="none" disabled :clearable="false">
-								</u-input>
-							</view>
-						</view>
-						<view class="creat-form-bottom">
-							<view class="creat-form-field">
-								<text>住院号</text>
-								<u-input :value="templateTwoMessage[index].patientNumber" border="none" disabled :clearable="false">
-								</u-input>
-							</view>
-							<view class="creat-form-field">
-								<text>性别</text>
-								<u-input :value="templateTwoMessage[index].genderValue" border="none" disabled :clearable="false">
-								</u-input>
-							</view>
-							<view class="creat-form-field">
-								<text>运送数量</text>
-								<u-input disabled :value="templateTwoMessage[index].actualData" type="text" border="none" disabled :clearable="false">
-								</u-input>
-							</view>
-						</view>
-					</view>
-					<view class="transport-parent-box">
-						<view class="content-type-title">运送类型</view>
-						<view class="transport-parent-box-title">
-							{{item.sampleValue}}
-						</view>
-						<view class="content-type-name">{{jointTransportMessage(index)}}</view>
-					</view>
-				</view>
-				<view class="addpatient-message-btn" @click="addMessageEvent">
-						<fa-icon type="plus" color="#44c3f3"></fa-icon>
-						<text>添加病人信息</text>
-				</view>
-			</view>
-			<view class="task-describe">
-				<text>任务描述</text>
-				<u--textarea v-model="taskDescribe" placeholder="请输入任务描述" height="140" :autoHeight="true" border="none"></u--textarea>
-			</view>
-		</view>
-		<view class="btn-box">
-			<view class="btn-sure">
-				<button class="sureBtn" type="primary" @click="getTransConfig">确认</button>
-			</view>
-			<view class="btn-cancel">
-				<button class="cancelBtn" type="primary" @click="cancel">取消</button>
-			</view>
-		</view>
+  <view class="content-box">
+   <u-transition :show="showLoadingHint" mode="fade-down">
+   	<view class="loading-box" v-if="showLoadingHint">
+   		<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
+   	</view>
+   </u-transition>
+   <view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
+   <u-toast ref="uToast" />
+   <view class="nav">
+   	<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="编辑订单" @backClick="backTo">
+   	</nav-bar> 
+   </view>
+    <!-- 病人编辑弹框 -->
 		<view class="u-modal-center-box">
 			<u-modal :show="patienModalShow" :title="isPressEdit ? `病人${updateIndex+1}`:`病人信息`" 
 				:showCancelButton="true"
@@ -297,25 +37,25 @@
 					<view class="bedNumberBox scroll-view-item">
 						<view>床号</view>
 						<view>
-							<u-input :value="patienModalMessage.bedNumber" border="none" placeholder="请输入床号" />
+							<u-input v-model="patienModalMessage.bedNumber" border="none" placeholder="请输入床号" />
 						</view>
 					</view>
 					<view class="bedNumberBox scroll-view-item">
 						<view>姓名</view>
 						<view>
-							<u-input :value="patienModalMessage.patientName" border="none" placeholder="请输入姓名" />
+							<u-input v-model="patienModalMessage.patientName" border="none" placeholder="请输入姓名" />
 						</view>
 					</view>
 					<view class="bedNumberBox scroll-view-item">
 						<view>住院号</view>
 						<view>
-							<u-input :value="patienModalMessage.patientNumber" border="none" placeholder="请输入住院号" />
+							<u-input v-model="patienModalMessage.patientNumber" border="none" placeholder="请输入住院号" />
 						</view>
 					</view>
 					<view class="genderBox scroll-view-item">
 						<view>性别</view>
 						<view>
-							<u-radio-group v-model="patienModalMessage.genderValue" @change="genderChange" activeColor="#101010">
+							<u-radio-group v-model="patienModalMessage.genderValue" activeColor="#101010">
 								<u-radio name="0" label="未知" labelColor="#101010"></u-radio>
 								<u-radio name="1" label="男" labelColor="#101010"></u-radio>
 								<u-radio name="2" label="女" labelColor="#101010"></u-radio>
@@ -325,7 +65,13 @@
 					<view class="bedNumberBox scroll-view-item transport-number">
 						<view>运送数量</view>
 						<view>
-							<u-input :value="patienModalMessage.actualData" disabled border="none" />
+							<u-input v-model="patienModalMessage.actualData" disabled border="none" type="number" />
+						</view>
+					</view>
+					<view class="bedNumberBox scroll-view-item transport-number">
+						<view>年龄</view>
+						<view>
+							<u-input v-model="patienModalMessage.patientAgeValue" type="digit" placeholder="请输入年龄" />
 						</view>
 					</view>
 					<view class="transportBox scroll-view-item">
@@ -357,11 +103,257 @@
 				</scroll-view>
 			</u-modal>
 		</view>
+    <!-- 运送大类 -->
+    <view class="transport-rice-box" v-if="showTransportRice">
+      <ScrollSelection v-model="showTransportRice" :columns="transportRiceList" title="运送大类" @sure="transportRiceSureEvent" @cancel="transportRiceCancelEvent" @close="transportRiceCloseEvent" />
+    </view>
+    <!-- 起点科室 -->
+    <view class="transport-rice-box" v-if="showStartDepartment">
+      <ScrollSelection v-model="showStartDepartment" :columns="startDepartmentList" title="起点科室" @sure="startDepartmentSureEvent" @cancel="startDepartmentCancelEvent" @close="startDepartmentCloseEvent" :isShowSearch="true"/>
+    </view>
+    <!-- 终点科室(模板一单选) -->
+    <view class="transport-rice-box" v-if="showEndDepartment">
+      <ScrollSelection v-model="showEndDepartment" :columns="endDepartmentList" title="终点科室" @sure="endDepartmentSureEvent" @cancel="endDepartmentCancelEvent" @close="endDepartmentCloseEvent" :isShowSearch="true" />
+    </view>
+    <!-- 终点科室(模板二多选) -->
+    <view class="transport-rice-box" v-if="showGoalSpaces">
+      <BottomSelect v-model="showGoalSpaces" :columns="goalSpacesOption" title="终点科室" :currentSelectData="currentGoalSpaces" @sure="goalSpacesSureEvent" @cancel="goalSpacesCancelEvent" @close="goalSpacesCloseEvent" />
+    </view>
+    <!-- 运送员 -->
+    <view class="transport-rice-box" v-if="showTransporter">
+      <ScrollSelection v-model="showTransporter" :columns="transporterList" title="运送员" @sure="transporterSureEvent" @cancel="transporterCancelEvent" @close="transporterCloseEvent" />
+    </view>
+    <!-- 转运工具 -->
+    <view class="transport-rice-box" v-if="showTransportTool">
+      <ScrollSelection v-model="showTransportTool" :columns="transportToolList" title="转运工具" @sure="transportToolSureEvent" @cancel="transportToolCancelEvent" @close="transportToolCloseEvent" />
+    </view>
+     <!-- 性别 -->
+    <view class="transport-rice-box" v-if="showGender">
+      <ScrollSelection v-model="showTransportTool" :columns="genderList" title="性别" @sure="genderSureEvent" @cancel="genderCancelEvent" @close="genderCloseEvent" />
+    </view>
+	<view class="message-box">
+		<view class="message-one">
+			<view class="message-one-left">
+				优先级
+			</view>
+			<view class="message-one-right">
+				<u-radio-group v-model="priorityRadioValue" direction="horizontal">
+					<u-radio name="1" activeColor="#289E8E" labelColor="#289E8E" label="正常"></u-radio>
+					<u-radio name="2" activeColor="#E8CB51" labelColor="#E8CB51" label="紧急"></u-radio>
+					<u-radio name="3" activeColor="#F2A15F" labelColor="#F2A15F" label="重要"></u-radio>
+					<u-radio name="4" activeColor="#E86F50" labelColor="#E86F50" label="紧急重要"></u-radio>
+				</u-radio-group>
+			</view>
+		</view>
+		<view class="select-box">
+			<view class="select-box-left">
+				<text>*</text>
+				<text>运送大类</text>
+			</view>
+			<view class="select-box-right" @click="transportPartentClickEvent">
+				<text :class="{'selectBoxRightStyle': !transportPartentSelected}">{{ currentTransportRice }}</text>
+				<u-icon name="arrow-right" :color="transportPartentSelected ? '#989999' : '#d6d6d6'" size="20"></u-icon>
+			</view>
+		</view>
+		<view class="transport-type" v-if="templateType === 'template_one'">
+			<view class="transport-type-left">
+				<text>运送类型</text>
+			</view>
+			<view class="transport-type-right">
+				<text class="transport-type-list" :class="{'transportTypeListStyle': transportTypeIndex == index}" 
+					v-for="(item,index) in transportTypeList"
+					@click="transportTypeEvent(item,index)" 
+					:key="index"
+					>
+					{{ item.text }}
+				</text>
+			</view>
+		</view>
+		<view class="select-box">
+			<view class="select-box-left">
+				<text>*</text>
+				<text>起点科室</text>
+			</view>
+			<view class="select-box-right" @click="showStartDepartment = true">
+				<text>{{ currentStartDepartment }}</text>
+				<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
+			</view>
+		</view>
+		<view class="message-one is-back task-total" v-if="templateType === 'template_two'">
+			<view class="trans-total-title">
+				该任务运送总数
+			</view>
+			<view class="trans-total-content">
+				<u-input v-model="taskTransportTotal" type="digit" readonly border="none" />
+			</view>
+		</view>
+		<view class="select-box end-select-box">
+			<view class="select-box-left">
+				<text>终点科室</text>
+			</view>
+			<view class="select-box-right" @click="templateType === 'template_one' ? showEndDepartment = true : showGoalSpaces = true">
+				<text>{{ templateType === 'template_one' ? currentEndDepartment : disposeTaskPresent(currentGoalSpaces)}}</text>
+				<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
+			</view>
+		</view>
+		<view class="select-box end-select-box">
+			<view class="select-box-left">
+				<text>运送员</text>
+			</view>
+			<view class="select-box-right" @click="showTransporter = true">
+				<text>{{ currentTransporter }}</text>
+				<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
+			</view>
+		</view>
+		<view class="select-box end-select-box">
+			<view class="select-box-left">
+				<text>转运工具</text>
+			</view>
+			<view class="select-box-right" @click="showTransportTool = true">
+				<text>{{ currentTransportTool }}</text>
+				<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
+			</view>
+		</view>
+		<view class="patient-message-box" v-if="templateType === 'template_one'">
+			<view class="patient-message-top">
+				<view class="creat-form-field">
+					<text>床号</text>
+					<u-input v-model="patientNumberValue" border="bottom" placeholder="请输入" />
+				</view>
+				<view class="creat-form-field">
+					<text>姓名</text>
+					<u-input v-model="patientNameValue" border="bottom" placeholder="请输入" />
+				</view>
+			</view>
+			<view class="patient-message-top patient-message-bottom">
+				<view class="creat-form-field">
+					<text>住院号</text>
+					<u-input v-model="admissionNumberValue" border="bottom" placeholder="请输入" />
+				</view>
+				<view class="creat-form-field">
+					<text>年龄</text>
+					<u-input v-model="patientAgeValue" type="digit" border="bottom" placeholder="请输入" />
+				</view>
+			</view>
+			<view class="patient-message-bottom-age">
+				<view class="patient-message-bottom-right">
+					<text>运送数量</text>
+					<u-input v-model="transportNumberValue" border="bottom" type="digit" placeholder="请输入运输数量" />
+				</view>
+				<view class="contact-isolation-box">
+					<view>接触隔离</view>
+					<view>
+						<u-radio-group v-model="isContactisolationValue">
+							<u-radio name="1" activeColor="#3B9DF9" label="是"></u-radio>
+							<u-radio name="0" activeColor="#3B9DF9" label="否"></u-radio>
+						</u-radio-group>
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="field-box-wrapper" v-if="templateType === 'template_two'">
+			<view class="field-box-two" v-for="(item,index) in templatelistTwo" :key="item">
+				<view class="field-title">
+					<view class="patient-name">病人{{index+1}}</view>
+					<view class="icon-area">
+						<u-icon name="trash" v-if="index > 0" @click="deletetMessage(index)" color="#E86F50"  size="22" /></u-icon>
+						<u-icon name="edit-pen" @click="editMessage(index)" color="#3B9DF9" size="22"></u-icon>
+					</view>
+				</view>
+				<view class="field-wrapper">
+					<view class="field-four">
+						<view class="contact-isolation-box">
+							<view>接触隔离:</view>
+							<view>
+							 {{ item.isContactisolationValue == 1 ? '是' : item.isContactisolationValue === null ? '' : '否' }}
+							</view>
+						</view>
+					</view>
+					<view class="field-one">
+						<view class="creat-form-field">
+							<text>床号</text>
+							<u-input v-model="item.bedNumber"  border="none" disabled :clearable="false">
+							</u-input>
+						</view>
+						<view class="creat-form-field">
+							<text>姓名</text>
+							<u-input v-model="item.patientName"  border="none" disabled :clearable="false">
+							</u-input>
+						</view>
+						<view class="creat-form-field">
+							<text>性别</text>
+							<u-input v-model="item.genderValue" border="none" disabled :clearable="false">
+							</u-input>
+						</view>
+					</view>
+					<view class="field-two">
+						<view class="creat-form-field">
+							<text>住院号</text>
+							<u-input v-model="item.patientNumber" border="none" disabled :clearable="false">
+							</u-input>
+						</view>
+						<view class="creat-form-field">
+							<text>运送数量</text>
+							<u-input disabled v-model="item.actualData" type="text" border="none" disabled :clearable="false">
+							</u-input>
+						</view>
+						<view class="creat-form-field">
+							<text>年龄</text>
+							<u-input v-model="item.patientAgeValue" border="none" disabled :clearable="false" type="number">
+							</u-input>
+						</view>
+					</view>
+					<view class="field-three">
+						<view class="sample-box">
+							<view>运送类型:</view>
+							<view>
+								{{item.sampleValue}}
+							</view>
+							<view>
+							{{jointTransportMessage(index)}}
+							</view>
+						</view>
+					</view>
+				</view>
+			</view>
+			<view class="add-message" @click="addMessageEvent" v-if="templateType === 'template_two'">
+					<u-icon name="plus" color="#43c3f3" size="16"></u-icon>
+					添加病人信息
+			</view>
+		</view>
+		<view class="select-box end-select-box" v-if="templateType === 'template_one'">
+			<view class="select-box-left">
+				<text>性别</text>
+			</view>
+			<view class="select-box-right" @click="showGender = true">
+				<text>{{ currentGender }}</text>
+				<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
+			</view>
+		</view>
+		<view class="message-one is-back">
+			<view class="message-one-left">
+				运送员是否返回
+			</view>
+			<view class="transport-isBack">
+				<u-radio-group v-model="isBackRadioValue">
+					<u-radio name="0" activeColor="#2c9af1" label="否"></u-radio>
+					<u-radio name="1" activeColor="#2c9af1" label="是"></u-radio>
+				</u-radio-group>
+			</view>
+		</view>
+		<view class="task-describe">
+			<text>任务描述</text>
+			<u--textarea v-model="taskDescribe" placeholder="请输入任务描述" height="140" :autoHeight="true" border="none"></u--textarea>
+		</view>
 	</view>
+	<view class="btn-box">
+	  <text class="operate-one" @click="getTransConfig">确认</text>
+	  <text class="operate-two" @click="cancelEvent">取消</text>
+	</view>
+  </view>
 </template>
-
 <script>
-	import {
+import {
 		mapGetters,
 		mapMutations
 	} from 'vuex'
@@ -374,849 +366,1181 @@
 		queryTransportTools,
 		queryTransportType,
 		queryAllDestination,
-		generateDispatchTask,
-		generateDispatchTaskMany,
-		queryTransConfig
-	} from '@/api/transport.js'
-	import ldSelect from '@/components/ld-select/ld-select.vue'
-	import stepNumberBox from '@/createWorkerOrderPackage/components/step-number-box/step-number-box.vue'
-	import faIcon from "@/components/kilvn-fa-icon/fa-icon.vue"
-	import navBar from "@/components/zhouWei-navBar"
-	export default {
-		components: {
-			ldSelect,
-			stepNumberBox,
-			faIcon,
-			navBar
-		},
-		data() {
-			return {
-				isShowNoData: false,
-				infoText: '加载中···',
-				isShowModal: false,
-				showLoadingHint: false,
-				controlListShow: false,
-				transportParentControlListShow: false,
-				taskTypeText: '',
-				typeText: '',
-				typeValue: '',
-				taskTotal: '',
-				typeIndex: null,
-				isContactisolationValue: null,
-				priorityValue: 1,
-				transportList: [],
-				hospitalList: [],
-				hospitalListTwovalue: '',
-				hospitalListValue: '',
-				temporaryHospitalList: [],
+		editDispathTaskSingle,
+		editDispatchTaskManyNew,
+		queryTransConfig,
+		getTransporter
+} from '@/api/transport.js'
+import StepNumberBox from '@/createWorkerOrderPackage/components/step-number-box/step-number-box.vue'
+import _ from 'lodash'
+import navBar from "@/components/zhouWei-navBar"
+import ScrollSelection from "@/components/scrollSelection/scrollSelection";
+import BottomSelect from "@/components/bottomSelect/bottomSelect";
+export default {
+  components: {
+    ScrollSelection,
+    BottomSelect,
+    StepNumberBox,
+		navBar
+  },
+  data() {
+    return {
+			showLoadingHint: false,
+			infoText: '加载中···',
+       taskDescribe: '',
+			patientNumberValue: '',
+			patientNameValue: '',
+			patientAgeValue: '',
+			taskTransportTotal: 12,
+			admissionNumberValue: '',
+			transportNumberValue: '',
+			commonTransportList: [],
+			transportPartentSelected: true,
+			isContactisolationValue: null,
+			showStartDepartment: false,
+			currentStartDepartment: '请选择',
+			startDepartmentList: [],
+			showEndDepartment: false,
+			currentEndDepartment: '请选择',
+			endDepartmentList: [],
+			showTransporter: false,
+			currentTransporter: '请选择',
+			currentTransporterValue: '',
+			transporterList: [],
+			showTransportTool: false,
+			currentTransportTool: '无工具',
+			transportToolList: [],
+			showGender: false,
+			currentGender: '未选择',
+			genderList: [
+				{ 
+					id: '2',
+					text: '女'
+				},
+				{ 
+					id: '1',
+					text: '男'
+				},
+				{
+					id: '0',
+					text: '未知'
+				}
+			],
+			showTransportRice: false,
+			currentTransportRice: '请选择',
+			currentTransportRiceValue: '',
+			transportRiceList: [],
+			transportTypeIndex: null,
+			currentTransportType: '',
+			transportTypeList: [],
+			goalSpacesOption: [],
+			showGoalSpaces: false,
+			currentGoalSpaces: [],
+			moveInfo: {
+				startX: ''
+			},
+			priorityRadioValue: '1',
+			isBackRadioValue: '0',
+			functionListIndex: 0,
+			overlayShow: false,
+			rightMenuShow: false,
+			patienModalShow: false,
+			transportParentControlListShow: false,
+			transportTypeParent: [],
+			templatelistTwo: [],
+			patienModalMessage: {
 				bedNumber: '',
 				patientName: '',
 				patientNumber: '',
-				actualData: '',
-				toolValue: '',
-				toolName: '',
-				toolList: [],
-				isBackValue: 0,
-				taskDescribe: '',
-				startPointId: '',
-				startPointName: '',
-				updateIndex: 0,
-				xflSelectShow: false,
-				templateTwoMessage: [{
-					bedNumber: '',
-					patientName: '',
-					patientNumber: '',
-					isContactisolationValue: null,
-					actualData: 0,
-					transportList: [],
-					genderValue: '未知',
-					sampleList: [],
-					sampleValue: '',
-					sampleId: ''
-				}],
-				patienModalMessage: {
-					bedNumber: '',
-					patientName: '',
-					patientNumber: '',
-					actualData: 0,
-					genderValue: '0',
-					isContactisolationValue: null,
-					transportList: [],
-					sampleList: [],
-					sampleValue: '',
-					sampleId: ''
-				},
-				transportTypeParent: [],
-				transportTypeChild: [],
-				patienModalShow: false,
-				isPressEdit: false
-			}
+				patientAgeValue: '',
+				isContactisolationValue: null,
+				actualData: 0,
+				genderValue: '0',
+				transportList: [],
+				sampleList: [],
+				sampleValue: '',
+				sampleId: ''
+			},
+			xflSelectShow: false,
+			isPressEdit: false,
+			updateIndex: 0
+    }
+  },
+
+  mounted() {
+		// this.echoTemporaryStorageMessage();
+    this.parallelFunction();
+  },
+
+  watch: {
+    // 监听每个病人对应的运送类型数量
+    templatelistTwo: {
+      handler(newVal,oldVal) {
+        this.taskTransportTotal  = this.templatelistTwo.reduce((accumulator, currentValue) => {
+          return accumulator + Number(currentValue.actualData)
+        },0);
+        if (this.taskTransportTotal >= 1) {
+          this.transportPartentSelected = false
+        } else {
+          this.transportPartentSelected = true
+        }
+      },
+      deep: true,
+      immediate: true
+    }
+  },
+  computed: {
+    ...mapGetters([
+			"userInfo",
+			"transTaskMessage",
+			"templateType",
+			'statusBarHeight',
+			'navigationBarHeight'
+		]),
+    proId () {
+      return this.userInfo.extendData.proId
+    },
+    userName () {
+      return this.userInfo.userName
+    },
+    proName () {
+      return this.userInfo.extendData.proName
+    },
+    workerId () {
+      return this.userInfo.extendData.userId
+    }
+  },
+
+  methods: {
+    ...mapMutations([]),
+		
+		// 顶部导航返回事件
+		backTo () {
+			uni.navigateBack()
 		},
-		// 监听每个病人对应的运送类型数量
-		watch: {
-			templateTwoMessage: {
-				handler(newVal, oldVal) {
-					this.taskTotal = this.templateTwoMessage.reduce((accumulator, currentValue) => {
-						return accumulator + Number(currentValue.actualData)
-					}, 0);
-				},
-				deep: true,
-				immediate: true
-			}
+		
+    // 处理终点科室
+		disposeTaskPresent (item) {
+			console.log('终点',item);
+			if (!item) { return '请选择'};
+			if (item.length == 0) { return '请选择'};
+			let temporaryArray = [];
+			for (let innerItem of item) {
+				temporaryArray.push(innerItem.text)
+			};
+			return temporaryArray.join('、')
 		},
-		computed: {
-			...mapGetters([
-				'statusBarHeight',
-				'navigationBarHeight',
-				'userInfo',
-				'templateType'
-			]),
-			userName() {
-				return this.userInfo.userName
-			},
-			depName() {
-				return this.userInfo.depName
-			},
-			depId() {
-				return this.userInfo.depId
-			},
-			proId() {
-				return this.userInfo.extendData.proId
-			},
-			proName() {
-				return this.userInfo.extendData.proName
-			},
-			workerId() {
-				return this.userInfo.extendData.userId
-			},
-			accountName() {
-				return this.userInfo.name
-			}
+
+		// 终点科室下拉选择框确认事件(模板二)
+		goalSpacesSureEvent (val) {
+			if (val.length > 0) {
+				this.currentGoalSpaces =  val
+			} else {
+				this.currentGoalSpaces = []
+			};
+			this.showGoalSpaces = false
 		},
-		mounted() {
-			console.log('1',this.templateType);
-			this.startPointId = this.depId;
-			this.startPointName = this.depName;
-			this.parallelFunction()
+
+		// 终点科室下拉选择框取消事件(模板二)
+		goalSpacesCancelEvent () {
+			this.showGoalSpaces = false
 		},
-		onLoad(options) {
-			if (options.transmitData == '{}') { return };
-			let transmitContent = JSON.parse(options.transmitData);
-			this.taskTypeText = transmitContent.value;
-			this.templateTwoMessage[0].sampleValue = transmitContent.value;
-			this.templateTwoMessage[0].sampleId = transmitContent.id
-		},	
-		methods: {
-			...mapMutations([
-			]),
-			
-			textChange () {
-				
-			},
-			
-			radio () {
-				
-			},
-			
-			// 顶部导航返回事件
-			backTo () {
-				uni.navigateBack()
-			},
-			
-			// 科室选择组件显示事件
-				ldSelectShow(val) {
-					this.isShowModal = val
-				},
-				
-				// 科室选择组件隐藏事件
-				ldSelectHide(val) {
-					this.isShowModal = val
-				},
-				
-				// 科室选择列表变化时
-				listChangeEvent(val) {
-					this.hospitalListValue = val;
-				},
-				
-				// 模板二科室选择列表变化时
-				hospitalListTwoSelectChange(val) {
-					this.hospitalListTwovalue = val;
-				},
-				
-				// 科室搜索事件
-				searchEvent (e) {
-					let temporaryArray = _.cloneDeep(this.hospitalList);
-					this.hospitalList = temporaryArray.filter((item) => { return item.value.indexOf(e) != -1});
-					if (e === '') {
-						this.hospitalList = _.cloneDeep(temporaryArray);
+
+		// 终点科室下拉选择框关闭事件(模板二)
+		goalSpacesCloseEvent () {
+			this.showGoalSpaces = false
+		},
+
+		// 回显编辑的信息
+		echoTemporaryStorageMessage () {
+			let casuallyTemporaryStorageCreateDispathTaskMessage = this.transTaskMessage;
+			if (this.templateType === 'template_one') {
+				this.priorityRadioValue = casuallyTemporaryStorageCreateDispathTaskMessage['priority'].toString();
+				this.currentTransportRice = casuallyTemporaryStorageCreateDispathTaskMessage['parentTypeName'];
+				this.currentTransportRiceValue = casuallyTemporaryStorageCreateDispathTaskMessage['parentTypeId'];
+				this.currentStartDepartment = casuallyTemporaryStorageCreateDispathTaskMessage['setOutPlaceName'];
+				this.currentEndDepartment = casuallyTemporaryStorageCreateDispathTaskMessage['destinationName'];
+				this.currentTransporter = casuallyTemporaryStorageCreateDispathTaskMessage['workerName'];
+				this.patientAgeValue = !casuallyTemporaryStorageCreateDispathTaskMessage['age'] ? '' : casuallyTemporaryStorageCreateDispathTaskMessage['age'];
+				this.currentTransporterValue = casuallyTemporaryStorageCreateDispathTaskMessage['workerId'];
+				this.currentTransportTool = casuallyTemporaryStorageCreateDispathTaskMessage['toolName'];
+				this.patientNumberValue = casuallyTemporaryStorageCreateDispathTaskMessage['bedNumber'];
+				this.isContactisolationValue = casuallyTemporaryStorageCreateDispathTaskMessage['quarantine'] === null ? casuallyTemporaryStorageCreateDispathTaskMessage['quarantine'] : casuallyTemporaryStorageCreateDispathTaskMessage['quarantine'].toString();
+				this.patientNameValue = casuallyTemporaryStorageCreateDispathTaskMessage['patientName'];
+				this.admissionNumberValue = casuallyTemporaryStorageCreateDispathTaskMessage['number'];
+				this.transportNumberValue = casuallyTemporaryStorageCreateDispathTaskMessage['actualCount'];
+				this.currentGender = casuallyTemporaryStorageCreateDispathTaskMessage['sex'] == 0 ? '未知' : casuallyTemporaryStorageCreateDispathTaskMessage['sex'] == 1 ? '男' : '女';
+				this.isBackRadioValue = casuallyTemporaryStorageCreateDispathTaskMessage['isBack'].toString();
+				this.taskDescribe = casuallyTemporaryStorageCreateDispathTaskMessage['taskRemark'];
+				this.querytransportChildByTransportParent(0, casuallyTemporaryStorageCreateDispathTaskMessage.parentTypeId, this.templateType,true);
+			} else if (this.templateType === 'template_two') {
+				this.priorityRadioValue = casuallyTemporaryStorageCreateDispathTaskMessage['priority'].toString();
+				this.currentTransportRice = casuallyTemporaryStorageCreateDispathTaskMessage['parentTypeName'];
+				this.currentTransportRiceValue = casuallyTemporaryStorageCreateDispathTaskMessage['parentTypeId'];
+				this.currentStartDepartment = casuallyTemporaryStorageCreateDispathTaskMessage['setOutPlaceName'];
+				this.currentTransporter = casuallyTemporaryStorageCreateDispathTaskMessage['workerName'];
+				this.currentTransporterValue = casuallyTemporaryStorageCreateDispathTaskMessage['workerId'];
+				this.currentTransportTool = casuallyTemporaryStorageCreateDispathTaskMessage['toolName'];
+				this.taskTransportTotal = casuallyTemporaryStorageCreateDispathTaskMessage['actualCount'];
+				this.isBackRadioValue = casuallyTemporaryStorageCreateDispathTaskMessage['isBack'].toString();
+				this.taskDescribe = casuallyTemporaryStorageCreateDispathTaskMessage['taskRemark'];
+				for (let i = 0,len = casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'].length; i < len; i++) {
+					this.templatelistTwo.push({
+						bedNumber: casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i].bedNumber == '床号未输入' ? '' : casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i].bedNumber,
+						patientName: casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i].patientName == '姓名未输入' ? '' : casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i].patientName,
+						patientAgeValue: casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i].age == '年龄未输入' ||  !casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i].age ? '' : casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i].age,
+						patientNumber: casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i].number == '住院号未输入' ? '' : casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i].number,
+						genderValue: casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i].sex == 0 ? '未知' : casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i].sex == 1 ? '男': '女',
+						actualData: casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i].quantity,
+						isContactisolationValue: casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i]['quarantine'].toString(),
+						sampleList: [], //病人信息模态框中运送大类列表 
+						sampleValue: this.currentTransportRice, //病人信息模态框中选中的运送大类名称
+						sampleId: casuallyTemporaryStorageCreateDispathTaskMessage['parentTypeId'], //病人信息模态框中选中的运送大类id
+						transportList: [],
+						generList: []
+					});
+					for (let innerItem of casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i]['typeList']) {
+						this.templatelistTwo[i]['transportList'].push({
+							text: innerItem.taskTypeName,
+							value: innerItem.taskTypeId,
+							checked: true,
+							typerNumber: innerItem['quantity']
+						})
 					}
-				},
-				
-				// 根据科室id获取科室名称
-				getDepartmentNameById(id) {
-					return this.hospitalList.filter((item) => {return item['id'] == id})[0]['value']
-				},
-				// 下拉框隐藏或显示时事件
-				visibleChange() {
-					this.hospitalList = this.temporaryHospitalList
-				},
-				// input中的数据变化时触发
-				inputEvent(val) {
-					let innerList = this.temporaryHospitalList;
-					this.hospitalList = innerList.filter((item) => {
-						return item.value.indexOf(val.detail.value) != -1
-					});
-				},
-				// 运送类型点击事件
-				typeEvent(item, index) {
-					this.typeIndex = index;
-					this.typeText = item.text;
-					this.typeValue = item.value;
-				},
-				// 模板二运送类型点击事件
-				sampleTypeEvent(innerItem, innerIndex) {
-					this.patienModalMessage.transportList[innerIndex].checked = !this.patienModalMessage.transportList[innerIndex].checked;
-					if (!this.patienModalMessage.transportList[innerIndex].checked) {
-						if (this.patienModalMessage.transportList[innerIndex]['typerNumber'] != 0) {
-							this.patienModalMessage.transportList[innerIndex]['typerNumber'] = 0
-						}
-					};
-					this.reduceTotal(0)
-				},
-				// 拼接运送类型信息函数
-				jointTransportMessage(index) {
-					let finalMsg = '';
-					let targetMsg = this.templateTwoMessage[index].transportList.filter((item) => {
-						return item.typerNumber > 0
-					});
-					for (let item of targetMsg) {
-						finalMsg += `${item.text}${item.typerNumber}个,`
-					};
-					if (targetMsg.length == 0) {
-						return finalMsg 
-					};
-					return `(${finalMsg})`
-				},
-				// 运送类型大类选择列表变化时
-				transportParentChange(val) {
-					this.querytransportChildByTransportParent(val.parentIndex, val.orignItem.id);
-					this.patienModalMessage.actualData = 0;
-					this.patienModalMessage.sampleValue = val.orignItem.value;
-					this.patienModalMessage.sampleId = val.orignItem.id;
-				},
-				// 运送类型大类下拉框隐藏或显示时事件
-				transportParentVisibleChange() {
-				},
-				// 运送类型大类input中的数据变化时触发
-				transportParentInputEvent(val) {},
-				
-				inpuntClick () {
-					
-				},
-				
-				// 运送类型子类步进器值改变事件
-				stepperValChange(msg) {
-					this.reduceTotal(msg[1]);
-				},
-				
-				// 步进器失去焦点事件
-				inputBlurEvent (msg) {
-				},
-				// 步进器增加或减少事件
-				plusNum(msg) {
-					this.patienModalMessage.transportList[msg[2]]['typerNumber'] = msg[1];
-					this.reduceTotal(msg[2]);
-				},
-				minusNum(msg) {
-					this.patienModalMessage.transportList[msg[2]]['typerNumber'] = msg[1];
-					this.reduceTotal(msg[2])
-				},
-				// 求和函数
-				reduceTotal(index) {
-					// 求该病人信息对应的运送数量
-					let targetMsg = this.patienModalMessage.transportList.filter((item) => {
-						return item.typerNumber > 0
-					});
-					this.patienModalMessage.actualData = targetMsg.reduce((accumulator, currentValue) => {
-						return accumulator + currentValue.typerNumber
-					}, 0);
-				},
-				// 底部按钮点击
-				clickEvent(item) {
-					if (item.text == "呼叫") {
-						if (this.isToCallTaskPage) {
-							this.backTo()
-						} else {
-							uni.redirectTo({
-								url: '/transportPackage/pages/callTask/callTask'
+				};
+				this.querytransportChildByTransportParent(0, casuallyTemporaryStorageCreateDispathTaskMessage['parentTypeId'], this.templateType,true);
+			}
+		},
+
+		// 添加病人信息事件
+		addMessageEvent () {
+			// 必须选择运送大类后才能添加病人信息
+			if (this.currentTransportRice == '请选择' || !this.currentTransportRice) {
+				this.$refs.uToast.show({
+					message: '请选择运送大类',
+				});
+				return
+			};
+			this.isPressEdit = false;
+			this.patienModalShow = true;
+			this.xflSelectShow = true;
+			this.patienModalMessage = {};
+			this.patienModalMessage = _.cloneDeep({
+				bedNumber: '',
+				patientName: '',
+				patientNumber: '',
+				patientAgeValue: '',
+				isContactisolationValue: null,
+				actualData: 0,
+				genderValue: '0',
+				transportList: _.cloneDeep(this.commonTransportList), //病人信息模态框中根据运送大类查询出的运送小类列表
+				sampleList: this.transportTypeParent, //病人信息模态框中运送大类列表
+				sampleValue: this.currentTransportRice, //病人信息模态框中选中的运送大类名称
+				sampleId: this.currentTransportRiceValue //病人信息模态框中选中的运送大类id
+			})
+		},
+
+		// 病人信息删除事件
+		deletetMessage (index) {
+			this.templatelistTwo.splice(index,1)
+		},
+
+		// 病人信息编辑事件
+		editMessage(index) {
+			// 没有选择运送大类时禁止编辑
+			if (this.currentTransportRice == '请选择' || !this.currentTransportRice) {
+				this.$refs.uToast.show({
+					message: '请选择运送大类',
+				});
+				return
+			};
+			this.updateIndex = index;
+			this.isPressEdit = true;
+			this.xflSelectShow = true;
+			this.patienModalShow = true;
+			this.patienModalMessage = {};
+			this.patienModalMessage = _.cloneDeep(this.templatelistTwo[index]);
+			// 过滤掉运送类型小类值为空的情况
+			this.patienModalMessage['transportList'] = this.patienModalMessage['transportList'].filter((item) => { return !item['text'] != true });
+			this.transferGenderTwo();
+			//病人信息展示框运送大类、运送小类为空时,给编辑病人信息模态框的运送大类和小类赋值)
+			if (!this.templatelistTwo[index]['sampleValue']) {
+				this.patienModalMessage['sampleList']  = this.transportTypeParent; //病人信息模态框中运送大类列表 
+				this.patienModalMessage['sampleValue'] = this.currentTransportRice; //病人信息模态框中选中的运送大类名称
+				this.patienModalMessage['sampleId'] = this.currentTransportRiceValue; //病人信息模态框中选中的运送大类id
+				this.patienModalMessage['transportList'] = _.cloneDeep(this.commonTransportList) //病人信息模态框中根据运送大类查询出的运送小类列表
+			};
+			//运送大类列表为空时,给编辑病人信息模态框的运送大类赋值
+			if (this.templatelistTwo[index]['sampleList'].length == 0) {
+				this.patienModalMessage['sampleList']  = this.transportTypeParent //病人信息模态框中运送大类列表 
+			};
+			if (this.templatelistTwo[index].actualData == 0) {
+				this.patienModalMessage['transportList'] = _.cloneDeep(this.commonTransportList) //病人信息模态框中根据运送大类查询出的运送小类列表
+			}
+		},
+
+		// 病人模态框信息确认事件
+		patienModalSure () {
+			if (this.isPressEdit) {
+				this.templatelistTwo.splice(this.updateIndex, 1,_.cloneDeep(this.patienModalMessage));
+				this.transferGenderOne(this.updateIndex)
+			} else {
+				this.templatelistTwo.push(_.cloneDeep(this.patienModalMessage));
+				if (this.templatelistTwo[this.templatelistTwo.length-1].genderValue === '1') {
+					this.templatelistTwo[this.templatelistTwo.length-1].genderValue = '男'
+				} else if (this.templatelistTwo[this.templatelistTwo.length-1].genderValue === '2') {
+					this.templatelistTwo[this.templatelistTwo.length-1].genderValue = '女'
+				} else if (this.templatelistTwo[this.templatelistTwo.length-1].genderValue === '0'){
+					this.templatelistTwo[this.templatelistTwo.length-1].genderValue = '未知'
+				}
+			};
+			this.xflSelectShow = false
+		},
+
+		// 病人模态框信息取消事件
+		patienModalCancel() {
+			this.xflSelectShow = false;
+		},
+
+		// 运送类型大类下拉框值变化时事件
+		sampleListValueChange (index) {
+			this.querytransportChildByTransportParent(index,this.templatelistTwo[index].sampleValue,this.templateType,false);
+			this.templatelistTwo[index].actualData = 0
+		},
+
+		// 运送类型大类选择列表变化时
+		transportParentChange(val) {
+			this.querytransportChildByTransportParent(val.parentIndex, val.orignItem.id,this.templateType,false);
+			this.patienModalMessage.actualData = 0;
+			this.patienModalMessage.sampleValue = val.orignItem.value;
+			this.patienModalMessage.sampleId = val.orignItem.id;
+		},
+
+		// 运送类型大类下拉框隐藏或显示时事件
+		transportParentVisibleChange() {
+
+		},
+
+		// 运送类型大类input中的数据变化时触发
+		transportParentInputEvent(val) {},
+
+		// 转换性别
+		transferGenderOne (index) {
+			if (this.templatelistTwo[index].genderValue === '1') {
+				this.templatelistTwo[index].genderValue = '男'
+			} else if (this.templatelistTwo[index].genderValue === '2') {
+				this.templatelistTwo[index].genderValue = '女'
+			} else if (this.templatelistTwo[index].genderValue === '0'){
+				this.templatelistTwo[index].genderValue = '未知'
+			}
+		},
+
+		transferGenderTwo () {
+			if (this.patienModalMessage.genderValue == '男') {
+				this.patienModalMessage.genderValue = '1'
+			} else if (this.patienModalMessage.genderValue == '女') {
+				this.patienModalMessage.genderValue = '2'
+			} else if (this.patienModalMessage.genderValue === '未知'){
+				this.patienModalMessage.genderValue = '0'
+			}
+		},
+
+		// 拼接运送类型信息函数
+		jointTransportMessage (index) {
+			let finalMsg = '';
+			let targetMsg = this.templatelistTwo[index].transportList.filter((item) => {
+				return item.typerNumber > 0 && item.text
+			});
+			for (let item of targetMsg) {
+				finalMsg += `${item.text}${item.typerNumber}个,`
+			};
+			if (targetMsg.length == 0) {
+				return finalMsg
+			};
+			return `(${finalMsg})`
+		},
+		
+		// 根据运送类型大类查询运送类型小类
+		querytransportChildByTransportParent (index,id, flag,isEcho) {
+			this.showLoadingHint = true;
+			this.loadingText = '加载中...';
+			this.commonTransportList = [];
+			queryTransportType({
+				proId: this.proId,
+				state: 0,
+				parentId: id
+			}).then((res) => {
+				this.showLoadingHint = false;
+				if (res && res.data.code == 200) {
+					if (flag == 'template_two') {
+						this.patienModalMessage['transportList'] = [];
+						for(let item of res.data.data) {
+							this.commonTransportList.push({
+								text: item.typeName,
+								value: item.id,
+								checked: false,
+								typerNumber: 0
 							});
-							this.changeBottomBarIndex(0);
-							this.changeIsToCallTaskPage(true)
-						}
-					} else if (item.text == "任务跟踪") {
-						uni.redirectTo({
-							url: '/transportPackage/pages/task-tail/task-tail'
-						});
-						this.changeBottomBarIndex(1);
-						this.changeIsToCallTaskPage(true)
-					} else if (item.text == "历史任务") {
-						uni.redirectTo({
-							url: '/transportPackage/pages/historyTask/historyTask'
-						});
-						this.changeBottomBarIndex(2);
-						this.changeIsToCallTaskPage(true)
-					} else if (item.text == "意见反馈") {
-						uni.redirectTo({
-							url: '/transportPackage/pages/totalFeedbackIdea/totalFeedbackIdea'
-						});
-						this.changeBottomBarIndex(3);
-						this.changeIsToCallTaskPage(true)
-					}
-				},
-				radioGroupChange(e) {
-					console.log(e);
-				},
-				toolChange(e) {
-					console.log(e);
-				},
-				toolGroupChange(e) {
-					this.toolValue = e;
-					let currentText = this.toolList.filter((item) => {
-						return item.value == e
-					});
-					this.toolName = currentText[0]['text']
-				},
-				isBackGroupChange(e) {
-					console.log(e);
-				},
-				genderChange (e) {
-					console.log(e);
-				},
-				// 查询目的地
-				getAllDestination() {
-					return new Promise((resolve, reject) => {
-						queryAllDestination(this.proId).then((res) => {
-								if (res && res.data.code == 200) {
-									resolve(res.data.data)
-								}
-							})
-							.catch((err) => {
-								reject(err.message)
-							})
-					})
-				},
-				// 查询转运工具
-				getTransportTools() {
-					return new Promise((resolve, reject) => {
-						queryTransportTools({
-								proId: this.proId,
-								state: 0
-							})
-							.then((res) => {
-								if (res && res.data.code == 200) {
-									resolve(res.data.data)
-								}
-							})
-							.catch((err) => {
-								reject(err.message)
-							})
-					})
-				},
-				// 查询运送类型小类
-				getTransPorttype(data) {
-					return new Promise((resolve, reject) => {
-						queryTransportType(data)
-							.then((res) => {
-								if (res && res.data.code == 200) {
-									resolve(res.data.data)
-								}
-							})
-							.catch((err) => {
-								reject(err.message)
-							})
-					})
-				},
-				// 查询运送类型大类
-				getTransportsTypeParent() {
-					return new Promise((resolve, reject) => {
-						queryTransportTypeClass({
-								proId: this.proId,
-								state: 0
-							}).then((res) => {
-								if (res && res.data.code == 200) {
-									if (res.data.data.length > 0) {
-										resolve(res.data.data)
-									}
-								}
-							})
-							.catch((err) => {
-								reject(err.message)
-							})
-					})
-				},
-				// 根据运送类型大类查询运送类型小类
-				querytransportChildByTransportParent(index, id) {
-					queryTransportType({
-							proId: this.proId,
-							state: 0,
-							parentId: id
-						})
-						.then((res) => {
-							if (res && res.data.code == 200) {
-								this.patienModalMessage['transportList'] = [];
-								for (let item of res.data.data) {
-									this.patienModalMessage['transportList'].push({
-										text: item.typeName,
-										value: item.id,
-										checked: false,
-										typerNumber: 0
-									})
-								}
-							}
-						})
-						.catch((err) => {
-							this.$refs.uToast.show({
-								title: `${err.message}`,
-								type: 'warning'
-							}).then(() => {})
-						})
-				},
-				// 并行查询目的地、转运工具、运送类型小类、运送类型大类
-				parallelFunction(type) {
-					Promise.all([this.getAllDestination(), this.getTransportTools(), this.getTransPorttype({
-							proId: this.proId,
-							state: 0,
-							parentId: this.titleText.id
-						}), this.getTransportsTypeParent()])
-						.then((res) => {
-							if (res && res.length > 0) {
-								this.toolList = [];
-								this.transportList = [];
-								this.hospitalList = [];
-								this.transportTypeParent = [];
-								this.templateTwoMessage[0]['sampleList'] = [];
-								this.templateTwoMessage[0]['transportList'] = [];
-								this.patienModalMessage['sampleList'] = [];
-								this.patienModalMessage['transportList'] = [];
-								this.transportTypeChild = [];
-								let [item1, item2, item3, item4] = res;
-								if (item1) {
-									Object.keys(item1).forEach((item) => {
-										this.hospitalList.push({
-											value: item1[item],
-											id: item
-										})
-									});
-									this.temporaryHospitalList = this.hospitalList
-								};
-								if (item2) {
-									for (let item of item2) {
-										this.toolList.push({
-											text: item.toolName,
-											value: item.id,
-											checked: false
-										})
-									};
-									this.toolList.push({
-										text: '无工具',
-										value: 0,
-										checked: false
-									})
-								};
-								if (item3) {
-									for (let item of item3) {
-										this.transportList.push({
-											text: item.typeName,
-											value: item.id
-										});
-										this.patienModalMessage['transportList'].push({
-											text: item.typeName,
-											value: item.id,
-											checked: false,
-											typerNumber: 0
-										});
-										this.templateTwoMessage[0]['transportList'].push({
-											text: item.typeName,
-											value: item.id,
-											checked: false,
-											typerNumber: 0
-										});
-										this.transportTypeChild.push({
-											text: item.typeName,
-											value: item.id,
-											checked: false,
-											typerNumber: 0
-										})
-									};
-								};
-								if (item4) {
-									for (let item of item4) {
-										this.transportTypeParent.push({
-											id: item.id,
-											value: item.typeName
-										})
-									};
-									this.patienModalMessage.sampleList = this.transportTypeParent;
-									this.patienModalMessage.sampleValue = this.titleText.value;
-									this.patienModalMessage.sampleId = this.titleText.id;
-									this.templateTwoMessage[0].sampleList = this.transportTypeParent;
-									this.templateTwoMessage[0].sampleValue = this.titleText.value;
-									this.templateTwoMessage[0].sampleId = this.titleText.id;
-								}
-							}
-						})
-						.catch((err) => {
-							this.$refs.uToast.show({
-								title: `${err}`,
-								type: 'warning'
-							})
-						})
-				},
-				// 转换性别
-				transferGenderOne (index) {
-					if (this.templateTwoMessage[index].genderValue === '1') {
-						this.templateTwoMessage[index].genderValue = '男'
-					} else if (this.templateTwoMessage[index].genderValue === '2') {
-						this.templateTwoMessage[index].genderValue = '女'
-					} else if (this.templateTwoMessage[index].genderValue === '0'){
-						this.templateTwoMessage[index].genderValue = '未知'
-					}
-				},
-				transferGenderTwo () {
-					if (this.patienModalMessage.genderValue == '男') {
-						this.patienModalMessage.genderValue = '1'
-					} else if (this.patienModalMessage.genderValue == '女') {
-						this.patienModalMessage.genderValue = '2'
-					} else if (this.patienModalMessage.genderValue === '未知'){
-						this.patienModalMessage.genderValue = '0'
-					}
-				},
-				// 病人模态框信息确认事件
-				patienModalSure () {
-					if (this.isPressEdit) {
-						this.templateTwoMessage.splice(this.updateIndex, 1,_.cloneDeep(this.patienModalMessage));
-						this.transferGenderOne(this.updateIndex);
-						console.log('病人信息',this.templateTwoMessage);
-					} else {
-						this.templateTwoMessage.push(_.cloneDeep(this.patienModalMessage));
-						if (this.templateTwoMessage[this.templateTwoMessage.length-1].genderValue === '1') {
-							this.templateTwoMessage[this.templateTwoMessage.length-1].genderValue = '男'
-						} else if (this.templateTwoMessage[this.templateTwoMessage.length-1].genderValue === '2') {
-							this.templateTwoMessage[this.templateTwoMessage.length-1].genderValue = '女'
-						} else if (this.templateTwoMessage[this.templateTwoMessage.length-1].genderValue === '0'){
-							this.templateTwoMessage[this.templateTwoMessage.length-1].genderValue = '未知'
-						}
-					};
-					this.patienModalShow = false;
-					this.xflSelectShow = false
-				},
-				// 病人模态框信息取消事件
-				patienModalCancel() {
-					this.patienModalShow = false;
-					this.xflSelectShow = false;
-				},
-				// 添加病人信息事件
-				addMessageEvent() {
-					this.isPressEdit = false;
-					this.patienModalShow = true;
-					this.xflSelectShow = true;
-					this.patienModalMessage = {};
-					this.patienModalMessage = _.cloneDeep({
-						bedNumber: '',
-						patientName: '',
-						patientNumber: '',
-						genderValue: '0',
-						actualData: 0,
-						isContactisolationValue: null,
-						transportList: this.transportTypeChild,
-						sampleList: this.transportTypeParent,
-						sampleValue: this.titleText.value,
-						sampleId: this.titleText.id
-					});
-				},
-				// 病人信息删除事件
-				deletetMessage(index) {
-					this.templateTwoMessage.splice(index, 1)
-				},
-				
-				// 返回病人序号
-				patientIndexFun() {
-					if(this.isPressEdit) {
-						return `病人${this.updateIndex+1}`
-					};
-					return `病人${this.this.templateTwoMessage.length+1}`
-				},
-				
-				// 病人信息编辑事件
-				editMessage(index) {
-					this.updateIndex = index;
-					this.isPressEdit = true;
-					this.xflSelectShow = true;
-					this.patienModalMessage = {};
-					this.patienModalMessage = _.cloneDeep(this.templateTwoMessage[index]);
-					this.transferGenderTwo();
-					this.patienModalShow = true
-				},
-				// 生成调度任务(一个病人)
-				postGenerateDispatchTask(data) {
-					this.showLoadingHint = true;
-					generateDispatchTask(data).then((res) => {
-							if (res && res.data.code == 200) {
-								this.$refs.uToast.show({
-									title: `${res.data.msg}`,
-									type: 'success'
+							if (!isEcho) {
+								this.patienModalMessage['transportList'].push({
+									text: item.typeName,
+									value: item.id,
+									checked: false,
+									typerNumber: 0
 								});
-								setTimeout(() => {
-									this.backTo()
-								}, 1000)
 							} else {
-								this.$refs.uToast.show({
-									title: `${res.data.msg}`,
-									type: 'warning'
-								})
-							};
-							this.showLoadingHint = false
-						})
-						.catch((err) => {
-							this.$refs.uToast.show({
-								title: `${err.message}`,
-								type: 'error'
-							})
-							this.showLoadingHint = false;
-						})
-				},
-				
-				//生成调度任务(多个病人)
-				postGenerateDispatchTaskMany(data) {
-					this.showLoadingHint = true;
-					generateDispatchTaskMany(data).then((res) => {
-							if (res && res.data.code == 200) {
-								this.$refs.uToast.show({
-									title: `${res.data.msg}`,
-									type: 'success'
-								});
-								setTimeout(() => {
-									this.backTo()
-								}, 1000)
-							} else {
-								this.$refs.uToast.show({
-									title: `${res.data.msg}`,
-									type: 'warning'
-								})
-							};
-							this.showLoadingHint = false
-						})
-						.catch((err) => {
-							this.$refs.uToast.show({
-								title: `${err.message}`,
-								type: 'error'
-							});
-							this.showLoadingHint = false;
-						})
-				},
-				
-				// 查询是否配置接触隔离选项0-没配置1-配置
-				getTransConfig () {
-					this.showLoadingHint = true;
-					queryTransConfig(this.proId,'TRANS_QUARANTINE').then((res) => {
-						if (res && res.data.code == 200) {
-							if (JSON.parse(res.data.data)[0]['value'] == 1) {
-								if (this.templateType === 'template_one') {
-									if (this.titleText.value == '检查') {
-										if (this.isContactisolationValue === null) {
-											this.$refs.uToast.show({
-												title: '请确认病人是否需要接触隔离!',
-												type: 'warning'
-											})
-										} else {
-											this.sure(true)
-										}
-									}	else {
-										this.sure(false)
+								for (let innerItem of this.templatelistTwo) {
+								if (innerItem['transportList'].filter((typeItem) => { return typeItem['value'] == item.id}).length == 0) {
+										innerItem['transportList'].push({
+											text: item.typeName,
+											value: item.id,
+											checked: false,
+											typerNumber: 0
+										})
 									}
-								} else if (this.templateType === 'template_two') {
-									if (this.patienModalMessage.sampleValue == '检查') {
-										let temporaryFlag = this.templateTwoMessage.some((item) => { return item.isContactisolationValue === null });
-										if (temporaryFlag) {
-											this.$refs.uToast.show({
-												title: '请确认病人是否需要接触隔离!',
-												type: 'warning'
-											})
-										} else {
-											this.sure(true)
-										}
-									}	else {
-										this.sure(false)
-									}
-								}  
-							} else {
-								this.sure(false)
-							}
-						} else {
-							this.$refs.uToast.show({
-								title: `${res.data.msg}`,
-								type: 'error'
+								}
+							} 
+						}
+					} else if (flag == 'template_one') {
+						this.transportTypeList = [];
+						for(let item of res.data.data) {
+							this.transportTypeList.push({
+								text: item.typeName,
+								value: item.id
 							})
 						};
-						this.showLoadingHint = false;
+						if (isEcho) {
+							this.transportTypeIndex = this.transportTypeList.findIndex((innerItem) => { return innerItem.value == this.transTaskMessage['taskTypeId']});
+							this.currentTransportType = {
+								text: this.transTaskMessage['taskTypeName'],
+								value: this.transTaskMessage['taskTypeId']
+							}
+						} else {
+							this.transportTypeIndex = null
+						};
+						console.log('运送类型',this.transportTypeList);
+					}
+				} else {
+					this.$refs.uToast.show({
+						message: res.data.msg,
+						type: 'error'
+					})
+				}
+			})
+			.catch((err) => {
+				this.showLoadingHint = false;
+				this.$refs.uToast.show({
+					message: `${err.message}`,
+					type: 'error'
+				})
+			})
+		},
+
+		// 查询运送类型小类
+		getTransPorttype (data) {
+			return new Promise((resolve,reject) => {
+				queryTransportType(data)
+				.then((res) => {
+					if (res && res.data.code == 200) {
+						resolve(res.data.data)
+					} else {
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
+				})
+				.catch((err) => {
+					reject({message:err.message})
+				})
+			})
+		},
+
+		// 查询运送类型大类
+		getTransportsTypeParent () {
+			return new Promise((resolve,reject) => {
+				queryTransportTypeClass({proId: this.proId, state: 0}).then((res) => {
+					if (res && res.data.code == 200) {
+						if (res.data.data.length > 0) {
+							resolve(res.data.data)
+						}
+					} else {
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
+				})
+					.catch((err) => {
+						reject({message:err.message})
+					})
+			})
+		},
+		
+		//运送类型子类步进器失去焦点事件
+		inputBlurEvent () {},
+
+		// 运送类型子类步进器值改变事件
+		stepperValChange(msg) {
+			this.reduceTotal(msg[1]);
+		},
+
+		// 步进器增加或减少事件
+		plusNum(msg) {
+			this.patienModalMessage.transportList[msg[2]]['typerNumber'] = msg[1];
+			this.reduceTotal(msg[2]);
+		},
+		minusNum(msg) {
+			this.patienModalMessage.transportList[msg[2]]['typerNumber'] = msg[1];
+			this.reduceTotal(msg[2])
+		},
+
+		// 根据运送员名称获取运送员id
+		getCurrentTransporterIdByName(text) {
+			return this.transporterList.filter((item) => {return item['text'] == text })[0]['value']
+		},
+
+		// 求和函数
+		reduceTotal(index) {
+			// 求该病人信息对应的运送数量
+			let targetMsg = this.patienModalMessage.transportList.filter((item) => {
+				return item.typerNumber > 0
+			});
+			this.patienModalMessage.actualData = targetMsg.reduce((accumulator, currentValue) => {
+				return accumulator + currentValue.typerNumber
+			}, 0);
+		},
+
+		// 并行查询目的地、转运工具、运送类型大类、运送员
+		parallelFunction (type) {
+				this.showLoadingHint = true;
+				this.loadingText = '加载中...';
+				Promise.all([this.getAllDestination(),this.getTransportTools(),this.getTransportsTypeParent(),this.queryTransporter()])
+				.then((res) => {
+					this.showLoadingHint = false;
+					if (res && res.length > 0) {
+						this.transportRiceList = [];
+						this.startDepartmentList = [];
+						this.endDepartmentList = [];
+						this.goalSpacesOption = [];
+						this.transportTypeParent = [];
+						this.transporterList = [];
+						let [item1,item2,item3,item4] = res;
+						if (item1) {
+							Object.keys(item1).forEach((item,index) => {
+								// 起点科室
+								this.startDepartmentList.push({
+									text: item1[item],
+									value: item,
+									id: index
+								});
+								if (this.templateType === 'template_one') {
+									// 终点科室(模板一)
+									this.endDepartmentList.push({
+										text: item1[item],
+										value: item,
+										id: index
+									})
+								} else {
+									// 终点科室(模板二)
+									this.goalSpacesOption.push({
+										text: item1[item],
+										value: item,
+										selected: false
+									})
+								}
+							});
+							// 回显目的地信息(模板二)
+							if (this.templateType === 'template_two') {
+								if (this.transTaskMessage['destinations'].length == 0 || !this.transTaskMessage['destinations']) {
+									this.currentGoalSpaces = []
+								} else {
+									for (let innerItem of this.transTaskMessage['destinations']) {
+										this.currentGoalSpaces.push({
+											text: innerItem['destinationName'],
+											value: innerItem['destinationId'].toString()
+										})
+									}
+								}
+							}  
+						};
+						if (item2) {
+							// 转运工具
+							this.transportToolList = [
+								{
+									text: '无工具',
+									value: null,
+									id: 0 
+								}
+							];
+							for (let i = 0, len = item2.length; i < len; i++) {
+								this.transportToolList.push({
+									text: item2[i].toolName,
+									value: item2[i].id,
+									id: i + 1
+								})
+							}
+						};
+						if (item3) {
+							// 运送大类
+							for (let i = 0, len = item3.length; i < len; i++) {
+								this.transportTypeParent.push({
+									id: item3[i].id,
+									value: item3[i].typeName
+								});
+								this.transportRiceList.push({
+									text: item3[i].typeName,
+									value: item3[i].id,
+									id: i
+								})
+							}
+						};
+						if (item4) {
+							for (let i = 0, len = item4.length; i < len; i++) {
+								this.transporterList.push({
+									text: item4[i].name,
+									value: item4[i]['workerId'],
+									complete: item4[i].complete, // 完成数量
+									ongoing: item4[i].ongoing, // 进行中数量
+									id: i
+								})
+							}
+						}
+					}
+				})
+				.catch((err) => {
+					this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: `${err.message}`,
+						type: 'error'
+					})
+				})
+			},
+
+			// 查询目的地
+			getAllDestination () {
+				return new Promise((resolve,reject) => {
+					queryAllDestination(this.proId).then((res) => {
+						if (res && res.data.code == 200) {
+							resolve(res.data.data)
+						} else {
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
 					})
 					.catch((err) => {
-						this.$refs.uToast.show({
-							title: `${err.message}`,
-							type: 'error'
-						});
-						this.showLoadingHint = false;
+						reject({message:err.message})
 					})
-				},
-				
-				// 运送类型信息确认事件
-				dispatchTaskSure(flag) {
-					if (this.templateType === 'template_one') {
-						// if (!this.hospitalListValue) {
-						// 	this.$refs.uToast.show({
-						// 		title: '科室不能为空',
-						// 		type: 'warning'
-						// 	});
-						// 	return 
-						// };
-						// 获取选中的运送工具信息
-						let taskMessage = {
-							setOutPlaceId: this.hospitalListValue == '' ? this.startPointId : this.hospitalListValue, //出发地ID
-							setOutPlaceName: this.hospitalListValue == '' ? this.startPointName : this.getDepartmentNameById(this.hospitalListValue),//出发地名称
-							// destinationId: this.hospitalListValue, //目的地ID
-							// destinationName: this.hospitalListValue == '' ? '' : this.getDepartmentNameById(this.hospitalListValue), //目的地名称
-							parentTypeId: this.titleText.id, //运送父类型Id
-							parentTypeName: this.titleText.value, //运送父类型名称
-							taskTypeId: this.typeValue, //运送类型 ID
-							taskTypeName: this.typeText, //运送类型 名 称
-							priority: this.priorityValue, //优先级   0-正常, 1-重要,2-紧急, 3-紧急重要
-							toolId: this.toolValue === 0 ? 0 : this.toolValue === '' ? '' : this.toolValue, //运送工具ID
-							toolName: this.toolName === '无工具' ? '无工具' : this.toolName === '' ? '' : this.toolName, //运送工具名称
-							actualCount: this.actualData, //实际数量
-							patientName: this.patientName, //病人姓名
-							sex: 0, //病人性别  0-未指定,1-男, 2-女
-							age: "", //年龄
-							quarantine: this.isContactisolationValue === null ? -1 : this.isContactisolationValue, // 接触隔离
-							number: this.patientNumber, //住院号
-							bedNumber: this.bedNumber, //床号
-							taskRemark: this.taskDescribe, //备注
-							createId: this.workerId, //创建者ID  当前登录者
-							createName: this.userName, //创建者名称  当前登陆者
-							proId: this.proId, //项目ID
-							proName: this.proName, //项目名称
-							isBack: this.isBackValue, //是否返回出发地  0-不返回，1-返回
-							createType: 2 ,//创建类型   0-调度员,1-医务人员(平板创建),2-医务人员(小程序)
-							startTerminal: 2 // 发起客户端类型 1-安卓APP，2-微信小程序
-						};
-						// 创建调度任务
-						this.postGenerateDispatchTask(taskMessage)
-					} else if (this.templateType === 'template_two') {
-						// if (this.hospitalListTwovalue.length == 0) {
-						// 	this.$refs.uToast.show({
-						// 		title: '科室不能为空',
-						// 		type: 'warning'
-						// 	});
-						// 	return 
-						// };
-						let taskMessageTwo = {
-							setOutPlaceId: this.hospitalListTwovalue == '' ? this.startPointId : this.hospitalListTwovalue, //出发地ID
-							setOutPlaceName: this.hospitalListTwovalue == '' ? this.startPointName : this.getDepartmentNameById(this.hospitalListTwovalue),//出发地名称
-							destinations: [],//多个目的地列表
-							patientInfoList: [], //多个病人信息列表
-							priority: this.priorityValue, //优先级   0-正常, 1-重要,2-紧急, 3-紧急重要
-							toolId: this.toolValue === 0 ? 0 : this.toolValue === '' ? '' : this.toolValue, //运送工具ID
-							toolName: this.toolName === '无工具' ? '无工具' : this.toolName === '' ? '' : this.toolName, //运送工具名称
-							actualCount: this.taskTotal, //实际数量
-							taskRemark: this.taskDescribe, //备注
-							createId: this.workerId, //创建者ID  当前登录者
-							createName: this.userName, //创建者名称  当前登陆者
-							proId: this.proId, //项目ID
-							proName: this.proName, //项目名称
-							isBack: this.isBackValue, //是否返回出发地  0-不返回，1-返回
-							createType: 2 ,//创建类型   0-调度员,1-医务人员(平板创建),2-医务人员(小程序)
-							startTerminal: 2 // 发起客户端类型 1-安卓APP，2-微信小程序
-						};
-						// 获取目的地列表数据
-						// if (this.hospitalListTwovalue.length > 0) {
-						// 	for (let item of this.hospitalListTwovalue) {
-						// 		taskMessageTwo.destinations.push({
-						// 			destinationId: item,
-						// 			destinationName: this.getDepartmentNameById(item)
-						// 		})
-						// 	}
-						// };	
-						// 获取多个病人信息列表数据
-						for (let patientItem of this.templateTwoMessage) {
-							taskMessageTwo.patientInfoList.push({
-								bedNumber: patientItem['bedNumber'],
-								patientName: patientItem['patientName'],
-								number: patientItem['patientNumber'],
-								quarantine: patientItem['isContactisolationValue'] === null ? -1 : patientItem['isContactisolationValue'], // 接触隔离
-								sex:  patientItem['genderValue'] === '男' ? 1 : patientItem['genderValue'] === '女' ? 2 : 0,
-								quantity: patientItem['actualData'],
-								typeList: []
-							})
-						};
-						// 获取每个病人的运送类型数据
-						for (let i = 0, len = this.templateTwoMessage.length; i < len; i++) {
-							if (this.templateTwoMessage[i]['transportList'].length > 0) {
-								// 获取选中的运送类型小类
-								let checkChildTypeList = this.templateTwoMessage[i]['transportList'].filter((item) => {return item.typerNumber > 0});
-								if (checkChildTypeList.length > 0) {
-									for (let innerItem of checkChildTypeList) {
-										taskMessageTwo.patientInfoList[i]['typeList'].push({
-											quantity: innerItem['typerNumber'],
-											parentTypeId: this.templateTwoMessage[i]['sampleId'],
-											parentTypeName: this.templateTwoMessage[i]['sampleValue'],
-											taskTypeId: innerItem['value'],
-											taskTypeName: innerItem['text']
-										})
-									}
-								} else {
-									taskMessageTwo.patientInfoList[i]['typeList'].push({
-										quantity: 1,
-										parentTypeId: this.templateTwoMessage[i]['sampleId'],
-										parentTypeName: this.templateTwoMessage[i]['sampleValue'],
-										taskTypeId: '',
-										taskTypeName: ''
-									});
-									// 没选运送类型小类时,大类也算一个数量
-									taskMessageTwo.patientInfoList[i]['quantity'] = 1;
-									this.templateTwoMessage[i]['actualData'] = 1;
-									// 重新计算运送类型总数
-									this.totalNumber  = this.templateTwoMessage.reduce((accumulator, currentValue) => {
-										return accumulator + Number(currentValue.actualData)
-									},0);
-									taskMessageTwo['actualCount'] = this.totalNumber
-								}	
-							}
-						};
-						this.postGenerateDispatchTaskMany(taskMessageTwo);
-						console.log('最终数据',taskMessageTwo);
-					}
-				},
-				// 调度任务生成
-				sure(flag) {
-					this.dispatchTaskSure(flag)
-				},
-				// 调度任务取消
-				cancel() {
-					this.backTo()
-				}
-		}
-	}
-</script>
+				})
+			},
 
-<style lang="scss">
-	@import "~@/common/stylus/variable.scss";
+		// 查询转运工具
+		getTransportTools () {
+			return new Promise((resolve,reject) => {
+				queryTransportTools({proId: this.proId, state: 0})
+				.then((res) => {
+					if (res && res.data.code == 200) {
+						resolve(res.data.data)
+					} else {
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
+				})
+				.catch((err) => {
+					reject({message:err.message})
+				})
+			})
+		},
+
+		// 查询运送员
+		queryTransporter () {
+			return new Promise((resolve,reject) => {
+				getTransporter(this.proId, this.workerId)
+				.then((res) => {
+					if (res && res.data.code == 200) {
+						resolve(res.data.data)
+					} else {
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
+				})
+				.catch((err) => {
+					reject({message:err.message})
+				})
+			})
+		},
+
+		// 运送大类点击显示下拉框事件
+		transportPartentClickEvent () {
+			if (this.transportPartentSelected) {
+				this.showTransportRice = true
+			}
+		},
+
+		// 运送大类下拉选择框确认事件
+		transportRiceSureEvent (val,value) {
+			if (val) {
+				this.currentTransportRice = val;
+				this.currentTransportRiceValue = value;
+				this.synchronizationPatientTransportType(val);
+				// 根据运送大类查询运送小类
+				this.querytransportChildByTransportParent(0,value,this.templateType,false);
+			} else {
+				this.currentTransportRice = '请选择';
+				this.currentTransportRiceValue = ''
+			};
+			this.showTransportRice = false
+		},
+
+		// 同步病人运送类型
+		synchronizationPatientTransportType (value) {
+			this.templatelistTwo.forEach((item) => {
+				if (item['sampleValue']) {
+					item['sampleValue'] = value
+				}
+			})
+		},
+
+		// 运送大类下拉选择框取消事件
+		transportRiceCancelEvent () {
+			this.showTransportRice = false
+		},
+
+		// 运送大类下拉选择框关闭事件
+		transportRiceCloseEvent () {
+			this.showTransportRice = false
+		},
+
+		// 起点科室下拉选择框确认事件
+		startDepartmentSureEvent (val) {
+			if (val) {
+				this.currentStartDepartment =  val
+			} else {
+				this.currentStartDepartment = '请选择'
+			};
+			this.showStartDepartment = false
+		},
+
+		// 起点科室下拉选择框取消事件
+		startDepartmentCancelEvent () {
+			this.showStartDepartment = false
+		},
+
+		// 起点科室下拉选择框关闭事件
+		startDepartmentCloseEvent () {
+			this.showStartDepartment = false
+		},
+
+		// 终点科室下拉选择框确认事件(模板一)
+		endDepartmentSureEvent (val) {
+			if (val) {
+				this.currentEndDepartment =  val
+			} else {
+				this.currentEndDepartment = '请选择'
+			};
+			this.showEndDepartment = false
+		},
+
+		// 终点科室下拉选择框取消事件(模板一)
+		endDepartmentCancelEvent () {
+			this.showEndDepartment = false
+		},
+
+		// 终点科室下拉选择框关闭事件(模板一)
+		endDepartmentCloseEvent () {
+			this.showEndDepartment = false
+		},
+
+		// 运送员下拉选择框确认事件
+		transporterSureEvent (val,value) {
+			if (val) {
+				this.currentTransporter =  val;
+				this.currentTransporterValue = value
+			} else {
+				this.currentTransporter = '请选择';
+				this.currentTransporterValue = ''
+			};
+			this.showTransporter = false
+		},
+
+		// 运送员下拉选择框取消事件
+		transporterCancelEvent () {
+			this.showTransporter = false
+		},
+
+		// 运送员下拉选择框关闭事件
+		transporterCloseEvent () {
+			this.showTransporter = false
+		},
+
+		// 转运工具下拉选择框确认事件
+		transportToolSureEvent (val) {
+			if (val) {
+				this.currentTransportTool =  val
+			} else {
+				this.currentTransportTool = '无工具'
+			};
+			this.showTransportTool = false
+		},
+
+		// 转运工具下拉选择框取消事件
+		transportToolCancelEvent () {
+			this.showTransportTool = false
+		},
+
+		// 转运工具下拉选择框关闭事件
+		transportToolCloseEvent () {
+			this.showTransportTool = false
+		},
+
+		// 性别下拉选择框确认事件
+		genderSureEvent (val) {
+			if (val) {
+				this.currentGender =  val
+			} else {
+				this.currentGender = '请选择'
+			};
+			this.showGender = false
+		},
+
+		// 性别下拉选择框取消事件
+		genderCancelEvent () {
+			this.showGender = false
+		},
+
+		// 性别下拉选择框关闭事件
+		genderCloseEvent () {
+			this.showGender = false
+		},
+
+		// 运送类型点击事件
+		transportTypeEvent (item,index) {
+			this.transportTypeIndex = index;
+			this.currentTransportType = item
+		},
+
+		// 根据科室名称获取科室id
+		getDepartmentIdByName(text) {
+			 if (this.startDepartmentList.filter((item) => {return item['text'] == text }).length == 0) {
+					return 0
+				} else {
+					return this.startDepartmentList.filter((item) => {return item['text'] == text })[0]['value']
+				}
+		},
+
+		// 查询是否配置接触隔离选项0-没配置1-配置
+		getTransConfig () {
+			if (this.templateType === 'template_one') {
+				if (this.currentTransportRice == '请选择' || !this.currentTransportRice) {
+					this.$refs.uToast.show({
+						message: '请选择运送大类',
+					});
+					return
+				};
+				if (this.currentStartDepartment == '请选择' || !this.currentStartDepartment) {
+					this.$refs.uToast.show({
+						message: '请选择起点科室',
+					});
+					return
+				};
+				// 起始地与目的地不能相同
+				if (this.currentStartDepartment == this.currentEndDepartment) {
+					this.$refs.uToast.show({
+						message: '起点科室与终点科室不能相同',
+					});
+					return
+				}
+			} else if (this.templateType === 'template_two') {
+				if (this.currentTransportRice == '请选择' || !this.currentTransportRice) {
+					this.$refs.uToast.show({
+						message: '请选择运送大类',
+					});
+					return
+				};
+				if (this.currentStartDepartment == '请选择' || !this.currentStartDepartment) {
+					this.$refs.uToast.show({
+						message: '请选择起点科室',
+					});
+					return
+				};
+				// 终点科室不能包含起点科室
+				if (this.currentGoalSpaces.length > 0) {
+					if (this.currentGoalSpaces.filter((item) => { return item.text == this.currentStartDepartment}).length > 0) {
+						this.$refs.uToast.show({
+							message: '终点科室不能包含起点科室',
+						});
+						return
+					}
+				}
+			}; 
+			 
+			this.infoText = '查询中...';
+			this.showLoadingHint = true;
+			queryTransConfig(this.proId,'TRANS_QUARANTINE').then((res) => {
+				if (res && res.data.code == 200) {
+					if (JSON.parse(res.data.data)[0]['value'] == 1) {
+						if (this.templateType === 'template_one') {
+							if (this.currentTransportRice == '检查') {
+								if (this.isContactisolationValue === null || this.isContactisolationValue == -1) {
+									this.$refs.uToast.show({
+										message: '请确认病人是否需要接触隔离',
+									})
+								} else {
+									this.sureEvent(true)
+								}
+							} else {
+								this.sureEvent(false)
+							}  
+						} else if (this.templateType === 'template_two') {
+							if (this.currentTransportRice == '检查') {
+								let temporaryFlag = this.templatelistTwo.some((item) => { return item.isContactisolationValue === null || item.isContactisolationValue == -1});
+								if (temporaryFlag) {
+									this.$refs.uToast.show({
+										message: '请确认病人是否需要接触隔离',
+									})
+								} else {
+									this.sureEvent(true)
+								}
+							} else {
+								this.sureEvent(false)
+							}  
+						}  
+					} else {
+						this.sureEvent(false)
+					}
+				} else {
+					this.$refs.uToast.show({
+						message: res.data.msg,
+						type: 'error',
+					})
+				};
+				this.showLoadingHint = false;
+			})
+			.catch((err) => {
+				this.showLoadingHint = false;
+				this.$refs.uToast.show({
+					message: `${err.message}`,
+					type: 'error'
+				})
+			})
+		},
+
+		// 确认事件(编辑调度任务)
+		sureEvent (flag) {
+			if (this.templateType === 'template_one') {
+				let taskMessage = {
+					setOutPlaceId: this.getDepartmentIdByName(this.currentStartDepartment), //出发地ID
+					setOutPlaceName: this.currentStartDepartment,//出发地名称
+					destinationId: this.currentEndDepartment == '请选择' || !this.currentEndDepartment ? '' : this.getDepartmentIdByName(this.currentEndDepartment), //目的地ID
+					destinationName: this.currentEndDepartment == '请选择' || !this.currentEndDepartment ? '' : this.currentEndDepartment,  //目的地名称
+					parentTypeId:  this.currentTransportRiceValue, //运送父类型Id
+					parentTypeName: this.currentTransportRice,//运送父类型名称
+					taskTypeId: this.currentTransportType['value'],  //运送类型 ID
+					id: this.transTaskMessage.id, // 任务id
+					taskTypeName: this.currentTransportType['text'],  //运送类型名称
+					priority: this.priorityRadioValue,   //优先级   1-正常, 2-重要,3-紧急, 4-紧急重要
+					toolId: this.currentTransportTool == '无工具' || this.currentTransportTool == '无' || !this.currentTransportTool ? 0 : this.transportToolList.filter((item) => { return item.text == this.currentTransportTool })[0]['value'], //运送工具ID
+					toolName: this.currentTransportTool, //运送工具名称
+					actualCount: this.transportNumberValue,   //实际数量
+					patientName: this.patientNameValue,  //病人姓名
+					sex: this.currentGender == '未选择' || this.currentGender == '未知' ? 0 : this.currentGender == '男' ? 1 : 2,    //病人性别  0-未指定,1-男, 2-女
+					age: this.patientAgeValue,   //年龄
+					quarantine: this.isContactisolationValue === null ? -1 : this.isContactisolationValue, // 接触隔离
+					number: this.admissionNumberValue,   //住院号
+					bedNumber: this.patientNumberValue,  //床号
+					taskRemark: this.taskDescribe,   //备注
+					workerId: this.currentTransporter == '请选择' || !this.currentTransporter ? '' : this.currentTransporterValue, // 运送员ID
+					workerName: this.currentTransporter == '请选择' || !this.currentTransporter ? '' : this.currentTransporter, // 运送员姓名
+					assignId: this.workerId,   //分配者ID  当前登录者
+					assignName: this.userName,   //分配者名称  当前登陆者
+					modifyId: this.workerId, //修改者id
+					modifyName: this.userName, //修改者姓名
+					proId: this.proId,   //项目ID
+					proName: this.proName,   //项目名称
+					isBack: this.isBackRadioValue,  //是否返回出发地  0-不返回，1-返回
+					createType: this.transTaskMessage['createType'] //创建类型
+
+				};
+				// 编辑调度任务
+				this.editDispatchTask(taskMessage);
+			} else if (this.templateType === 'template_two') {
+				let taskMessageTwo = {
+					setOutPlaceId: this.getDepartmentIdByName(this.currentStartDepartment), //出发地ID
+					setOutPlaceName: this.currentStartDepartment, //出发地名称
+					destinations: [],//多个目的地列表
+					patientInfoList: [], //多个病人信息列表
+					priority: this.priorityRadioValue, //优先级   1-正常, 2-重要,3-紧急, 4-紧急重要
+					toolId: this.currentTransportTool == '无工具' || this.currentTransportTool == '无' || !this.currentTransportTool ? 0 : this.transportToolList.filter((item) => { return item.text == this.currentTransportTool })[0]['value'], //运送工具ID
+					toolName: this.currentTransportTool, //运送工具名称
+					actualCount: this.taskTransportTotal, //实际数量
+					taskRemark: this.taskDescribe, //备注
+					workerId: this.currentTransporter == '请选择' || !this.currentTransporter ? '' : this.currentTransporterValue, // 运送员ID
+					workerName: this.currentTransporter == '请选择' || !this.currentTransporter ? '' : this.currentTransporter, // 运送员姓名
+					modifyId: this.workerId, //修改者id
+					modifyName: this.userName, //修改者姓名
+					id: this.transTaskMessage.id, // 任务id
+					parentTypeId: this.currentTransportRiceValue, //运送父类型Id
+					parentTypeName: this.currentTransportRice,//运送父类型名称
+					originalWorkerId: this.transTaskMessage.workerId, // 原始运送员id
+					taskTypeId: '',
+					taskTypeName: '',
+					proId: this.proId, //项目ID
+					proName: this.proName, //项目名称
+					isBack: this.isBackRadioValue, //是否返回出发地  0-不返回，1-返回
+					createType: this.transTaskMessage['createType'] //创建类型
+				};
+				// 处理多个终点科室信息
+				if (this.currentGoalSpaces.length > 0) {
+					for (let item of this.currentGoalSpaces) {
+						taskMessageTwo['destinations'].push({
+							destinationId: item.value,
+							destinationName: item.text
+						})
+					}
+				};
+				// 后端需要这种数据格式
+				taskMessageTwo['destinations'] = JSON.stringify(taskMessageTwo['destinations']);
+				// 获取多个病人信息列表数据
+				for (let patientItem of this.templatelistTwo) {
+					taskMessageTwo.patientInfoList.push({
+						bedNumber: patientItem['bedNumber'],
+						patientName: patientItem['patientName'],
+						age: patientItem['patientAgeValue'],
+						quarantine: patientItem['isContactisolationValue'] === null ? -1 : patientItem['isContactisolationValue'],// 接触隔离
+						number: patientItem['patientNumber'],
+						sex: patientItem['genderValue'] == '未知' ? 0 : patientItem['genderValue'] == '男' ?  1 : 2,
+						quantity: patientItem['actualData'],
+						typeList: []
+					})
+				};
+				// 获取每个病人的运送类型数据
+				for (let i = 0, len = this.templatelistTwo.length; i < len; i++) {
+					if (this.templatelistTwo[i]['transportList'].length > 0) {
+						// 获取选中的运送类型小类
+						let checkChildTypeList = this.templatelistTwo[i]['transportList'].filter((item) => {return item.typerNumber > 0});
+						// 运送类型小类存在没选的情况
+						if (checkChildTypeList.length > 0) {
+							for (let innerItem of checkChildTypeList) {
+								taskMessageTwo.patientInfoList[i]['typeList'].push({
+									quantity: innerItem['typerNumber'],
+									parentTypeId: this.currentTransportRiceValue,
+									parentTypeName: this.currentTransportRice,
+									taskTypeId: innerItem['value'],
+									taskTypeName: innerItem['text']
+								})
+							}
+						} else {
+							taskMessageTwo.patientInfoList[i]['typeList'].push({
+								quantity: 0,
+								parentTypeId: this.currentTransportRiceValue,
+								parentTypeName: this.currentTransportRice,
+								taskTypeId: '',
+								taskTypeName: ''
+							});
+							// 没选运送类型小类时,大类也算一个数量
+							taskMessageTwo.patientInfoList[i]['quantity'] = 1;
+							this.templatelistTwo[i]['actualData'] = 1;
+							// 重新计算运送类型总数
+							this.totalNumber  = this.templatelistTwo.reduce((accumulator, currentValue) => {
+								return accumulator + Number(currentValue.actualData)
+							},0);
+							taskMessageTwo['actualCount'] = this.totalNumber
+						}
+					}
+				};
+				taskMessageTwo['patientInfoList'] = JSON.stringify(taskMessageTwo['patientInfoList']);
+				this.postGenerateDispatchTaskMany(taskMessageTwo)
+			}
+		},
+
+		// 编辑调度任务(一个病人)
+		editDispatchTask (data) {
+			this.infoText = '编辑中...';
+			this.showLoadingHint = true;
+			editDispathTaskSingle(data).then((res) => {
+				if (res && res.data.code == 200) {
+					this.$refs.uToast.show({
+						message: '编辑成功',
+					});
+					this.backTo();
+				} else {
+					this.$refs.uToast.show({
+						message: res.data.msg,
+						type: 'error',
+					})
+				};
+				this.showLoadingHint = false;
+			})
+			.catch((err) => {
+				this.showLoadingHint = false;
+        this.$refs.uToast.show({
+        	message: `${err.message}`,
+        	type: 'error'
+        })
+			})
+		},
+
+		//编辑调度任务(多个病人)
+		postGenerateDispatchTaskMany(data) {
+			this.infoText = '编辑中...';
+			this.showLoadingHint = true;
+			editDispatchTaskManyNew(data).then((res) => {
+				if (res && res.data.code == 200) {
+					tthis.$refs.uToast.show({
+						message: '编辑成功',
+					});
+					this.backTo()
+				} else {
+					this.$refs.uToast.show({
+						message: res.data.msg,
+						type: 'error',
+					})
+				};
+				this.showLoadingHint = false
+			})
+			.catch((err) => {
+				this.showLoadingHint = false;
+				this.$refs.uToast.show({
+					message: `${err.message}`,
+					type: 'error'
+				})
+			})
+		},
+
+    // 取消事件
+    cancelEvent () {
+      this.backTo()
+    }
+  }
+};
+</script>
+<style lang='scss' scoped>
+@import "~@/common/stylus/variable.scss";
 	page {
 		width: 100%;
 		height: 100%;
 	};
-	.content-box {
+  .content-box {
 		@include content-wrapper;
+		height: 100vh !important;
 		box-sizing: border-box;
-		background: #fff;
+		background: #f7f7f7;
 		::v-deep .u-popup {
 			flex: none !important
 		};
@@ -1238,7 +1562,7 @@
 			left: 0;
 			z-index: 10
 		};
-		// 病人信息模态框样式
+		/* 病人信息模态框样式 */
 		.u-modal-center-box {
 			/deep/ .u-modal {
 				padding: 16px;
@@ -1260,7 +1584,7 @@
 								line-height: 60px;
 								&:first-child {
 									width: 30%;
-									color: $color-text-left;
+									color: #9E9E9A;
 									float: left;
 								};
 								&:last-child {
@@ -1287,6 +1611,7 @@
 							> view {
 								&:last-child {
 									.u-input {
+										padding: 0 !important;
 										border: none !important;
 									}
 								}
@@ -1336,7 +1661,7 @@
 								line-height: 60px;
 								&:first-child {
 									width: 30%;
-									color: $color-text-left;
+									color: #9E9E9A;
 									float: left
 								};
 								&:last-child {
@@ -1365,7 +1690,7 @@
 								&:first-child {
 									float: left;
 									width: 30%;
-									color: $color-text-left;
+									color: #9E9E9A;
 									box-sizing: border-box
 								};
 								&:last-child {
@@ -1408,7 +1733,7 @@
 										float: left;
 										width: 50%;
 										height: 60px;
-										color: $color-text-left;
+										color: #9E9E9A;
 										box-sizing: border-box;
 										-webkit-overflow-scrolling: touch;
 										overflow-x: auto;
@@ -1445,7 +1770,7 @@
 											}
 										}
 									}
-								};
+								}
 							}
 						}
 					}
@@ -1475,7 +1800,7 @@
 		.nav {
 			width: 100%;
 		};
-		.create-box {
+		.message-box {
 			position: relative;
 			width: 100%;
 			flex: 1;
@@ -1485,25 +1810,25 @@
 			color: black;
 			display: flex;
 			flex-direction: column;
-			.creat-priority {
+			.message-one {
 				width: 100%;
-				height: 60px;
-				line-height: 60px;
-				border-bottom: 1px solid $color-underline;
-				.creat-priority-title {
-					height: 59px;
-					line-height: 59px;
-					float: left;
-					width: 30%;
-					color: $color-text-left;
-					padding-left: 4px;
-					box-sizing: border-box;
+				padding: 10px 6px 10px 16px;
+				box-sizing: border-box;
+				background: #fff;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				font-size: 14px;
+				margin-top: 6px;
+				.message-one-left {
+					width: 20%;
+					color: #101010
 				};
-				.creat-priority-content {
-					height: 59px;
+				.message-one-right {
+					flex: 1;
+					height: 20px;
 					float: right;
 					position: relative;
-					width: 70%;
 					/deep/ .u-radio-group {
 						position: absolute;
 						width: 100% !important;
@@ -1519,13 +1844,237 @@
 							}
 						}
 					}
+				}
+			};
+			.select-box {
+				width: 100%;
+				padding: 8px 6px;
+				box-sizing: border-box;
+				background: #fff;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				font-size: 14px;
+				margin-top: 6px;
+				.select-box-left {
+					padding-right: 10px;
+					box-sizing: border-box;
+					>text {
+						&:nth-child(1) {
+							color: red
+						};
+						&:nth-child(2) {
+							color: #9E9E9A;
+							padding-right: 6px;
+							box-sizing: border-box
+						};
+					}
+				};
+				.select-box-right {
+					flex: 1;
+					justify-content: flex-end;
+					align-items: center;
+					display: flex;
+					width: 0;
+					>text {
+						color: #101010;
+						text-align: right;
+						flex: 1;
+						@include no-wrap();
+					};
+					.selectBoxRightStyle {
+						color: #d6d6d6 !important 
+					}
+				}
+			};
+			.end-select-box {
+				.select-box-left {
+					padding: 0 10px;
+					box-sizing: border-box;
+					>text {
+						&:nth-child(1) {
+							color: #9E9E9A;
+							padding-right: 6px;
+							box-sizing: border-box
+						};
+					}
+				};
+			};
+			.transport-type {
+				width: 100%;
+				padding: 10px 6px;
+				box-sizing: border-box;
+				background: #fff;
+				display: flex;
+				justify-content: space-between;
+				font-size: 14px;
+				margin-top: 6px;
+				.transport-type-left {
+					padding: 0 10px;
+					box-sizing: border-box;
+					>text {
+						&:nth-child(1) {
+							color: #9E9E9A
+						}
+					}
+				};
+				.transport-type-right {
+					flex: 1;
+					width: 0;
+					display: flex;
+					flex-wrap: wrap;
+					.transport-type-list {
+						display: inline-block;
+						font-size: 13px;
+						color: #9E9E9A;
+						background: #F9F9F9;
+						text-align: center;
+						border-radius: 10px;
+						margin-right: 10px;
+						margin-bottom: 10px;
+						line-height: 20px;
+						padding: 6px 10px;
+						box-sizing: border-box
+					};
+					.transportTypeListStyle {
+						color: #fff !important;
+						background: #3B9DF9 !important
+					}
+				}
+			};
+			.patient-message-box {
+				width: 100%;
+				padding: 10px 6px;
+				box-sizing: border-box;
+				background: #fff;
+				font-size: 14px;
+				margin-top: 6px;
+				.patient-message-top {
+					display: flex;
+					width: 100%;
+					flex-direction: row;
+					flex-wrap: wrap;
+					justify-content: space-between;
+					align-content: flex-start;
+					margin: 4px 0;
+					.creat-form-field {
+						&:first-child {
+							margin: 0 6px 0 10px;
+						};
+						flex: 1;
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+						> text {
+							width: 32%;
+							margin-right: 4px;
+							font-size: 14px;
+							color: #9E9E9A;
+						};
+						/deep/ .u-input {
+							flex: 1;
+							padding: 4px 2px;
+							.u-label-text {
+								font-size: 14px;
+								color: #9E9E9A;
+							};
+							.fild-body {
+								.uni-input-input {
+									color: #9E9E9A !important
+								}
+							}
+						}
+					}
+				};
+				.patient-message-bottom {
+				};
+				.patient-message-bottom-age {
+					display: flex;
+					align-items: center;
+					.patient-message-bottom-right {
+						width: 50%;
+						flex: none;
+						&:first-child {
+							margin: 0 6px 0 10px;
+						};
+						flex: 1;
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+						> text {
+							width: 35%;
+							margin-right: 4px;
+							font-size: 14px;
+							color: #9E9E9A;
+						};
+						/deep/ .u-input {
+							flex: 1;
+							padding: 4px 2px;
+							.u-label-text {
+								font-size: 14px;
+								color: #9E9E9A
+							};
+							.fild-body {
+								.uni-input-input {
+									color: $color-text-right !important
+								}
+							}
+						}
+					};
+					.contact-isolation-box {
+						flex: 1;
+						display: flex;
+						align-items: center;
+						>view {
+							font-size: 14px;
+							display: inline-block;
+							height: 100%;
+							&:first-child {
+								color: #9E9E9A;
+								margin-right: 14px;
+								padding-left: 10px;
+								box-sizing: border-box;
+								line-height: 44px;
+								vertical-align: top;
+							};
+							&:last-child {
+								flex: 1;
+								display: flex;
+								align-items: center;
+								justify-content: flex-end;
+								float: right;
+								position: relative;
+								/deep/ .u-radio-group {
+									display: flex;
+									justify-content: flex-end;
+									position: absolute;
+									width: 100%;
+									top: 50%;
+									transform: translateY(-50%);
+									left: 0;
+									.u-radio {
+										&:last-child {
+											margin-left: 10px;
+										}
+									}
+								}
+							}
+						}
+					}  
+				}
+			};
+			.is-back {
+				.message-one-left {
+					width: 30% !important;
+					color: #9E9E9A !important
 				};
 				.transport-isBack {
-					height: 59px;
 					float: right;
 					position: relative;
 					width: 70%;
 					/deep/ .u-radio-group {
+						display: flex;
+						justify-content: flex-end;
 						position: absolute;
 						width: 100%;
 						top: 50%;
@@ -1539,439 +2088,119 @@
 					}
 				}
 			};
-			
-			.priority-box-one {
-				.creat-priority-title {
-					width: 20% !important
-				};
-				.creat-priority-content {
-					width: 80% !important
-				}
-			};
-			
-			.tool-box {
-				width: 100%;
-				border-bottom: 12px solid #f6f6f6;
-				> view {
-					display: inline-block
-				};
-				.creat-priority-title {
-					width: 20%;
-					padding-left: 4px;
-					box-sizing: border-box;
-					height: 48px;
-					vertical-align: middle;
-					line-height: 48px;
-					color: #7d7d7d;
-				};	 
-				.creat-priority-content {
-					font-size: 15px;
-					color: $color-text-right;
-					width: 80%;
-					vertical-align: middle;
-					padding: 6px 6px 8px 0;
-					box-sizing: border-box;
-					/deep/ u-radio-group {
-						width: 100%
-					}
-				}
-			};
-			.creat-chooseHospital {
-				width: 100%;
-				height: 60px;
-				display: flex;
-				align-items: center;
-				.creat-chooseHospital-title {
-					height: 59px;
-					float: left;
-					width: 30%;
-					line-height: 59px;
-					padding-left: 4px;
-					color: $color-text-left;
-					box-sizing: border-box
-				};
-				.creat-chooseHospital-content {
-					height: 59px;
-					float: right;
-					position: relative;
-					width: 70%;
-					.show-box {
-						color: $color-text-right;
-						position: absolute;
-						left: 0;
-						top: 50%;
-						transform: translateY(-50%);
-						height: 40px !important;
-						background: #f9f9f9;
-						border: none;
-						/deep/ .input {
-							font-size: 15px !important
-						};
-						.right-arrow {
-							color: $color-text-right !important
-						}
-					}
-				};
-				.creat-chooseHospital-content-two {
-					height: 60px;
-					float: right;
-					position: relative;
-					width: 70%;
-					background: #fff !important;
-					.main {
-						color: $color-text-right;
-						position: absolute;
-						left: 0;
-						top: 10px;
-						width: 100%;
-						background: #f9f9f9;
-						border: none;
-						/deep/ .input {
-							height: 40px !important;
-							box-sizing: border-box;
-							border: none;
-							.uni-input-wrapper {
-								font-size: 15px !important
-							}
-						};
-						/deep/.text-blue {
-							color: #969696 !important
-						};
-						/deep/ .text-green {
-							color: #43c3f3 !important
-						}
-					}
-				}
-			};
-			
-			.creat-chooseHospital-one {
-				.creat-chooseHospital-title {
-					width: 20%;
-				};
-				.creat-chooseHospital-content {
-					width: 80%
-				}
-			};
-			.priority-box {
-				.creat-priority-title {
-					height: 59px;
-					line-height: 59px;
-					float: left;
-					width: 20%;
-					color: $color-text-left;
-					padding-left: 4px;
-					box-sizing: border-box;
-				};
-				.creat-priority-content {
-					width: 80% !important;
-					/deep/ .u-radio-group {
-						position: absolute;
-						width: 100% !important;
-						top: 50%;
-						transform: translateY(-50%);
-						left: 0;
-						display: flex;
-						justify-content: space-between;
-						.u-radio {
-							flex: 1 0 auto !important;
-							.u-radio__label {
-								margin-right: 9px;
-							}
-						}
-					}
-				}
-			};
-			.creat-transport-type {
-				width: 100%;
-				display: flex;
-				flex-direction: row;
-				border-top: 12px solid #f6f6f6;
-				border-bottom: 12px solid #f6f6f6;
-				.creat-transport-type-title {
-					margin-top: 8px;
-					width: 20%;
-					height: 35px;
-					line-height: 35px;
-					color: $color-text-left;
-					text {
-						&:nth-child(1) {
-							padding-left: 4px;
-							box-sizing: border-box;
-							margin-right: 8px
-						};
-			
-						&:nth-child(2) {
-							font-size: 14px;
-							color: red
-						}
-					}
-				};
-			
-				.creat-transport-type-content {
-					flex: 1;
-					display: flex;
-					font-size: 15px;
-					color: $color-text-right;
-					width: 0;
-					flex-direction: row;
-					flex-wrap: wrap;
-					justify-content: space-between;
-					align-content: flex-start;
-					padding: 8px 6px 8px 0;
-					box-sizing: border-box;
-					.transTypeListStyle {
-						background: #d6f4ff;
-						color: #01a6ff;
-						border: 1px solid #4cc5f2
-					};
-			
-					>view {
-						width: 45%;
-						margin-bottom: 4px;
-						height: 35px;
-						text-align: center;
-						line-height: 35px;
-						background:: #f9f9f9;
-						border-radius: 16px;
-						text-overflow: ellipsis;
-						overflow: hidden;
-						white-space: nowrap;
-						padding: 0 6px;
-						box-sizing: border-box;
-					}
-				}
-			};
-			.creat-form {
-				width: 100%;
-				border-bottom: 12px solid #f6f6f6;
-				display: flex;
-				width: 100%;
-				flex-direction: row;
-				flex-wrap: wrap;
-				justify-content: space-between;
-				align-content: flex-start;
-				.creat-form-top {
-					display: flex;
-					width: 100%;
-					flex-direction: row;
-					flex-wrap: wrap;
-					justify-content: space-between;
-					align-content: flex-start;
-					margin: 4px 0;
-					.creat-form-field {
-						&:first-child {
-							margin: 0 6px 0 4px;
-						};
-						flex: 1;
-						display: flex;
-						align-items: center;
-						justify-content: space-between;
-						> text {
-							width: 32%;
-							margin-right: 4px;
-							font-size: 14px;
-							color: $color-text-left;
-						};
-						/deep/ .u-input {
-							flex: 1;
-							padding: 4px 2px;
-							.u-label-text {
-								font-size: 14px;
-								color: $color-text-left
-							};
-							.fild-body {
-								.uni-input-input {
-									color: $color-text-right !important
-								}
-							}
-						}
-					}
-				}
-			};
-			.field-four {
-				padding-left: 4px;
+			.task-total {
+				padding: 8px 6px !important;
 				box-sizing: border-box;
-				border-bottom: 12px solid #f6f6f6;
-				.contact-isolation-box {
-					width: 100%;
-					display: flex;
-					>view {
-						font-size: 14px;
-						display: inline-block;
-						height: 100%;
-						&:first-child {
-							height: 60px;
-							display: flex;
-							align-items: center;
-							color: #7d7d7d;
-							margin-right: 10px;
-							vertical-align: top;
-						};
-						&:last-child {
-							flex: 1;
-							height: 60px;
-							display: flex;
-							align-items: center;
-							::v-deep .u-radio-group {
-								width: 100%;
-								.u-radio {
-									&:nth-child(1) {
-										margin-right: 14px !important
-									}
-								}
-							};
-							::v-deep u-radio-group {
-								width: 100%;
-								.u-radio {
-									&:nth-child(1) {
-										margin-right: 14px !important
-									}
-								}
-							}
-						}
-					}
-				}
-			};
-			.creat-is-back {
-				.creat-priority-title {
-					display: inline-block;
-					height: 59px;
-					line-height: 59px;
-					width: 30%;
-					padding-left: 4px;
-					box-sizing: border-box;
-				};
-				.creat-priority-content {
-					display: inline-block;
-					position: relative;
-					height: 59px;
-					width: 70%;
-					
-					/deep/ .u-radio-group {
-						position: absolute;
-						width: 100%;
-						top: 50%;
-						transform: translateY(-50%);
-						left: 0
-					}
-				}
-			};
-			.task-describe {
-				height: 120px;
-				padding: 6px 4px;
-				box-sizing: border-box;
-				border-bottom: 12px solid #f6f6f6;
-				display: flex;
-				> text {
-					padding-top: 10px;
-					box-sizing: border-box;
-					color: $color-text-left;
-					font-size: 14px;
-					margin-right: 10px;
-				};
-				/deep/ .u-textarea {
-					flex: 1;
-					padding:10px 0 10px 4px;
-					color: $color-text-left;
-					background: #f9f9f9;
-				}
-			};
-			.task-describe-one {
-				border-top: 12px solid #f6f6f6;
-			}
-		}
-		.template-two {
-			.trans-total {
 				.trans-total-title {
 					float: left;
-					width: 30%;
-					color: $color-text-left;
-					padding-left: 4px;
-					line-height: 59px !important;
-					height: 59px !important;
+					width: 40%;
+					color: #9E9E9A;
+					padding: 0 10px 0 6px;
+					box-sizing: border-box;
+					line-height: 28px !important;
+					height: 28px !important;
 				};
 				.trans-total-content {
-					height: 59px !important;
+					height: 28px !important;
 					float: right;
-					width: 70%;
+					width: 20%;
 					position: relative;
 					/deep/ .u-input {
 						position: absolute;
 						top: 50%;
 						width: 100%;
-						min-height: 40px;
-						color: $color-text-right;
+						min-height: 28px;
 						transform: translateY(-50%);
 						left: 0;
 						border: none;
-						background: #f9f9f9
+						background: #f9f9f9;
+						.u-input__content__field-wrapper__field {
+							text-align: center !important;
+						}
 					}
 				}
-			}
-			.patient-box {
-				border-top: 12px solid #f6f6f6;
-				border-bottom: 12px solid #f6f6f6;
-				padding: 0 0 8px 4px;
-				.addpatient-message-btn {
-					width: 96%;
-					height: 40px;
-					margin: 0 auto;
-					margin-top: 8px;
-					line-height: 40px;
-					text-align: center;
-					color: #43c3f3;				
-					border: 1px solid #44c3f3;
-					border-radius: 20px;
-					font-size: 16px;
-					/deep/ .fa-plus {
-						margin-right: 6px
+			};
+			.transport-type {
+				.transport-type-right {
+					/deep/ .van-cell {
+						padding: 4px 6px !important;
+						background: #F9F9F9
 					}
-				};
-				.patient-box-list {
-					margin-bottom: 4px;
-					.creat-transport-type{
-						margin-bottom: 0
-					};
-					.patient-title {
-						height: 50px;
-						line-height: 50px;
-						color: black;
+				}
+			};
+			.field-box-wrapper {
+				width: 100%;
+				margin: 10px 0;
+				background: #fff;
+				.field-box-two {
+					width: 100%;
+					padding: 0 12px;
+					box-sizing: border-box;
+					.field-title {
+						font-size: 18px;
+						height: 40px;
 						font-weight: bold;
-						position: relative;
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
 						.patient-name {
-							position: absolute;
-							top: 0;
-							height: 100%;
+							height: 40px;
+							line-height: 40px;
 							font-size: 16px;
 							width: 100px;
-							left: 4px;
+							padding-left: 4px;
+							box-sizing: border-box;
 							color: #000000
 						};
-						/deep/ .fa-trash-o {
-							position: absolute;
-							top: 50%;
-							transform: translateY(-50%);
-							right: 4px;
-							color: #000000 !important;
-							font-size: 20px !important
-						};
-						.fa-edit  {
-							position: absolute;
-							top: 50%;
-							transform: translateY(-50%);
-							right: 50px;
-							color: #000000 !important;
-							font-size: 20px !important
+						.icon-area {
+							flex: 1;
+							display: flex;
+							align-items: center;
+							justify-content: flex-end;
+							margin-left: 30px;
+							padding-right: 10px;
+							box-sizing: border-box;
+							/deep/ .u-icon {
+								&:first-child {
+									margin-right: 4px;
+								}
+							}
 						}
 					};
-					.creat-form {
-						width: 100%;
-						padding: 4px 0 0 4px;
-						box-sizing: border-box;
-						border: none !important;
+					.field-wrapper {
 						background: #f9f9f9;
-						width: 100%;
-						.creat-form-top {
+						padding: 14px;
+						border-radius: 4px;
+						> view {
+							> view {
+								display: inline-block;
+								/deep/ .u-input {
+									padding: 2px 0;
+									height: 34px;
+									background: #f9f9f9;
+									.van-field__label {
+										width: 50px;
+										text-align: left;
+										height: 34px;
+										line-height: 34px;
+										font-size: 14px;
+										color: '';
+									}
+									.van-field__value {
+										height: 34px;
+										line-height: 34px;
+										color: '';
+										font-size: 16px;
+										.van-field__body {
+											.van-field__control:disabled {
+												-webkit-text-fill-color: #101010 !important;
+											}
+										}
+									}
+								}
+							}
+						};
+						.field-one {
 							display: flex;
 							width: 100%;
 							flex-direction: row;
@@ -1981,23 +2210,24 @@
 							margin: 4px 0;
 							.creat-form-field {
 								&:first-child {
-									margin-right: 6px;
+									margin: 0 6px 0 4px;
 								};
 								flex: 1;
 								display: flex;
 								align-items: center;
 								justify-content: space-between;
 								> text {
+									width: 32%;
 									margin-right: 4px;
 									font-size: 14px;
-									color: $color-text-left;
+									color: #9E9E9A;
 								};
 								/deep/ .u-input {
 									flex: 1;
 									padding: 4px 2px;
 									.u-label-text {
 										font-size: 14px;
-										color: $color-text-left
+										color: #9E9E9A
 									};
 									.fild-body {
 										.uni-input-input {
@@ -2007,7 +2237,7 @@
 								}
 							}
 						};
-						.creat-form-bottom {
+						.field-two {
 							display: flex;
 							width: 100%;
 							flex-direction: row;
@@ -2025,13 +2255,13 @@
 								> text {
 									margin-right: 4px;
 									font-size: 14px;
-									color: $color-text-left;
+									color: #9E9E9A;
 								};
 								/deep/ .u-input {
 									padding: 4px 2px;
 									.u-label-text {
 										font-size: 14px;
-										color: $color-text-left
+										color: #9E9E9A
 									};
 									.fild-body {
 										.uni-input-input {
@@ -2040,189 +2270,167 @@
 									}
 								}
 							}
-						}
-					};
-					.field-four {
-						padding: 4px 0 0 2px;
-						box-sizing: border-box;
-						background: #f9f9f9;
-						border: none !important;
-						.contact-isolation-box {
-							width: 100%;
-							line-height: 20px;
-							display: flex;
-							align-items: center;
-							>view {
-								font-size: 14px;
-								display: inline-block;
-								height: 100%;
-								&:first-child {
-									color: #7d7d7d;
-									margin-right: 10px;
-									vertical-align: top;
-								};
-								&:last-child {
-									flex: 1;
-									::v-deep .u-radio-group {
-										.u-radio {
-											&:nth-child(1) {
-												margin-right: 14px !important
+						};
+						.field-three {
+							margin-top: 10px;
+							.sample-box {
+								width: 100%;
+								line-height: 20px;
+								display: flex;
+								flex-flow: row nowrap;
+								> view {
+									font-size: 14px;
+									display: inline-block;
+									height: 100%;
+									&:first-child {
+										color: '';
+										margin-right: 4px;
+										vertical-align: top;
+									};
+									&:nth-child(2) {
+										vertical-align: top;
+										margin-right: 4px
+									};
+									&:last-child {
+										flex: 1
+									}
+								}
+							};
+						};
+						.field-four {
+							margin-top: 4px;
+							.contact-isolation-box {
+								width: 100%;
+								line-height: 20px;
+								display: flex;
+								>view {
+									font-size: 14px;
+									display: inline-block;
+									height: 100%;
+									&:first-child {
+										color: '';
+										margin-right: 10px;
+										vertical-align: top;
+									};
+									&:last-child {
+										flex: 1;
+										/deep/ .u-radio-group {
+											.u-radio--horizontal {
+												&:nth-child(1) {
+													margin-right: 20px !important
+												}
 											}
 										}
 									}
 								}
 							}
 						}
-					};
-					.transport-parent-box {
-						padding-left: 6px;
-						height: 40px;
-						display: flex;
-						flex-flow: row nowrap;
-						background: #f9f9f9;
-						justify-content: space-between;
-						.content-type-title {
-							margin-right: 4px;
-							color: $color-text-left;
-							font-size: 14px;
-							height: 40px;
-							line-height: 40px;
-							width: 60px;
-						};
-						.transport-parent-box-title {
-							color: $color-text-right;
-							font-size: 14px !important;
-							height: 40px;
-							line-height: 40px;
-							margin-right: 4px
-						};
-						.content-type-name {
-							font-weight: bold;
-							color: $color-text-right;
-							font-size: 15px;
-							height: 40px;
-							line-height: 40px;
-							flex: 1;
-							font-size: 12px;
-							-webkit-overflow-scrolling: touch;
-							overflow: auto
-						};
-					};
-					.creat-transport-type {
-						width: 100%;
-						height: 110px;
-						border: 1px solid red;
-						-webkit-overflow-scrolling: touch;
-						overflow: auto;
-						margin: 0 auto;
-						padding: 4px 0;
-						display: flex;
-						flex: 1;
-						flex-direction: column;
+					}
+					.type-list-box {
 						border: 1px solid #bcbcbc;
-						.creat-transport-type-content {
-							flex: 1;
-							display: flex;
-							width: 0;
-							flex-direction: row;
-							flex-wrap: wrap;
-							justify-content: space-between;
-							align-content: flex-start;
-							padding: 0 4px;
-							box-sizing: border-box;
-							-webkit-overflow-scrolling: touch;
-							overflow: auto;
-							.transTypeListStyle {
-								background: #75acef;
-								color: #fff;
-								border: none
-							};
-							.creat-transport-type-content-list {
-								width: 49%;
-								margin-bottom: 4px;
-								height: 35px;
-								border: 1px solid #dfdfdf;
-								position: relative;
-								.creat-transport-type-content-list-title {
-									height: 100%;
-									position: absolute;
-									top: 0;
-									width: 45%;
-									text-align: left;
-									left: 2px;
-									-webkit-overflow-scrolling: touch;
-									overflow-x: auto;
+						padding: 4px 4px 0 4px;
+						flex: 1;
+						overflow: scroll;
+						display: flex;
+						flex-flow: row wrap;
+						justify-content: space-between;
+						align-items: flex-start;
+						.type-list {
+							border: 1px solid #bcbcbc;
+							text-align: center;
+							width: 48%;
+							height: 40px;
+							line-height: 40px;
+							margin-bottom: 4px;
+							position: relative;
+							> view {
+								position: absolute;
+								top: 0;
+								&:first-child {
+									left: 2px
 								};
-								.creat-transport-type-content-list-content {
-									height: 100%;
-									position: absolute;
-									top: 0;;
-									width: 55%;
-									right: 0;
-									.subtract-box  {
-										width: 30px;
-										height: 33px;
-										background: #d2d2d2;
-										line-height: 33px;
-									};
-									input {
-										flex: 1;
-										height: 100%;
-										background: #a7a7a7;
-									};
-									.plus-box  {
-										width: 30px;
-										height: 33px;
-										background: #d2d2d2;
-										line-height: 33px
-									}
+								&:last-child {
+									right: 2px
 								}
 							}
+						};
+						.typeListStyle {
+							border: none;
+							color: #fff;
+							background: #2895ea
 						}
+					}
+				};
+				.add-message {
+					width: 96%;
+					height: 41px;
+					margin-top: 8px;
+					margin-bottom: 8px;
+					margin-left: 2%;
+					color: #43c3f3;
+					border: 1px solid #44c3f3;
+					border-radius: 20px;
+					font-size: 16px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					/deep/ .u-icon {
+						margin-right: 6px;
 					}
 				}
 			};
 			.task-describe {
+				background: #fff;
+				height: 120px;
+				padding: 8px 6px;
+				box-sizing: border-box;
+				border-top: 12px solid #f6f6f6;
+				display: flex;
+				> text {
+					padding-top: 10px;
+					padding-left: 10px;
+					box-sizing: border-box;
+					color: #9E9E9A;
+					font-size: 14px;
+					margin-right: 10px;
+				};
+				/deep/ .u-textarea {
+					flex: 1;
+					padding:10px 0 10px 4px;
+					color: #9E9E9A;
+					background: #f9f9f9;
+				}
 			}
 		};
 		.btn-box {
-			width: 100%;
-			box-sizing: border-box;
-			padding: 0 20px;
+			width: 90%;
 			margin: 0 auto;
-			height: 80px;
+			height: 100px;
 			display: flex;
-			flex-direction: row;
-			flex-wrap: wrap;
-			justify-content: space-between;
 			align-items: center;
-			view {
-				::after {
-					border-radius: 4px;
-					border: none;
+			justify-content: center;
+			>text {
+				width: 35%;
+				display: inline-block;
+				height: 45px;
+				font-size: 14px;
+				line-height: 45px;
+				background: #fff;
+				text-align: center;
+				border-radius: 4px;
+				&:nth-child(1) {
+					color: #fff;
+					background: #2B98FE;
+					box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
+					margin-right: 30px
 				};
-				width: 47%;
-				&:first-child {
-					button {
-						border-radius: 4px;
-						background-image: linear-gradient(to right, #37d5fc , #429bff);
-						color: #fff
-					}
-				};
-				
-				&:last-child {
-					button {
-						border-radius: 4px;
-						background: #e8e8e8;
-						border: none;
-						color: #666666
-					}
+				&:nth-child(2) {
+					color: #2B98FE;
+					border: 1px solid #2B98FE;
+					box-sizing: border-box;
+					box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
 				}
 			}
-		}
-		.bottom-bar {
-			height: 50px;
-			width: 100%;
-		}
-	}
+		}	
+  }
 </style>

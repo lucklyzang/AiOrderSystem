@@ -43,10 +43,10 @@
 					<view class="message-one">
 							<view class="message-one-left">
 									<text>编号:</text>
-									<text>{{ schedulingTaskDetails.taskNumber }}</text>
+									<text>{{ projectTaskMessage.taskNumber }}</text>
 							</view>
-							<view class="message-one-right" :class="{'noAllocationStyle':schedulingTaskDetails.state == 0,'noLookupStyle':schedulingTaskDetails.state == 1,'noStartStyle': schedulingTaskDetails.state == 2,'underwayStyle':schedulingTaskDetails.state == 3,'tobeSigned':schedulingTaskDetails.state == 4}">
-									{{ taskStatusTransition(schedulingTaskDetails.state) }}
+							<view class="message-one-right" :class="{'noAllocationStyle':projectTaskMessage.state == 0,'noLookupStyle':projectTaskMessage.state == 1,'noStartStyle': projectTaskMessage.state == 2,'underwayStyle':projectTaskMessage.state == 3,'tobeSigned':projectTaskMessage.state == 4}">
+									{{ taskStatusTransition(projectTaskMessage.state) }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -54,7 +54,7 @@
 									<text>创建时间</text>
 							</view>
 							<view class="message-two-right">
-									{{ schedulingTaskDetails.createTime }}
+									{{ projectTaskMessage.createTime }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -62,7 +62,7 @@
 									<text>已经历时间</text>
 							</view>
 							<view class="message-two-right">
-									{{ elapsedTime(schedulingTaskDetails.planStartTime) }}
+									{{ elapsedTime(projectTaskMessage.planStartTime) }}
 							</view>
 					</view>
 					 <view class="message-one message-two">
@@ -70,7 +70,7 @@
 									<text>响应时间</text>
 							</view>
 							<view class="message-two-right">
-									{{ schedulingTaskDetails.responseTime }}
+									{{ projectTaskMessage.responseTime }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -78,7 +78,7 @@
 									<text>开始时间</text>
 							</view>
 							<view class="message-two-right">
-									{{ schedulingTaskDetails.planStartTime }}
+									{{ projectTaskMessage.planStartTime }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -86,7 +86,7 @@
 									<text>位置</text>
 							</view>
 							<view class="message-two-right">
-									{{ schedulingTaskDetails.depName == '/' ? '' : schedulingTaskDetails.depName }}
+									{{ projectTaskMessage.depName == '/' ? '' : projectTaskMessage.depName }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -94,7 +94,7 @@
 									<text>房间</text>
 							</view>
 							<view class="message-two-right">
-								 {{ disposeCheckType(schedulingTaskDetails.spaces) }}
+								 {{ disposeCheckType(projectTaskMessage.spaces) }}
 							</view>
 					</view>
 					<view class="message-one message-two message-six">
@@ -103,13 +103,13 @@
 							</view>
 							<view class="message-two-right" 
 							:class="{
-									'priorityNormalStyle' : schedulingTaskDetails.priority == 1,
-									'priorityUrgencyStyle' : schedulingTaskDetails.priority == 2,
-									'priorityImportanceStyle' : schedulingTaskDetails.priority == 3,
-									'priorityUrgentImportanceStyle' : schedulingTaskDetails.priority == 4,
+									'priorityNormalStyle' : projectTaskMessage.priority == 1,
+									'priorityUrgencyStyle' : projectTaskMessage.priority == 2,
+									'priorityImportanceStyle' : projectTaskMessage.priority == 3,
+									'priorityUrgentImportanceStyle' : projectTaskMessage.priority == 4,
 							 
 							 }">
-									{{ taskPriotityTransition(schedulingTaskDetails.priority) }}
+									{{ taskPriotityTransition(projectTaskMessage.priority) }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -117,7 +117,7 @@
 									<text>维修员</text>
 							</view>
 							<view class="message-two-right">
-									{{ schedulingTaskDetails.workerName }}
+									{{ projectTaskMessage.workerName }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -125,15 +125,15 @@
 									<text>参与人</text>
 							</view>
 							<view class="message-two-right">
-									{{ disposeTaskPresent(schedulingTaskDetails.present) }}
+									{{ disposeTaskPresent(projectTaskMessage.present) }}
 							</view>
 					</view>
 					<view class="issue-image">
 							<view class="issue-image-left">
 									<text>问题图片</text>
 							</view>
-							<view class="issue-image-list" v-if="schedulingTaskDetails.images && schedulingTaskDetails.images.length > 0">
-									<text v-for="(innerItem,innerIndex) in schedulingTaskDetails.images" :key="innerIndex" >
+							<view class="issue-image-list" v-if="projectTaskMessage.images && projectTaskMessage.images.length > 0">
+									<text v-for="(innerItem,innerIndex) in projectTaskMessage.images" :key="innerIndex" >
 											<image alt="" :src="innerItem.path" @click="enlareEvent(innerItem.path)"
 											>
 									</text>
@@ -144,7 +144,7 @@
 									<text>问题描述</text>
 							</view>
 							<view class="message-two-right task-remark">
-									{{ schedulingTaskDetails.taskDesc }}
+									{{ projectTaskMessage.taskDesc }}
 							</view>
 					</view>
 			</view>
@@ -182,7 +182,7 @@ export default {
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo","schedulingTaskDetails",'statusBarHeight','navigationBarHeight','storeAllOrderCancelReason']),
+    ...mapGetters(["userInfo","projectTaskMessage",'statusBarHeight','navigationBarHeight','storeAllOrderCancelReason']),
     proId () {
       return this.userInfo.extendData.proId
     }
@@ -308,7 +308,7 @@ export default {
 				return 
 			};
 			this.cancelProjectWorkerOrderMessageTask({
-				taskId: this.schedulingTaskDetails['id'], //任务id
+				taskId: this.projectTaskMessage['id'], //任务id
 				state: 6,
 				proId: this.proId, // 医院id
 				reason: this.projectSelectCancelReason['text'] //取消原因
@@ -362,6 +362,7 @@ page {
 };
 .content-box {
   @include content-wrapper;
+	height: 100vh !important;
   box-sizing: border-box;
   background: #f6f6f6;
 	::v-deep .u-popup {

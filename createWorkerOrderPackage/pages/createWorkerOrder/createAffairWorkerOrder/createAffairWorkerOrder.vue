@@ -91,12 +91,12 @@
 						</view>
 					</view>
 				</view>
-			</view>	
-			<view class="btn-box">
-				<text class="operate-one" @click="sureEvent">确认</text>
-				<text class="operate-three" @click="cancelEvent">取消</text>
 			</view>
 		</view>
+		<view class="btn-box">
+			<text class="operate-one" @click="sureEvent">确认</text>
+			<text class="operate-three" @click="cancelEvent">取消</text>
+		</view>	
 	</view>
 </template>
 
@@ -386,10 +386,17 @@
 					queryStructure(this.proId).then((res) => {
 						if (res && res.data.code == 200) {
 							resolve(res.data.data)
-						}
+						} else {
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
 					})
 					.catch((err) => {
-						reject(err.message)
+						reject({message:err.message})
 					})
 				})
 			},
@@ -401,10 +408,17 @@
 					.then((res) => {
 						if (res && res.data.code == 200) {
 							resolve(res.data.data)
-						}
+						} else {
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
 					})
 					.catch((err) => {
-						reject(err.message)
+						reject({message:err.message})
 					})
 				})
 			},
@@ -547,6 +561,7 @@
 	};
 	.content-box {
 		@include content-wrapper;
+		height: 100vh !important;
 		box-sizing: border-box;
 		background: #fff;
 		::v-deep .u-popup {
@@ -591,9 +606,9 @@
 				transform: translate(-50%,-50%)
 			};
 			.message-box {
-				flex: 1;
-				width: 100%;
+				height: 100%;
 				overflow: scroll;
+				width: 100%;
 				.message-one {
 					width: 100%;
 					padding: 10px 6px 10px 16px;
@@ -761,40 +776,37 @@
 						}
 					}
 				}
-			};
-			.btn-box {
-				width: 90%;
-				margin: 0 auto;
-				height: 60px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				>text {
-					width: 40%;
-					display: inline-block;
-					height: 45px;
-					font-size: 18px;
-					line-height: 45px;
-					background: #fff;
-					text-align: center;
-					border-radius: 30px;
-					&:nth-child(1) {
-						color: #fff;
-						background: linear-gradient(to right, #6cd2f8, #2390fe);
-						box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
-						margin-right: 30px
-					};
-					&:nth-child(2) {
-						color: #1864FF;
-						box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
-						// margin-right: 30px
-					};
-					&:last-child {
-						color: #1864FF;
-						box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1)
-					}
+			}
+		};
+		.btn-box {
+			width: 90%;
+			margin: 0 auto;
+			height: 100px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			>text {
+				width: 35%;
+				display: inline-block;
+				height: 45px;
+				font-size: 14px;
+				line-height: 45px;
+				background: #fff;
+				text-align: center;
+				border-radius: 4px;
+				&:nth-child(1) {
+					color: #fff;
+					background: #2B98FE;
+					box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
+					margin-right: 30px
+				};
+				&:nth-child(2) {
+					color: #2B98FE;
+					border: 1px solid #2B98FE;
+					box-sizing: border-box;
+					box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
 				}
 			}
-		}
+		}	
 	}
 </style>

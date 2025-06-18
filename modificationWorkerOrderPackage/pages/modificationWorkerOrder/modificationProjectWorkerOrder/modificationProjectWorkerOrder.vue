@@ -351,7 +351,7 @@
 				'statusBarHeight',
 				'navigationBarHeight',
 				"templateType",
-				'schedulingTaskDetails'
+				'projectTaskMessage'
 			]),
 			proId () {
 				return this.userInfo.extendData.proId
@@ -371,7 +371,7 @@
 		},
 		methods: {
 			...mapMutations([
-				'changeSchedulingTaskDetails'
+				'changeProjectTaskMessage'
 			]),
 			
 			// 顶部导航返回事件
@@ -381,7 +381,7 @@
 
 			 // 回显编辑信息
 			echoEditMessage () {
-				let casuallyTemporaryStorageCreateRepairsTaskMessage = this.schedulingTaskDetails;
+				let casuallyTemporaryStorageCreateRepairsTaskMessage = this.projectTaskMessage;
 				this.priorityRadioValue = casuallyTemporaryStorageCreateRepairsTaskMessage['priority'].toString();
 				this.currentTaskType = casuallyTemporaryStorageCreateRepairsTaskMessage['typeName'] ? casuallyTemporaryStorageCreateRepairsTaskMessage['typeName'] : '请选择';
 				this.problemOverview = casuallyTemporaryStorageCreateRepairsTaskMessage['taskDesc'];
@@ -627,20 +627,20 @@
 							};
 							if (item6) {
 								//任务详情信息
-								this.changeSchedulingTaskDetails(item6);
+								this.changeProjectTaskMessage(item6);
 								//回显要编辑的信息
 								this.echoEditMessage();
 								// tools字段返回的值可能为null
-								if (!this.schedulingTaskDetails['tools']) {
+								if (!this.projectTaskMessage['tools']) {
 									this.currentUseTool = []
 								} else {
-									if (this.schedulingTaskDetails['tools'].length == 0) {
+									if (this.projectTaskMessage['tools'].length == 0) {
 										this.currentUseTool = []
 									} else {
-										this.currentUseTool = this.schedulingTaskDetails['tools']
+										this.currentUseTool = this.projectTaskMessage['tools']
 									}
 								};
-								this.currentGoalSpaces = this.schedulingTaskDetails['spaces'].length == 0 || !this.schedulingTaskDetails['spaces'] ? [] : this.schedulingTaskDetails['spaces'];
+								this.currentGoalSpaces = this.projectTaskMessage['spaces'].length == 0 || !this.projectTaskMessage['spaces'] ? [] : this.projectTaskMessage['spaces'];
 								if (this.currentStructure != '请选择' && this.currentStructure) {
 									this.getDepartmentByStructureId(this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value'],false,true)
 								}
@@ -659,13 +659,20 @@
 				// 查询任务详情
 				getRepairsDetails () {
 					return new Promise((resolve,reject) => {
-						repairsDetails(this.schedulingTaskDetails.id).then((res) => {
+						repairsDetails(this.projectTaskMessage.id).then((res) => {
 							if (res && res.data.code == 200) {
 								resolve(res.data.data)
+							} else {
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
 							}
 						})
 						.catch((err) => {
-							reject(err.message)
+							reject({message:err.message})
 						})
 					})
 				},
@@ -676,10 +683,17 @@
 						queryRepairsTaskTool(this.proId).then((res) => {
 							if (res && res.data.code == 200) {
 								resolve(res.data.data)
+							} else {
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
 							}
 						})
 						.catch((err) => {
-							reject(err.message)
+							reject({message:err.message})
 						})
 					})
 				},
@@ -691,11 +705,16 @@
 							if (res && res.data.code == 200) {
 								resolve(res.data.data)
 							} else {
-								reject(res.data.msg)
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
 							}
 						})
 						.catch((err) => {
-							reject(err.message)
+							reject({message:err.message})
 						})
 					})
 				},
@@ -706,10 +725,17 @@
 						queryStructure(this.proId).then((res) => {
 							if (res && res.data.code == 200) {
 								resolve(res.data.data)
+							} else {
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
 							}
 						})
 						.catch((err) => {
-							reject(err.message)
+							reject({message:err.message})
 						})
 					})
 				},
@@ -721,10 +747,17 @@
 					.then((res) => {
 						if (res && res.data.code == 200) {
 							resolve(res.data.data)
-						}
+						} else {
+								reject({message:res.data.msg});
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
 					})
 					.catch((err) => {
-						reject(err.message)
+						reject({message:err.message})
 					})
 				})
 			},
@@ -736,10 +769,17 @@
 					.then((res) => {
 						if (res && res.data.code == 200) {
 							resolve(res.data.data)
-						}
+						} else {
+								reject({message:res.data.msg})
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error',
+								})
+							}
 					})
 					.catch((err) => {
-						reject(err.message)
+						reject({message:err.message})
 					})
 				})
 			},
@@ -936,8 +976,8 @@
 				};
 				// 编辑维修任务
 				let temporaryMessage = {
-					id: this.schedulingTaskDetails.id, //任务id
-					taskNumber: this.schedulingTaskDetails['taskNumber'], // 任务编号
+					id: this.projectTaskMessage.id, //任务id
+					taskNumber: this.projectTaskMessage['taskNumber'], // 任务编号
 					typeId: this.taskTypeOption.filter((item) => { return item['text'] == this.currentTaskType})[0]['value'], // 任务类型
 					taskDesc: this.problemOverview, // 问题描述
 					destinationId: '', // 目的地id
@@ -1025,9 +1065,7 @@
 							message: `${res.data.msge}`,
 							type: 'success'
 						});
-						this.$router.push({path:'/engineeringTaskManagement'});
-						this.changeTitleTxt({tit:'工程维保任务管理'});
-						setStore('currentTitle','工程维保任务管理');
+						this.backTo();
 					} else {
 						this.$refs.uToast.show({
 							message: `${res.data.msge}`,
@@ -1168,6 +1206,7 @@
 	};
 	.content-box {
 		@include content-wrapper;
+		height: 100vh !important;
 		box-sizing: border-box;
 		background: #fff;
 		::v-deep .u-popup {
@@ -1553,7 +1592,7 @@
 					transform: translate(-50%,-50%)
 				};
 				.message-box {
-					flex: 1;
+					height: 100%;
 					width: 100%;
 					overflow: scroll;
 					.message-one {
@@ -1799,23 +1838,25 @@
 			align-items: center;
 			justify-content: center;
 			>text {
-				width: 40%;
+				width: 35%;
 				display: inline-block;
 				height: 45px;
-				font-size: 18px;
+				font-size: 14px;
 				line-height: 45px;
 				background: #fff;
 				text-align: center;
-				border-radius: 30px;
+				border-radius: 4px;
 				&:nth-child(1) {
 					color: #fff;
-					background: linear-gradient(to right, #6cd2f8, #2390fe);
-					box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
+					background: #2B98FE;
+					box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
 					margin-right: 30px
 				};
-				&:last-child {
-					color: #1864FF;
-					box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1)
+				&:nth-child(2) {
+					color: #2B98FE;
+					border: 1px solid #2B98FE;
+					box-sizing: border-box;
+					box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
 				}
 			}
 		}

@@ -48,13 +48,13 @@ export default {
 				state.capsuleMessage = playLoad
 			}
 		},
-		storeAllOrderCancelReason:(state) => {
+		storeAllOrderCancelReason:(state,playLoad) => {
 			if (playLoad && playLoad != 'null') {
 				setCache('allOrderCancelReason', playLoad);
 				state.allOrderCancelReason = playLoad
 			}
 		},
-		storeCurrentIndex:(state) => {
+		storeCurrentIndex:(state,playLoad) => {
 			if (playLoad && playLoad != 'null') {
 				setCache('currentIndex', playLoad);
 				state.currentIndex = playLoad

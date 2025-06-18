@@ -132,7 +132,10 @@
 				</view>
 			</view>
 		</view>
-		<view class="task-start" @click="submitEvent">提交</view>
+		<view class="btn-box">
+		  <text class="operate-one" @click="submitEvent">确认</text>
+		  <text class="operate-two" @click="cancelEvent">取消</text>
+		</view>
 		<u-modal :show="deleteInfoDialogShow" title="确定删除此图片?" 
 			confirm-button-color="#218FFF" show-cancel-button
 			@confirm="sureDeleteEvent"
@@ -298,6 +301,11 @@
 			// 顶部导航返回事件
 			backTo () {
 				uni.navigateBack()
+			},
+			
+			// 取消事件
+			cancelEvent () {
+			  this.backTo()
 			},
 			
 			// 优先级选择器确定事件
@@ -786,6 +794,7 @@
 	};
 	.content-box {
 		@include content-wrapper;
+		height: 100vh !important;
 		box-sizing: border-box;
 		background: #fff;
 		::v-deep .u-popup {
@@ -1047,21 +1056,36 @@
 		        }
 		      }
 		    }
-		  }
-		  .task-start {
-		    height: 48px;
-		    width: 266px;
-		    font-size: 18px;
-		    margin: 0 auto;
-		    line-height: 48px;
-		    background: linear-gradient(to right, #6cd2f8, #2390fe);
-		    box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
-		    color: #fff;
-		    border-radius: 30px;
-		    font-weight: bold;
-		    margin-top: 20px;
-		    margin-bottom: 20px;
-		    text-align: center;
-		  }
+		  };
+			.btn-box {
+				width: 90%;
+				margin: 0 auto;
+				height: 100px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				>text {
+					width: 35%;
+					display: inline-block;
+					height: 45px;
+					font-size: 14px;
+					line-height: 45px;
+					background: #fff;
+					text-align: center;
+					border-radius: 4px;
+					&:nth-child(1) {
+						color: #fff;
+						background: #2B98FE;
+						box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
+						margin-right: 30px
+					};
+					&:nth-child(2) {
+						color: #2B98FE;
+						border: 1px solid #2B98FE;
+						box-sizing: border-box;
+						box-shadow: 0px 2px 6px 0 rgba(0, 0, 0, 0.4);
+					}
+				}
+			}
 	}
 </style>
