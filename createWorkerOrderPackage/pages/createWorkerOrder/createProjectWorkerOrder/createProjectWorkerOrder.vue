@@ -46,7 +46,7 @@
 						优先级
 					</view>
 					<view class="message-one-right">
-						<u-radio-group v-model="priorityRadioValue" @change="radioGroupChange">
+						<u-radio-group v-model="priorityRadioValue">
 							<u-radio name="1" activeColor="#289E8E" labelColor="#289E8E" label="正常"></u-radio>
 							<u-radio name="2" activeColor="#F2A15F" labelColor="#F2A15F" label="重要"></u-radio>
 							<u-radio name="3" activeColor="#E8CB51" labelColor="#E8CB51" label="紧急"></u-radio>
@@ -132,7 +132,7 @@
 						我方解决
 					</view>
 					<view class="message-one-right">
-						<u-radio-group v-model="isMeRadioValue" @change="isBackGroupChange" activeColor="#3B9DF9">
+						<u-radio-group v-model="isMeRadioValue" activeColor="#3B9DF9">
 							<u-radio name="0" label="否"></u-radio>
 							<u-radio name="1" label="是"></u-radio>
 						</u-radio-group>
@@ -178,7 +178,7 @@
 		</view>
 		<!-- 物料弹框  -->
 		<view class="material-box">
-			<u-modal :show="materialShow"  show-cancel-button width="700rpx"
+			<u-modal :show="materialShow" :closeOnClickOverlay="true" showCancelButton width="700rpx"
 					@confirm="materialSure" @cancel="materialCancel" confirmText="添加"
 					cancelText="取消"
 				>
@@ -372,6 +372,7 @@
 		},
 		methods: {
 			...mapMutations([
+				'storeCurrentIndex'
 			]),
 			
 			// 顶部导航返回事件
@@ -923,7 +924,7 @@
 					});
 					return
 				};
-				// 创建维修任务
+				// 创建工程任务
 				let temporaryMessage = {
 					typeId: this.taskTypeOption.filter((item) => { return item['text'] == this.currentTaskType})[0]['value'], // 任务类型
 					taskDesc: this.problemOverview, // 问题描述
@@ -996,9 +997,9 @@
 				this.postGenerateRepairsTask(temporaryMessage)
 				},
 
-				// 生成维修任务
+				// 生成工程任务
 				postGenerateRepairsTask (data) {
-				console.log('拼接的数据',data);
+				this.infoText = '创建中···';
 				this.showLoadingHint = true;
 				createRepairsTask(data).then((res) => {
 					this.showLoadingHint = false;
@@ -1008,7 +1009,10 @@
 							type: 'success',
 							position: 'center'
 						});
-						this.backTo();
+						this.storeCurrentIndex(2);
+						uni.redirectTo({
+							url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
+						});
 					} else {
 						this.$refs.uToast.show({
 							message: res.data.msg,

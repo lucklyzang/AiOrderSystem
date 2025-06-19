@@ -33,7 +33,7 @@
 						优先级
 					</view>
 					<view class="message-one-right">
-						<u-radio-group v-model="priorityRadioValue" @change="radioGroupChange">
+						<u-radio-group v-model="priorityRadioValue">
 							<u-radio name="1" activeColor="#8af08a" labelColor="#8af08a" label="正常"></u-radio>
 							<u-radio name="2" activeColor="#fcd388" labelColor="#fcd388" label="重要"></u-radio>
 							<u-radio name="3" activeColor="#ea7171" labelColor="#ea7171" label="紧急"></u-radio>
@@ -168,7 +168,7 @@
 		},
 		methods: {
 			...mapMutations([
-				''
+				'storeCurrentIndex'
 			]),
 			
 			// 顶部导航返回事件
@@ -519,30 +519,34 @@
 			
 			// 生成维修任务
 			postGenerateRepairsTask (data) {
-			this.showLoadingHint = true;
-			createRepairsTask(data).then((res) => {
-				this.showLoadingHint = false;
-				if (res && res.data.code == 200) {
-					this.$refs.uToast.show({
-						message: `${res.data.msg}`,
-						type: 'success',
-						position: 'center'
-					});
-					this.commonIsTemporaryStorageMethods();
-				} else {
-					this.$refs.uToast.show({
-						message: res.data.msg,
-						type: 'error',
-					})
-				};
-			})
-			.catch((err) => {
-				this.showLoadingHint = false;
-				this.$refs.uToast.show({
-					message: `${err.message}`,
-					type: 'error'
+				this.infoText = '创建中···';
+				this.showLoadingHint = true;
+				createRepairsTask(data).then((res) => {
+					this.showLoadingHint = false;
+					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							message: `${res.data.msg}`,
+							type: 'success',
+							position: 'center'
+						});
+						this.storeCurrentIndex(3);
+						uni.redirectTo({
+							url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
+						});
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+						})
+					};
 				})
-			})
+				.catch((err) => {
+					this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: `${err.message}`,
+						type: 'error'
+					})
+				})
 			},
 			
 			// 取消事件

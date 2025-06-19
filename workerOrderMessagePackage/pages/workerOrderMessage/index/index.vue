@@ -118,8 +118,8 @@
 			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'trans')" v-for="(item,index) in transOrderList" :key="index">
 				<view class="list-content-top">
 					<view class="list-content-top-left">
-						<image src="@/static/img/ai-create-order-icon.png"></image>
-						<text>Ai下单</text>
+						<image :src="item.createType == 1 ? '/static/img/ai-create-order-icon.png' : '/static/img/manual-create-icon.png'"></image>
+						<text>{{ item.createType == 1 ? 'Ai下单' : '手动下单' }}</text>
 						<text>{{ item.createTime }}</text>
 					</view>
 					<view class="list-content-top-right" :class="{'noLookupStyle':item.state == 1,'noStartStyle':item.state == 2,'underwayStyle':item.state == 3,'noEndStyle':item.state == 4}">
@@ -173,10 +173,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view @click.stop="modificationOrderEvent(item,'trans')">
+					<view class="modification-btn" @click.stop="modificationOrderEvent(item,'trans')">
 						修改
 					</view>
-					<view @click.stop="cancelOrderEvent(item,'trans')" v-if="item.state < 5">
+					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'trans')" v-if="item.state < 5">
 						取消订单
 					</view>
 				</view>
@@ -187,8 +187,8 @@
 			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'environment')" v-for="(item,index) in environmentOrderList" :key="index">
 				<view class="list-content-top">
 					<view class="list-content-top-left">
-						<image src="@/static/img/ai-create-order-icon.png"></image>
-						<text>Ai下单</text>
+						<image :src="item.createType == 1 ? '/static/img/ai-create-order-icon.png' : '/static/img/manual-create-icon.png'"></image>
+						<text>{{ item.createType == 1 ? 'Ai下单' : '手动下单' }}</text>
 						<text>{{ item.createTime }}</text>
 					</view>
 					<view class="list-content-top-right" :class="{
@@ -215,10 +215,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view @click.stop="modificationOrderEvent(item,'environment')">
+					<view class="modification-btn" @click.stop="modificationOrderEvent(item,'environment')">
 						修改
 					</view>
-					<view @click.stop="cancelOrderEvent(item,'environment')" v-if="item.state < 5">
+					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'environment')" v-if="item.state < 5">
 						取消订单
 					</view>
 				</view>
@@ -229,11 +229,14 @@
 			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'project')" v-for="(item,index) in projectOrderList" :key="index">
 				<view class="list-content-top">
 					<view class="list-content-top-left">
-						<image src="@/static/img/ai-create-order-icon.png"></image>
-						<text>Ai下单</text>
+						<image :src="item.createType == 1 ? '/static/img/ai-create-order-icon.png' : '/static/img/manual-create-icon.png'"></image>
+						<text>{{ item.createType == 1 ? 'Ai下单' : '手动下单' }}</text>
 						<text>{{ item.createTime }}</text>
 					</view>
-					<view class="list-content-top-right" :class="{'noAllocationStyle':item.state == 0,'noLookupStyle':item.state == 1,'noStartStyle': item.state == 2,'underwayStyle':item.state == 3,'tobeSigned':item.state == 4}">
+					<view class="list-content-top-right" :class="{'noAllocationStyle':item.state == 0,'noLookupStyle':item.state == 1,'noStartStyle': item.state == 2,
+					'underwayStyle':item.state == 3,'tobeSigned':item.state == 4,'waitCheck':item.state == 8
+					}"
+					>
 						<text>{{ projectTaskStatusTransition(item.state) }}</text>
 					</view>
 				</view>
@@ -252,10 +255,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view @click.stop="modificationOrderEvent(item,'project')">
+					<view class="modification-btn" @click.stop="modificationOrderEvent(item,'project')">
 						修改
 					</view>
-					<view @click.stop="cancelOrderEvent(item,'project')" v-if="item.state < 5">
+					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'project')" v-if="item.state < 5">
 						取消订单
 					</view>
 				</view>
@@ -266,8 +269,8 @@
 			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'affair')" v-for="(item,index) in affairOrderList" :key="index">
 				<view class="list-content-top">
 					<view class="list-content-top-left">
-						<image src="@/static/img/ai-create-order-icon.png"></image>
-						<text>Ai下单</text>
+						<image :src="item.createType == 1 ? '/static/img/ai-create-order-icon.png' : '/static/img/manual-create-icon.png'"></image>
+						<text>{{ item.createType == 1 ? 'Ai下单' : '手动下单' }}</text>
 						<text>{{ item.createTime }}</text>
 					</view>
 					<view class="list-content-top-right">
@@ -283,10 +286,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view @click.stop="modificationOrderEvent(item,'affair')">
+					<view class="modification-btn" @click.stop="modificationOrderEvent(item,'affair')">
 						修改
 					</view>
-					<view @click.stop="cancelOrderEvent(item,'affair')" v-if="item.state < 5">
+					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'affair')" v-if="item.state < 5">
 						取消订单
 					</view>
 				</view>
@@ -389,6 +392,7 @@
 			}
 		},
 		onShow() {
+			this.parallelQueryCancelReasonFunction();
 			this.current = this.currentIndex;
 			if (this.currentIndex == 0) {
 				this.transportOrderShow = true;
@@ -741,11 +745,20 @@
 						break;
 					case 5 :
 						return '已完成'
-						break
+						break;
+					case 6 :
+						return '已取消'
+						break;
+					case 7 :
+						return '已延迟'
+						break;
+					 case 8 :
+						return '待审核'
+						break;
 				}
 			},
 			
-			// 工程任务状态转换
+			// 事务任务状态转换
 			affairTaskStatusTransition (state) {
 				switch(state) {
 					case 0 :
@@ -765,7 +778,16 @@
 						break;
 					case 5 :
 						return '已完成'
-						break
+						break;
+					case 6 :
+						return '已取消'
+						break;
+					case 7 :
+						return '已延迟'
+						break;
+					 case 8 :
+						return '待审核'
+						break;
 				}
 			},
 			
@@ -792,7 +814,7 @@
 			// 运送订单的取消
 			cancelDispatchTask (data) {
 				this.showLoadingHint = true;
-				this.infoText = '取消中···'
+				this.infoText = '取消中···';
 			  updateDispatchTask(data)
 			  .then((res) => {
 					this.showLoadingHint = false;
@@ -860,7 +882,7 @@
 			// 环境订单的取消
 			cancelEnvironmentWorkerOrderMessageTask (data) {
 				this.showLoadingHint = true;
-				this.infoText = '取消中···'
+				this.infoText = '取消中···';
 			  cancelTask(data)
 			  .then((res) => {
 					this.showLoadingHint = false;
@@ -925,7 +947,7 @@
 			// 工程订单的取消
 			cancelProjectWorkerOrderMessageTask (data) {
 				this.showLoadingHint = true;
-				this.infoText = '取消中···'
+				this.infoText = '取消中···';
 			  cancelRepairsTask(data)
 			  .then((res) => {
 					this.showLoadingHint = false;
@@ -978,7 +1000,7 @@
 			},
 			
 			// 工程订单取消原因弹框取消事件
-			environmentCancelReasonDialogCancel () {
+			projectCancelReasonDialogCancel () {
 				this.projectCancelReasonShow = false;
 			  this.$refs['projectCancelOption'].clearSelectValue()
 			},
@@ -1046,6 +1068,7 @@
 			
 			// 查询运送订单列表
 			getTransTaskList (data) {
+				this.infoText = '加载中···';
 			  this.isShowTransportNoData = false;
 			  this.showLoadingHint = true;
 			  getDispatchTaskComplete(data).then((res) => {
@@ -1109,6 +1132,7 @@
 			
 				// 查询环境订单列表列表
 				getEnvironmentTaskList (data) {
+					this.infoText = '加载中···';
 					this.showLoadingHint = true;
 					this.isShowEnvironmentNoData = false;
 					queryCleaningManageTaskList(data).then((res) => {
@@ -1136,15 +1160,16 @@
 		
 		//查询工程订单列表
 		getProjectTaskList () {
+			this.infoText = '加载中···';
 			this.showLoadingHint = true;
 			this.isShowProjectNoData = false;
-			repairsList(-3,this.proId,1)
+			repairsList(-3,this.proId,1,this.workerId)
 			.then((res) => {
 				this.showLoadingHint = false;
 				if (res && res.data.code == 200) {
 					this.projectOrderList = res.data.data;
 					// 显示未完成(不包括已取消)的任务状态(0-未分配，1-未查阅,2-未开始，3-进行中，4-待签字，5-已完成，6-已取消)
-					this.projectOrderList = this.projectOrderList.filter(( item ) => { return item.state != 5 && item.state != 6});
+					this.projectOrderList = this.projectOrderList.filter(( item ) => { return item.state != 6});
 					if (this.projectOrderList.length == 0) {
 						this.isShowProjectNoData = true;
 						this.projectOrderList = [];
@@ -1167,6 +1192,7 @@
 		
 		//查询事务订单列表
 		getAffairTaskList () {
+			this.infoText = '加载中···';
 			this.showLoadingHint = true;
 			this.isShowAffairNoData = false;
 			affairList(-3,this.proId,1)
@@ -1217,17 +1243,17 @@
 						url: '/workerOrderMessagePackage/pages/workerOrderMessage/transportWorkerOrderMessage/transportWorkerOrderMessage'
 					})
 				} else if (text == 'environment') {
-					// this.changeEnvironmentTaskMessage(item);
+					this.changeEnvironmentTaskMessage(item);
 					uni.navigateTo({
 						url: '/workerOrderMessagePackage/pages/workerOrderMessage/environmentWorkerOrderMessage/environmentWorkerOrderMessage'
 					})
 				} else if (text == 'project') {
-					// this.changeProjectTaskMessage(item);
+					this.changeProjectTaskMessage(item);
 					uni.navigateTo({
 						url: '/workerOrderMessagePackage/pages/workerOrderMessage/projectWorkerOrderMessage/projectWorkerOrderMessage'
 					});
 				} else if (text == 'affair') {
-					// this.changeAffairTaskMessage(item);
+					this.changeAffairTaskMessage(item);
 					uni.navigateTo({
 						url: '/workerOrderMessagePackage/pages/workerOrderMessage/affairWorkerOrderMessage/affairWorkerOrderMessage'
 					})
@@ -1444,50 +1470,6 @@
 						font-size: 12px;
 						background: #E86F50;
 						color: #fff;
-					};
-					// 运送订单
-					.noLookupStyle {
-						background: #E8CB51 !important
-					};
-					.noStartStyle {
-						background: #174E97 !important
-					};
-					.underwayStyle {
-						background: #289E8E !important
-					};
-					.noEndStyle {
-						background: #F2A15F !important
-					};
-					
-					// 环境订单
-					.underwayStyle {
-						background: #289E8E !important
-					};
-					.completeStyle {
-						background: #242424 !important
-					};
-					.reviewStyle {
-						background: #F2A15F !important
-					};
-					.haveReviewStyle {
-						background: #9B7D31 !important
-					};
-					
-					// 工程订单
-					.noAllocationStyle {
-						background: #E86F50 !important
-					};
-					.noLookupStyle {
-						background: #E8CB51 !important
-					};
-					.noStartStyle {
-						background: #174E97 !important
-					};
-					.underwayStyle {
-						background: #289E8E !important
-					};
-					.tobeSigned {
-						background: #40f9e0 !important
 					}
 				};
 				.list-content-center {
@@ -1528,21 +1510,86 @@
 						align-items: center;
 						justify-content: center;
 						font-size: 12px;
-						&:first-child {
-							background: #E8CB51;
-							color: #fff;
-							margin-right: 10px;
-						};
-						&:last-child {
-							border: 1px solid #E86F50;
-							color: #E86F50;
-						}
+					};
+					.modification-btn {
+						background: #E8CB51;
+						color: #fff;
+						margin-right: 10px;
+					}
+					.cancel-btn {
+						border: 1px solid #E86F50;
+						color: #E86F50;
 					}
 				}
+			}	
+		};
+		.transport-order-content {
+			.noLookupStyle {
+				background: #E8CB51 !important
+			};
+			.noStartStyle {
+				background: #174E97 !important
+			};
+			.underwayStyle {
+				background: #289E8E !important
+			};
+			.noEndStyle {
+				background: #F2A15F !important
 			}
 		};
-		.environment-order-content {};
-		.project-order-content {};
-		.affair-order-content {};
+		.environment-order-content {
+			.underwayStyle {
+				background: #289E8E !important
+			};
+			.completeStyle {
+				background: #242424 !important
+			};
+			.reviewStyle {
+				background: #F2A15F !important
+			};
+			.haveReviewStyle {
+				background: #9B7D31 !important
+			}
+		};
+		.project-order-content {
+			.noAllocationStyle {
+				background: #E86F50 !important
+			};
+			.noLookupStyle {
+				background: #E8CB51 !important
+			};
+			.noStartStyle {
+				background: #174E97 !important
+			};
+			.underwayStyle {
+				background: #289E8E !important
+			};
+			.tobeSigned {
+				background: #40f9e0 !important
+			};
+			.waitCheck {
+				background: orange !important
+			}
+		};
+		.affair-order-content {
+			.noAllocationStyle {
+				background: #E86F50 !important
+			};
+			.noLookupStyle {
+				background: #E8CB51 !important
+			};
+			.noStartStyle {
+				background: #174E97 !important
+			};
+			.underwayStyle {
+				background: #289E8E !important
+			};
+			.tobeSigned {
+				background: #40f9e0 !important
+			};
+			.waitCheck {
+				background: orange !important
+			}
+		};
 	}
 </style>

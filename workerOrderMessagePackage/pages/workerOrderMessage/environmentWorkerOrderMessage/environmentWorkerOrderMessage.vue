@@ -13,9 +13,9 @@
 		</view>
 		<!-- 图片放大弹框  -->
 		<view class="image-dislog-box">
-		    <u-modal v-model="imageBoxShow" width="98%" :close-on-click-overlay="true" confirm-button-text="关闭">
-		        <image :src="currentimageUrl" />
-		    </u-modal> 
+				 <u-modal :show="imageBoxShow" :closeOnClickOverlay="true" showConfirmButton="关闭" @close="imageBoxShow = false">
+				     <image :src="currentimageUrl" />
+				 </u-modal> 
 		</view>
     <view class="content">
       <view class="forthwith-task-number">
@@ -121,13 +121,15 @@ export default {
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo","environmentTaskMessage",'statusBarHeight','navigationBarHeight','storeAllOrderCancelReason']),
+    ...mapGetters(["userInfo","environmentTaskMessage",'statusBarHeight','navigationBarHeight','allOrderCancelReason']),
   },
 	onShow() {
 		this.taskId = this.environmentTaskMessage.id;
 	},
   methods: {
-    ...mapMutations([]),
+    ...mapMutations([
+			'storeCurrentIndex'
+		]),
 
     // 回显图片
     echoImage () {
@@ -152,7 +154,10 @@ export default {
     				message: `${res.data.msg}`,
     				type: 'success'
     			});
-					this.backTo();
+					this.storeCurrentIndex(1);
+					uni.redirectTo({
+						url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
+					});
     		} else {
     		 this.$refs.uToast.show({
     			message: `${res.data.msg}`,
@@ -240,7 +245,7 @@ export default {
 
     // 取消订单事件
     cancelTaskEvent () {
-			this.environmentCancelReasonOption = this.storeAllOrderCancelReason['environmentCancelReason'];
+			this.environmentCancelReasonOption = this.allOrderCancelReason['environmentCancelReason'];
 			this.environmentCancelReasonShow = true
     },
 		
@@ -571,7 +576,7 @@ page {
     }
   };
   .btn-box {
-  		height: 50px;
+  		height: 80px;
   		display: flex;
   		align-items: center;
   		justify-content: center;
@@ -590,7 +595,7 @@ page {
   			color: #fff;
   		};
   		.operate-one {
-  			margin-right: 10px;
+  			margin-right: 20px;
   			background: #E8CB51
   		};
   		.operate-two {

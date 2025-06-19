@@ -14,10 +14,10 @@ export default {
 
   mutations:{
 		// 保存事务订单的信息
-		changeAffairTaskMessage (state, payLoad) {
+		changeAffairTaskMessage (state, playLoad) {
 			if (playLoad && playLoad != 'null') {
 				setCache('affairTaskMessage', playLoad);
-				state.affairTaskMessage = payLoad
+				state.affairTaskMessage = playLoad
 			}
 		}
   },

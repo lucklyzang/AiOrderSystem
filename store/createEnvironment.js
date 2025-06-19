@@ -26,10 +26,10 @@ export default {
 
   mutations:{
     // 保存环境任务添加的位置信息
-    storeLocationMessage (state, payLoad) {
+    storeLocationMessage (state, playLoad) {
 			if (playLoad && playLoad != 'null') {
 				setCache('locationMessage', playLoad);
-				state.locationMessage = payLoad
+				state.locationMessage = playLoad
 			}
     },
 		//保存阿里云签名信息

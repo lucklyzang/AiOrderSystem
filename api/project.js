@@ -2,9 +2,9 @@ import request from '@/api/request';
 import Qs from 'qs'
 
 // 维修任务列表查询
-export function repairsList (state,proId,flag) {
+export function repairsList (state,proId,flag,workId) {
 	return request({
-		url: `project/bxTask/new/queryTask?state=${state}&proId=${proId}&flag=${flag}`,
+		url: `project/bxTask/new/queryTask?state=${state}&proId=${proId}&flag=${flag}&workId=${workId}`,
 		method: 'get'
 	})
 };

@@ -55,7 +55,7 @@ export default {
 			}
 		},
 		storeCurrentIndex:(state,playLoad) => {
-			if (playLoad && playLoad != 'null') {
+			if (playLoad != 'null') {
 				setCache('currentIndex', playLoad);
 				state.currentIndex = playLoad
 			}

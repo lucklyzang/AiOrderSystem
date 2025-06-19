@@ -387,7 +387,7 @@ export default {
     return {
 			showLoadingHint: false,
 			infoText: '加载中···',
-       taskDescribe: '',
+      taskDescribe: '',
 			patientNumberValue: '',
 			patientNameValue: '',
 			patientAgeValue: '',
@@ -512,7 +512,9 @@ export default {
   },
 
   methods: {
-    ...mapMutations([]),
+    ...mapMutations([
+			'storeCurrentIndex'
+		]),
 		
 		// 顶部导航返回事件
 		backTo () {
@@ -1478,7 +1480,10 @@ export default {
 					this.$refs.uToast.show({
 						message: '编辑成功',
 					});
-					this.backTo();
+					this.storeCurrentIndex(0);
+					uni.redirectTo({
+						url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
+					});
 				} else {
 					this.$refs.uToast.show({
 						message: res.data.msg,
@@ -1505,7 +1510,10 @@ export default {
 					tthis.$refs.uToast.show({
 						message: '编辑成功',
 					});
-					this.backTo()
+					this.storeCurrentIndex(0);
+					uni.redirectTo({
+						url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
+					});
 				} else {
 					this.$refs.uToast.show({
 						message: res.data.msg,

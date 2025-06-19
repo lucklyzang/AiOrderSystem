@@ -257,7 +257,8 @@
 		
 		methods: {
 			...mapMutations([
-				'changeSocketOpen'
+				'changeSocketOpen',
+				'storeCurrentIndex'
 			]),
 			
       goback() {
@@ -306,6 +307,7 @@
 			
 			// 修改工单事件
 			modificationWorkOrderEvent () {
+				this.storeCurrentIndex(0);
 				if (this.triangleRectListInfoShow) {
 					this.triangleRectListInfoShow = false;
 				};

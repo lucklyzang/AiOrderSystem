@@ -34,7 +34,7 @@
     </view>
     <!-- 图片放大弹框  -->
     <view class="image-dislog-box">
-        <u-modal v-model="imageBoxShow" width="98%" :close-on-click-overlay="true" confirm-button-text="关闭">
+        <u-modal :show="imageBoxShow" :closeOnClickOverlay="true" showConfirmButton="关闭" @close="imageBoxShow = false">
             <image :src="currentimageUrl" />
         </u-modal> 
     </view>
@@ -147,14 +147,16 @@ export default {
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo","affairTaskMessage",'statusBarHeight','navigationBarHeight']),
+    ...mapGetters(["userInfo","affairTaskMessage",'statusBarHeight','navigationBarHeight','allOrderCancelReason']),
     proId () {
       return this.userInfo.extendData.proId
     }
   },
 
   methods: {
-    ...mapMutations([]),
+    ...mapMutations([
+			'storeCurrentIndex'
+		]),
 
      // 顶部导航返回事件
      backTo () {
@@ -227,7 +229,7 @@ export default {
 
     // 取消点击事件
     cancelReasonEvent() {
-     this.affairSelectCancelReason = this.storeAllOrderCancelReason['affairCancelReason'];
+     this.affairCancelReasonOption = this.allOrderCancelReason['affairCancelReason'];
      this.projectCancelReasonShow = true;
     },
 
@@ -244,7 +246,10 @@ export default {
    				message: `${res.data.msg}`,
    				type: 'success'
    			});
-   			this.backTo()
+   			this.storeCurrentIndex(3);
+   			uni.redirectTo({
+   				url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
+   			});
    		} else {
    		 this.$refs.uToast.show({
    			message: `${res.data.msg}`,
@@ -429,6 +434,8 @@ page {
 		 padding: 0 0 10px 0;
 		 box-sizing: border-box;
 		.message-box {
+			height: 100%;
+			overflow: auto;
 				.message-one {
 						width: 100%;
 						padding: 4px 6px;
@@ -536,7 +543,7 @@ page {
 		}
   };
 	.btn-box {
-			height: 50px;
+			height: 80px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -555,7 +562,7 @@ page {
 				color: #fff;
 			};
 			.operate-one {
-				margin-right: 10px;
+				margin-right: 20px;
 				background: #E8CB51
 			};
 			.operate-two {

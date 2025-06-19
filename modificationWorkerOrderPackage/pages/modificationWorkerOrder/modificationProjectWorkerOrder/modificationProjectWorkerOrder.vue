@@ -46,7 +46,7 @@
 						优先级
 					</view>
 					<view class="message-one-right">
-						<u-radio-group v-model="priorityRadioValue" @change="radioGroupChange">
+						<u-radio-group v-model="priorityRadioValue">
 							<u-radio name="1" activeColor="#289E8E" labelColor="#289E8E" label="正常"></u-radio>
 							<u-radio name="2" activeColor="#F2A15F" labelColor="#F2A15F" label="重要"></u-radio>
 							<u-radio name="3" activeColor="#E8CB51" labelColor="#E8CB51" label="紧急"></u-radio>
@@ -132,7 +132,7 @@
 						我方解决
 					</view>
 					<view class="message-one-right">
-						<u-radio-group v-model="isMeRadioValue" @change="isBackGroupChange" activeColor="#3B9DF9">
+						<u-radio-group v-model="isMeRadioValue" activeColor="#3B9DF9">
 							<u-radio name="0" label="否"></u-radio>
 							<u-radio name="1" label="是"></u-radio>
 						</u-radio-group>
@@ -177,7 +177,7 @@
 		</view>
 		<!-- 物料弹框  -->
 		<view class="material-box">
-			<u-modal :show="materialShow"  show-cancel-button width="700rpx"
+			<u-modal :show="materialShow" :closeOnClickOverlay="true" showCancelButton width="700rpx"
 					@confirm="materialSure" @cancel="materialCancel" confirmText="添加"
 					cancelText="取消"
 				>
@@ -278,7 +278,7 @@
 		mapGetters,
 		mapMutations
 	} from 'vuex'
-	import { createRepairsTask, repairsDetails, getTransporter, querySpace, queryDepartment, queryRepairsTaskTool, queryStructure, queryRepairsTaskMaterial, getRepairsTaskType } from '@/api/project.js'
+	import { editRepairsTask, repairsDetails, getTransporter, querySpace, queryDepartment, queryRepairsTaskTool, queryStructure, queryRepairsTaskMaterial, getRepairsTaskType } from '@/api/project.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import { setCache,removeAllLocalStorage } from '@/common/js/utils'
 	import _ from 'lodash'
@@ -371,7 +371,8 @@
 		},
 		methods: {
 			...mapMutations([
-				'changeProjectTaskMessage'
+				'changeProjectTaskMessage',
+				'storeCurrentIndex'
 			]),
 			
 			// 顶部导航返回事件
@@ -381,6 +382,7 @@
 
 			 // 回显编辑信息
 			echoEditMessage () {
+				console.log('回显信息',this.projectTaskMessage);
 				let casuallyTemporaryStorageCreateRepairsTaskMessage = this.projectTaskMessage;
 				this.priorityRadioValue = casuallyTemporaryStorageCreateRepairsTaskMessage['priority'].toString();
 				this.currentTaskType = casuallyTemporaryStorageCreateRepairsTaskMessage['typeName'] ? casuallyTemporaryStorageCreateRepairsTaskMessage['typeName'] : '请选择';
@@ -389,7 +391,7 @@
 				this.currentParticipant = casuallyTemporaryStorageCreateRepairsTaskMessage['present'] ? casuallyTemporaryStorageCreateRepairsTaskMessage['present'] : [];
 				this.isMeRadioValue = casuallyTemporaryStorageCreateRepairsTaskMessage['isMe'].toString();
 				this.taskDescribe = casuallyTemporaryStorageCreateRepairsTaskMessage['taskRemark'];
-				this.consumableMsgList = casuallyTemporaryStorageCreateRepairsTaskMessage['materials'];
+				this.consumableMsgList = casuallyTemporaryStorageCreateRepairsTaskMessage['materials'] == null ? [] : casuallyTemporaryStorageCreateRepairsTaskMessage['materials'];
 				// 处理目的建筑、目的科室显示信息
 				let trmporaryMessage = casuallyTemporaryStorageCreateRepairsTaskMessage['depName'].split("/");
 				this.currentStructure = trmporaryMessage[0] ? trmporaryMessage[0] : '请选择';
@@ -1062,13 +1064,16 @@
 				editRepairsTask(data).then((res) => {
 					if (res && res.data.code == 200) {
 						this.$refs.uToast.show({
-							message: `${res.data.msge}`,
+							message: `${res.data.msg}`,
 							type: 'success'
 						});
-						this.backTo();
+						this.storeCurrentIndex(2);
+						uni.redirectTo({
+							url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
+						});
 					} else {
 						this.$refs.uToast.show({
-							message: `${res.data.msge}`,
+							message: `${res.data.msg}`,
 							type: 'error'
 						})
 					};
@@ -1118,6 +1123,7 @@
 	
 			// 添加物料确认
 			materialSure () {
+				this.materialShow = false;
 				let count = this.echoInventoryMsgList.some((item)=> {return item.checked == true && !item.disabled});
 				if (!count) {
 					this.$refs.uToast.show({
@@ -1145,6 +1151,7 @@
 	
 			// 添加物料取消
 			materialCancel () {
+				this.materialShow = false;
 				this.currentPage = 1
 			},
 	

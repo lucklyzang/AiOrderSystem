@@ -135,8 +135,9 @@
 			<text class="operate-one" @click="sureEvent">确认</text>
 			<text class="operate-two" @click="cancelEvent">取消</text>
 		</view>
-		<u-modal :show="deleteInfoDialogShow" title="确定删除此图片?" 
-			confirm-button-color="#218FFF" show-cancel-button
+		<u-modal :show="deleteInfoDialogShow" title="确定删除此图片?"
+			:closeOnClickOverlay="true" @close="deleteInfoDialogShow = false"
+			confirmColor="#218FFF" showCancelButton
 			@confirm="sureDeleteEvent"
 			@cancel="deleteInfoDialogShow=false"
 			>
@@ -283,7 +284,8 @@
 			...mapMutations([
 				"changeTimeMessage",
 				"changeOssMessage",
-				"storeLocationMessage"
+				"storeLocationMessage",
+				"storeCurrentIndex"
 			]),
 			
 			// 顶部导航返回事件
@@ -519,6 +521,7 @@
 					
 					// 上传图片到服务器
 					uploadFileEvent (imgI) {
+						this.infoText = '图片上传中···';
 						this.showLoadingHint = true;
 						return new Promise((resolve, reject) => {
 							uni.uploadFile({
@@ -633,8 +636,9 @@
 			      this.addForthwithCleanTask(paramsData) 
 			    },
 			
-			    // 添加任务
+			    // 编辑环境任务
 			    addForthwithCleanTask (data) {
+					 this.infoText = '编辑中···';
 			     this.showLoadingHint = true;
 			      addForthwithCleanTask(data).then((res) => {
 			         this.showLoadingHint = false;
@@ -658,7 +662,10 @@
 			            this.selectValue = [];
 			            this.personNumberValue = '';
 			            this.durationValue = '';
-									this.backTo();
+									this.storeCurrentIndex(1);
+									uni.redirectTo({
+										url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
+									});
 								} else {
 									this.$refs.uToast.show({
 										message: res.data.msg,

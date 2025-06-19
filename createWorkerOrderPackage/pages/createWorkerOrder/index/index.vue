@@ -1390,7 +1390,7 @@ export default {
 						message: '创建成功',
 					});
 					this.storeCurrentIndex(0);
-          uni.navigateTo({
+          uni.redirectTo({
           	url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
           });
         } else {
@@ -1420,7 +1420,7 @@ export default {
 						message: '创建成功',
 					});
 					this.storeCurrentIndex(0);
-					uni.navigateTo({
+					uni.redirectTo({
 						url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
 					});
         } else {

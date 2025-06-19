@@ -34,9 +34,9 @@
     </view>
     <!-- 图片放大弹框  -->
     <view class="image-dislog-box">
-        <u-modal v-model="imageBoxShow" width="98%" :close-on-click-overlay="true" confirm-button-text="关闭">
-            <image :src="currentimageUrl" />
-        </u-modal> 
+				 <u-modal :show="imageBoxShow" :closeOnClickOverlay="true" showConfirmButton="关闭" @close="imageBoxShow = false">
+				     <image :src="currentimageUrl" />
+				 </u-modal> 
     </view>
     <view class="content">
 			<view class="message-box">
@@ -45,8 +45,10 @@
 									<text>编号:</text>
 									<text>{{ projectTaskMessage.taskNumber }}</text>
 							</view>
-							<view class="message-one-right" :class="{'noAllocationStyle':projectTaskMessage.state == 0,'noLookupStyle':projectTaskMessage.state == 1,'noStartStyle': projectTaskMessage.state == 2,'underwayStyle':projectTaskMessage.state == 3,'tobeSigned':projectTaskMessage.state == 4}">
-									{{ taskStatusTransition(projectTaskMessage.state) }}
+							<view class="message-one-right" :class="{'noAllocationStyle':projectTaskMessage.state == 0,'noLookupStyle':projectTaskMessage.state == 1,'noStartStyle': projectTaskMessage.state == 2,
+							'underwayStyle':projectTaskMessage.state == 3,'tobeSigned':projectTaskMessage.state == 4,'waitCheck':item.state == 8
+							}">
+									{{ projectTaskStatusTransition(projectTaskMessage.state) }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -70,7 +72,7 @@
 									<text>响应时间</text>
 							</view>
 							<view class="message-two-right">
-									{{ projectTaskMessage.responseTime }}
+									{{ projectTaskMessage.responseTime == null ? '无' : projectTaskMessage.responseTime }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -149,10 +151,10 @@
 					</view>
 			</view>
     </view>
-		<div class="btn-box">
+		<view class="btn-box">
 			<text class="operate-one" @click="editEvent">修改</text>
 			<text class="operate-two" @click="cancelReasonEvent">取消订单</text>
-		</div> 
+		</view> 
   </view>
 </template>
 <script>
@@ -178,18 +180,22 @@ export default {
 			projectCancelReasonOption: [{text: "请选择取消原因",value: null}],
     }
   },
-
+	
+	onShow () {},
+	
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo","projectTaskMessage",'statusBarHeight','navigationBarHeight','storeAllOrderCancelReason']),
+    ...mapGetters(["userInfo","projectTaskMessage",'statusBarHeight','navigationBarHeight','allOrderCancelReason']),
     proId () {
       return this.userInfo.extendData.proId
     }
   },
 
   methods: {
-    ...mapMutations([]),
+    ...mapMutations([
+			'storeCurrentIndex'
+		]),
 
      // 顶部导航返回事件
      backTo () {
@@ -199,7 +205,7 @@ export default {
     // 处理维修任务空间信息
     disposeCheckType (item) {
       if (!item) { return };
-      if (item.length == 0) { return };
+      if (item.length == 0) { return '无' };
       let temporaryArray = [];
       for (let innerItem of item) {
         temporaryArray.push(innerItem.name)
@@ -227,7 +233,7 @@ export default {
 	// 处理维修任务参与者
 	disposeTaskPresent (item) {
 		if (!item) { return };
-		if (item.length == 0) { return };
+		if (item.length == 0) { return '无' };
 		let temporaryArray = [];
 		for (let innerItem of item) {
 			temporaryArray.push(innerItem.name)
@@ -274,7 +280,10 @@ export default {
 						message: `${res.data.msg}`,
 						type: 'success'
 					});
-					this.backTo();
+					this.storeCurrentIndex(2);
+					uni.redirectTo({
+						url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
+					});
 				} else {
 				 this.$refs.uToast.show({
 					message: `${res.data.msg}`,
@@ -316,7 +325,7 @@ export default {
 		},
 		
 		// 工程订单取消原因弹框取消事件
-		environmentCancelReasonDialogCancel () {
+		projectCancelReasonDialogCancel () {
 			this.projectCancelReasonShow = false;
 		  this.$refs['projectCancelOption'].clearSelectValue()
 		},
@@ -324,32 +333,41 @@ export default {
 
     // 取消点击事件
     cancelReasonEvent() {
-			this.projectSelectCancelReason = this.storeAllOrderCancelReason['projectCancelReason'];
+			this.projectCancelReasonOption = this.allOrderCancelReason['projectCancelReason'];
       this.projectCancelReasonShow = true;
     },
 		
     // 任务状态转换
-    taskStatusTransition (state) {
-      switch(state) {
-        case 0 :
-          return '未分配'
-          break;
-        case 1 :
-          return '未查阅'
-          break;
-        case 2 :
-          return '未开始'
-          break;
-        case 3 :
-          return '进行中'
-          break;
-        case 4 :
-          return '待签字'
-          break;
-				case 5 :
-					return '已完成'
-					break
-      }
+    projectTaskStatusTransition (state) {
+    	switch(state) {
+    		case 0 :
+    			return '未分配'
+    			break;
+    		case 1 :
+    			return '未查阅'
+    			break;
+    		case 2 :
+    			return '未开始'
+    			break;
+    		case 3 :
+    			return '进行中'
+    			break;
+    		case 4 :
+    			return '待签字'
+    			break;
+    		case 5 :
+    			return '已完成'
+    			break;
+    		case 6 :
+    			return '已取消'
+    			break;
+    		case 7 :
+    			return '已延迟'
+    			break;
+    		 case 8 :
+    			return '待审核'
+    			break;
+    	}
     }
   }
 };
@@ -488,6 +506,8 @@ page {
 		 padding: 0 0 10px 0;
 		 box-sizing: border-box;
 		.message-box {
+			height: 100%;
+			overflow: auto;
 				.message-one {
 						width: 100%;
 						padding: 4px 6px;
@@ -524,6 +544,9 @@ page {
 						};
 						.tobeSigned {
 							background: #40f9e0 !important
+						};
+						.waitCheck {
+							background: orange !important
 						}
 				};
 				.message-two {
@@ -595,7 +618,7 @@ page {
 		}
   };
 	.btn-box {
-			height: 50px;
+			height: 80px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -614,7 +637,7 @@ page {
 				color: #fff;
 			};
 			.operate-one {
-				margin-right: 10px;
+				margin-right: 20px;
 				background: #E8CB51
 			};
 			.operate-two {

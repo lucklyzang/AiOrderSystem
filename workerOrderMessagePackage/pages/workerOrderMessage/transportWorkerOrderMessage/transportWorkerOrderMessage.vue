@@ -54,7 +54,7 @@
 					 <view class="handle-message-line-wrapper">
 						 <view>
 							 <text class="message-tit" :class="{'priorityTwoStyle' : transTaskMessage.priority != 1}">优&nbsp;&nbsp;先&nbsp;级 :&nbsp;</text>
-							 <text class="message-tit-real" :class="[transTaskMessage.priority==1 ? 'priorityOneStyle' : 'priorityTwoStyle']">{{priorityTransfer(transTaskMessage.priority)}}</text>
+							 <text class="message-tit-real" :class="[transTaskMessage.priority==1 ? 'priorityOneStyle' : 'priorityTwoStyle']">{{taskPriotityTransition(transTaskMessage.priority)}}</text>
 						 </view>
 					 </view>
 					<view class="handle-message-line-wrapper handle-message-line-wrapper-other">
@@ -213,10 +213,11 @@
 		computed: {
 			...mapGetters([
 				'userInfo',
+				'templateType',
 				'statusBarHeight',
 				'navigationBarHeight',
 				'transTaskMessage',
-				'storeAllOrderCancelReason'
+				'allOrderCancelReason'
 			]),
 			userName() {
 			},
@@ -229,7 +230,8 @@
 		},
 		methods: {
 			...mapMutations([
-				'changeTransTaskMessage'
+				'changeTransTaskMessage',
+				'storeCurrentIndex'
 			]),
 			
 			// 顶部导航返回事件
@@ -257,7 +259,10 @@
 							message: `${res.data.msg}`,
 							type: 'success'
 						});
-						this.backTo();
+						this.storeCurrentIndex(0);
+						uni.redirectTo({
+							url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
+						});
 					} else {
 					 this.$refs.uToast.show({
 						message: `${res.data.msg}`,
@@ -308,8 +313,26 @@
 			
 			// 取消点击事件
 			cancelReasonEvent() {
-				this.cancelReasonOption = this.storeAllOrderCancelReason['cancelReason'];
+				this.cancelReasonOption = this.allOrderCancelReason['cancelReason'];
 			  this.cancelReasonShow = true
+			},
+			
+			// 优先级装换
+			taskPriotityTransition (state) {
+				switch(state) {
+					case 1 :
+						return '正常'
+						break;
+					case 2 :
+						return '紧急'
+						break;
+					case 3 :
+						return '重要'
+						break;
+					case 4 :
+						return '紧急重要'
+						break
+				}
 			},
 			
 			// 任务状态转换图片
@@ -639,7 +662,7 @@
 			}
 		};
 		.btn-box {
-				height: 50px;
+				height: 80px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
@@ -658,7 +681,7 @@
 					color: #fff;
 				};
 				.operate-one {
-					margin-right: 10px;
+					margin-right: 20px;
 					background: #E8CB51
 				};
 				.operate-two {
