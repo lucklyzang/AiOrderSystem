@@ -272,8 +272,7 @@
 			}
 		},
 		onShow(){
-			console.log('撒',this.timeMessage);
-			this.getWorkerList();
+		  this.getWorkerList();
 		  this.echoLoactionMessage();
 		},
 		methods: {
@@ -378,7 +377,7 @@
 			                this.standardColumns.push({
 			                  text: res.data.data[i],
 			                  value: i+1,
-												checked: false
+							  checked: false
 			                })
 			              }
 			            }

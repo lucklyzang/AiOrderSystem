@@ -128,7 +128,9 @@ options: {
 	  resultValue (val) {
 	    this.searchVal = ''
 	    this.columnsData = JSON.parse(JSON.stringify(this.columns));
+		if (this.columnsData.length > 0) {
 			this.change(val);
+		};
 	    this.$emit('input', val)
 	  },
 		
@@ -179,23 +181,23 @@ options: {
       this.$emit('confirm', this.resultValue, this.getData(this.resultValue))
     },
 		
-		// 复选框变化事件
+	// 复选框变化事件
     change (val) {
-      this.$emit('change', val, this.getData(val));
-			this.columnsData.map((item) => { item.checked = false });
-			for (let inneritem of val) {
-				let mateIndex;
-				mateIndex = this.columnsData.findIndex((item) => {return item.value == inneritem});
-				if (mateIndex != -1) {
-					this.$set(this.columnsData[mateIndex],'checked',true)
-				}
-			};
-			let isAllCheckd = this.columnsData.every((item) => { return item.checked == true });
-			if (isAllCheckd) {
-				this.allCheckboxChecked = true;
-			} else {
-				this.allCheckboxChecked = false;
+		this.$emit('change', val, this.getData(val));
+		this.columnsData.map((item) => { item.checked = false });
+		for (let inneritem of val) {
+			let mateIndex;
+			mateIndex = this.columnsData.findIndex((item) => {return item.value == inneritem});
+			if (mateIndex != -1) {
+				this.$set(this.columnsData[mateIndex],'checked',true)
 			}
+		};
+		let isAllCheckd = this.columnsData.every((item) => { return item.checked == true });
+		if (isAllCheckd) {
+			this.allCheckboxChecked = true;
+		} else {
+			this.allCheckboxChecked = false;
+		};
     },
 		
 		// 全选复选框变化事件
@@ -223,9 +225,9 @@ options: {
     },
     
     showPopu () {
-			this.columnsData = JSON.parse(JSON.stringify(this.columns))
-			this.checkboxValue = JSON.parse(JSON.stringify(this.selectValue))
-			this.resultValue = JSON.parse(JSON.stringify(this.selectValue))
+			this.columnsData = JSON.parse(JSON.stringify(this.columns));
+			this.checkboxValue = JSON.parse(JSON.stringify(this.selectValue));
+			this.resultValue = JSON.parse(JSON.stringify(this.selectValue));
 			this.show = !this.show;
 			if (this.show) {
 			  this.$emit('showPopu')
