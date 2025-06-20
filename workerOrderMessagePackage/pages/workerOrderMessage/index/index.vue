@@ -401,7 +401,7 @@
 				this.affairOrderShow = false;
 				this.getTransTaskList({
 					proId:this.proId, 
-					workerId: this.workerId,
+					workerId: '',
 					state: -1,
 					departmentId: this.userInfo.depId
 				});
@@ -1074,42 +1074,8 @@
 			  getDispatchTaskComplete(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
-						let temporaryDataList = [];
-						if (res.data.data.length > 0) {
-							temporaryDataList = res.data.data;
-							if (temporaryDataList.length > 0) {
-								this.isShowTransportNoData = false;
-							} else {
-								this.transOrderList = [];
-								this.isShowTransportNoData = true;
-							};
-							for (let item of temporaryDataList) {
-								this.transOrderList.push({
-									createTime: item.createTime,
-									planUseTime: item.planUseTime,
-									planStartTime: item.planStartTime,
-									patientInfoList: item.patientInfoList,
-									state: item.state,
-									setOutPlaceName: item.setOutPlaceName,
-									destinationName: item.destinationName,
-									taskTypeName: item.taskTypeName,
-									toolName: item.toolName,
-									priority: item.priority,
-									number: item.taskNumber,
-									id: item.id,
-									quarantine: item.quarantine,
-									distName: item.distName,
-									destinations: item.destinations,
-									patientName: item.patientName,
-									bedNumber: item.bedNumber,
-									startPhoto: item.startPhoto,
-									endPhoto: item.endPhoto,
-									isBack: item.isBack,
-									isSign: item.isSign,
-									workerName: item.workerName
-								})
-							}
-						} else {
+						this.transOrderList = res.data.data;
+						if (res.data.data.length == 0) {
 							this.isShowTransportNoData = true;
 							this.transOrderList = [];
 						}

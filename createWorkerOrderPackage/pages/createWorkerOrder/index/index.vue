@@ -129,7 +129,7 @@
     </view>
      <!-- 性别 -->
     <view class="transport-rice-box" v-if="showGender">
-      <ScrollSelection v-model="showTransportTool" :columns="genderList" title="性别" @sure="genderSureEvent" @cancel="genderCancelEvent" @close="genderCloseEvent" />
+      <ScrollSelection v-model="showGender" :columns="genderList" title="性别" @sure="genderSureEvent" @cancel="genderCancelEvent" @close="genderCloseEvent" />
     </view>
 	<view class="message-box">
 		<view class="message-one">
@@ -714,9 +714,9 @@ export default {
               })
             };
             // 如果有暂存信息，怎回显选中的运送类型
-            if (this.temporaryStorageCreateDispathTaskMessage['isTemporaryStorage']) {
-              this.transportTypeIndex = this.transportTypeList.findIndex((innerItem) => { return innerItem.value == this.temporaryStorageCreateDispathTaskMessage['currentTransportType']['value']});
-            }
+            // if (this.temporaryStorageCreateDispathTaskMessage['isTemporaryStorage']) {
+            //   this.transportTypeIndex = this.transportTypeList.findIndex((innerItem) => { return innerItem.value == this.temporaryStorageCreateDispathTaskMessage['currentTransportType']['value']});
+            // }
           }
         } else {
 					this.$refs.uToast.show({

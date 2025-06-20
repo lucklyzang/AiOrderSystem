@@ -129,7 +129,7 @@
     </view>
      <!-- 性别 -->
     <view class="transport-rice-box" v-if="showGender">
-      <ScrollSelection v-model="showTransportTool" :columns="genderList" title="性别" @sure="genderSureEvent" @cancel="genderCancelEvent" @close="genderCloseEvent" />
+      <ScrollSelection v-model="showGender" :columns="genderList" title="性别" @sure="genderSureEvent" @cancel="genderCancelEvent" @close="genderCloseEvent" />
     </view>
 	<view class="message-box">
 		<view class="message-one">
@@ -371,7 +371,7 @@ import {
 		queryTransConfig,
 		getTransporter
 } from '@/api/transport.js'
-import StepNumberBox from '@/createWorkerOrderPackage/components/step-number-box/step-number-box.vue'
+import StepNumberBox from '@/modificationWorkerOrderPackage/components/step-number-box/step-number-box.vue'
 import _ from 'lodash'
 import navBar from "@/components/zhouWei-navBar"
 import ScrollSelection from "@/components/scrollSelection/scrollSelection";
@@ -468,7 +468,7 @@ export default {
   },
 
   mounted() {
-		// this.echoTemporaryStorageMessage();
+		this.echoTemporaryStorageMessage();
     this.parallelFunction();
   },
 
@@ -552,6 +552,24 @@ export default {
 		goalSpacesCloseEvent () {
 			this.showGoalSpaces = false
 		},
+		
+		// 提取运送类型名称
+		extractTransTypeName (dataArr) {
+			if (dataArr.length > 0) {
+				if (dataArr[0]['typeList'].length > 0) {
+					return dataArr[0]['typeList'][0]['parentTypeName']
+				}
+			}
+		},
+		
+		// 提取运送类型value
+		extractTransTypeValue (dataArr) {
+			if (dataArr.length > 0) {
+				if (dataArr[0]['typeList'].length > 0) {
+					return dataArr[0]['typeList'][0]['parentTypeId']
+				}
+			}
+		},
 
 		// 回显编辑的信息
 		echoTemporaryStorageMessage () {
@@ -577,8 +595,8 @@ export default {
 				this.querytransportChildByTransportParent(0, casuallyTemporaryStorageCreateDispathTaskMessage.parentTypeId, this.templateType,true);
 			} else if (this.templateType === 'template_two') {
 				this.priorityRadioValue = casuallyTemporaryStorageCreateDispathTaskMessage['priority'].toString();
-				this.currentTransportRice = casuallyTemporaryStorageCreateDispathTaskMessage['parentTypeName'];
-				this.currentTransportRiceValue = casuallyTemporaryStorageCreateDispathTaskMessage['parentTypeId'];
+				this.currentTransportRice = this.extractTransTypeName(casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList']);
+				this.currentTransportRiceValue = this.extractTransTypeValue(casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList']);
 				this.currentStartDepartment = casuallyTemporaryStorageCreateDispathTaskMessage['setOutPlaceName'];
 				this.currentTransporter = casuallyTemporaryStorageCreateDispathTaskMessage['workerName'];
 				this.currentTransporterValue = casuallyTemporaryStorageCreateDispathTaskMessage['workerId'];
@@ -683,6 +701,7 @@ export default {
 
 		// 病人模态框信息确认事件
 		patienModalSure () {
+			this.patienModalShow = false;
 			if (this.isPressEdit) {
 				this.templatelistTwo.splice(this.updateIndex, 1,_.cloneDeep(this.patienModalMessage));
 				this.transferGenderOne(this.updateIndex)
@@ -701,6 +720,7 @@ export default {
 
 		// 病人模态框信息取消事件
 		patienModalCancel() {
+			this.patienModalShow = false;
 			this.xflSelectShow = false;
 		},
 
@@ -1507,7 +1527,7 @@ export default {
 			this.showLoadingHint = true;
 			editDispatchTaskManyNew(data).then((res) => {
 				if (res && res.data.code == 200) {
-					tthis.$refs.uToast.show({
+					this.$refs.uToast.show({
 						message: '编辑成功',
 					});
 					this.storeCurrentIndex(0);

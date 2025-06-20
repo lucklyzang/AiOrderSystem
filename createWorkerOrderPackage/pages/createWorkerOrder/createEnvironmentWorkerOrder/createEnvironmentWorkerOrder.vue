@@ -147,6 +147,7 @@
 </template>
 
 <script>
+	import store from '@/store'
 	import {
 		mapGetters,
 		mapMutations
@@ -182,24 +183,8 @@
 				maxDate: new Date(2050, 10, 1),
 				currentDate: new Date(),
 				selectStandard: [],
-				selectValue: [1,2],
-				standardColumns: [
-					{
-						text: '扫扫赶紧',
-						value: 0,
-						checked: false
-					},
-					{
-						text: '等哈看的',
-						value: 1,
-						checked: false
-					},
-					{
-						text: '加大监督',
-						value: 2,
-						checked: false
-					}
-				],
+				selectValue: [],
+				standardColumns: [],
 				categoryOption: [
 					{
 							text: '请选择类别',
@@ -286,10 +271,9 @@
 				return this.userInfo.extendData.proId
 			}
 		},
-		onLoad() {
-			this.getWorkerList();
-		},
 		onShow(){
+			console.log('撒',this.timeMessage);
+			this.getWorkerList();
 		  this.echoLoactionMessage();
 		},
 		methods: {
@@ -388,10 +372,10 @@
 			        getViolateStandardMessage({id: this.locationMessage[3]['id']}).then((res) => {
 			          this.showLoadingHint = false;
 			          if (res && res.data.code == 200) {
-			            this.standardColumns = [[]];
+			            this.standardColumns = [];
 			            if (res.data.data.length > 0) {
 			              for ( let i =0, len = res.data.data.length; i< len ; i++) {
-			                this.standardColumns[0].push({
+			                this.standardColumns.push({
 			                  text: res.data.data[i],
 			                  value: i+1,
 												checked: false
@@ -412,11 +396,16 @@
 			          	type: 'error'
 			          })
 			        })
-			      }
+			      } else {
+							this.$refs.uToast.show({
+								message: '请选择位置',
+							})
+						}
 			    },
 			
 			    // 回显位置信息
 			    echoLoactionMessage () {
+						console.log('选择地址',this.locationMessage);
 			      if (this.locationMessage.length == 4) {
 			        this.locationValue = `${this.locationMessage[0]['structName']}-${this.locationMessage[1]['departmentName']}-${this.locationMessage[2]['itemName']}-${this.locationMessage[3]['name']}`
 			      }
@@ -547,7 +536,7 @@
 						this.showLoadingHint = true;
 						return new Promise((resolve, reject) => {
 							uni.uploadFile({
-							 url: 'https://dev.nurse.blinktech.cn/nurse/app-api/infra/file/upload',
+							 url: 'https://blink.blinktech.cn/clean/oss/upload ',
 							 filePath: imgI,
 							 name: 'file',
 							 header: {
@@ -555,9 +544,11 @@
 								'Authorization': `Bearer ${store.getters.token}`
 							 },
 							 success: (res) => {
+								console.log('结果',res);
 								if (res.statusCode == 200) {
 									let temporaryData = JSON.parse(res.data);
 									this.imageOnlinePathArr.push(temporaryData.data);
+									console.log('图片线上地址',this.imageOnlinePathArr);
 									resolve()
 								} else {
 									this.showLoadingHint = false;
@@ -632,25 +623,13 @@
 			        proId: this.userInfo.proId, // 所属项目id
 			        proName: this.userInfo.proName // 所属项目名称
 			      };
-			      // 上传图片到阿里云服务器
+			      // 上传图片到服务器
 			      if (this.fileList.length > 0) {
-			        this.showLoadingHint = true;
-			        for (let imageI of this.fileList) {
-			          if (Object.keys(this.timeMessage).length > 0) {
-			            // 判断签名信息是否过期
-			            if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
-			              await this.getSign();
-			              await this.uploadImageToOss(imageI)
-			            } else {
-			              await this.uploadImageToOss(imageI)
-			            }
-			          } else {
-			            await this.getSign();
-			            await this.uploadImageToOss(imageI)
-			          }
+			        for (let imgI of this.fileList) {
+			        	await this.uploadFileEvent(imgI)
 			        };
-			        paramsData.path = this.imageOnlinePathArr
-			      };
+							paramsData.path = this.imageOnlinePathArr
+						};
 			      paramsData.spaces.push({
 			        id: this.locationMessage[3]['id'],
 			        name: this.locationMessage[3]['name']

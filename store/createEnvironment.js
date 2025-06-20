@@ -11,7 +11,7 @@ export default {
 			return state.locationMessage
 		},
 		timeMessage: (state) => {
-			// state.timeMessage = JSON.parse(getCache('timeMessage')) ? JSON.parse(getCache('timeMessage')) : {};
+			state.timeMessage = getCache('timeMessage') ? getCache('timeMessage') : {};
 			return state.timeMessage
 		},
 		ossMessage:(state) => {

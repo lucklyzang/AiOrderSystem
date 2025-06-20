@@ -281,7 +281,7 @@
 			functionAreaClickEvent(item) {
 				this.selectFunctionAreaValue = [];
 				this.selectFunctionAreaValue.push(item);
-				this.$router.push({ path: "/addTask"});
+				this.backTo();
 				let temporary = [];
 				let temporaryMessage = temporary.concat(this.selectArchitectureValue,this.selectDepartmentValue,this.selectgoalAreaValue,this.selectFunctionAreaValue);
 				this.storeLocationMessage(temporaryMessage)

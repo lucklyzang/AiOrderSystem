@@ -25,7 +25,7 @@
       <view class="checkbox-con"  style="max-height:264px;overflow-y:auto;position:relative">
           <u-empty description="暂无数据" v-if="columnsData.length == 0" />
           <u-input v-model="searchVal"  placeholder="搜索" @input="search" v-if="isSearch" input-align="left"/>
-					<view class="all-check-area">
+					<view class="all-check-area" v-if="columnsData.length > 0">
 						<u-checkbox-group
 							iconPlacement="right" 
 							placement="column"
@@ -115,14 +115,20 @@ options: {
   },
 	
 	watch: {
-	  selectValue: function (newVal) {
-	    this.resultValue = newVal
-	  },
+	  selectValue: {
+			handler (newVal) {
+				this.resultValue = newVal;
+				if (this.resultValue.length == 0) {
+					
+				}
+			},
+			immediate: true
+		},
 		
 	  resultValue (val) {
 	    this.searchVal = ''
 	    this.columnsData = JSON.parse(JSON.stringify(this.columns));
-		this.change(val);
+			this.change(val);
 	    this.$emit('input', val)
 	  },
 		

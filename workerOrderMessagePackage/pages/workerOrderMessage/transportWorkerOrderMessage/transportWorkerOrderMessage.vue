@@ -38,10 +38,10 @@
 				<image :src="stateTransferimage(transTaskMessage.state)" />
 			</view>
 			<view class="basic-message-title">
+				<image src="@/static/img/basic-message.png" alt="">
 				<text>
-					<image :src="taskInfoPng" alt="">
+					基本信息
 				</text>
-				基本信息
 			</view>
 			 <view class="wait-handle-message">
 				 <view class="wait-handle-message-top">
@@ -200,7 +200,6 @@
 				cancelReasonShow: false,
 				cancelReasonValue: null,
 				cancelReasonOption: [{text: "请选择取消原因",value: null}],
-				taskInfoPng: require('@/static/img/basic-message.png'),
 				noEndPng: require('@/static/img/no-end.png'),
 				noReferPng: require('@/static/img/no-refer.png'),
 				noStartPng: require('@/static/img/no-start.png'),
@@ -227,6 +226,7 @@
 		},
 		onShow() {
 			this.taskId = this.transTaskMessage.id;
+			this.getTaskMessage();
 		},
 		methods: {
 			...mapMutations([
@@ -244,6 +244,17 @@
 				uni.navigateTo({
 					url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/index/index'
 				})
+			},
+			
+			// 转换性别
+			genderTransfer (index) {
+				if (index.toString() === '1') {
+					return '男'
+				} else if (index.toString() === '2') {
+					return '女'
+				} else if (index.toString() === '0'){
+					return '未知'
+				}
 			},
 			
 			// 运送订单的取消
@@ -367,6 +378,7 @@
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
 						this.changeTransTaskMessage(res.data.data);
+						console.log('运送订单详情',res.data.data,this.transTaskMessage);
 						this.transportList = mergeMethods(this.transTaskMessage['patientInfoList']);
 					}
 				})
@@ -514,16 +526,14 @@
 				color: #1a89fd;
 				height: 40px;
 				line-height: 40px;
-				text {
-					display: inline-block;
-					height: 15px;
-					width: 15px;
-					vertical-align: top;
-					margin-top: 1px;
-					image {
-						width: 100%;
-						height: 100%
-					}
+				>image {
+					height: 18px;
+					width: 18px;
+					margin-right: 2px;
+					vertical-align: middle;
+				};
+				>text {
+					vertical-align: middle;
 				}
 			}
 			.wait-handle-message {
