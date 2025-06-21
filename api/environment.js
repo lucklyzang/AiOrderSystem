@@ -1,10 +1,19 @@
 import request from '@/api/request';
 import Qs from 'qs'
 
-// 即时保洁任务新增
+// 即时保洁任务新增editForthwithCleanTask
 export function addForthwithCleanTask(data) {
     return request({
         url: 'clean/cleanTask/add',
+        method: 'post',
+        data
+    })
+}
+
+// 即时保洁任务编辑
+export function editForthwithCleanTask(data) {
+    return request({
+        url: 'clean/cleanTask/edit',
         method: 'post',
         data
     })

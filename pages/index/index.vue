@@ -258,7 +258,8 @@
 		methods: {
 			...mapMutations([
 				'changeSocketOpen',
-				'storeCurrentIndex'
+				'storeCurrentIndex',
+				'storeLocationMessage'
 			]),
 			
       goback() {
@@ -299,6 +300,7 @@
 						url: '/createWorkerOrderPackage/pages/createWorkerOrder/createAffairWorkerOrder/createAffairWorkerOrder'
 					})
 				} else if (item == '环境') {
+					// this.storeLocationMessage({});
 					uni.navigateTo({
 						url: '/createWorkerOrderPackage/pages/createWorkerOrder/createEnvironmentWorkerOrder/createEnvironmentWorkerOrder'
 					})

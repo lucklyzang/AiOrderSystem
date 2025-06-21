@@ -545,10 +545,30 @@
 							 success: (res) => {
 								console.log('结果',res);
 								if (res.statusCode == 200) {
-									let temporaryData = JSON.parse(res.data);
-									this.imageOnlinePathArr.push(temporaryData.data);
-									console.log('图片线上地址',this.imageOnlinePathArr);
-									resolve()
+									if (res.data != '') {
+										let temporaryData = JSON.parse(res.data);
+										if (temporaryData.code == 200) {
+											this.imageOnlinePathArr.push(temporaryData.data);
+											console.log('图片线上地址',this.imageOnlinePathArr);
+											resolve()
+										} else {
+											this.showLoadingHint = false;
+											this.$refs.uToast.show({
+												message: temporaryData.msg,
+												type: 'error',
+												position: 'center'
+											});
+											reject()
+										}
+									} else {
+										this.showLoadingHint = false;
+										this.$refs.uToast.show({
+											message: '返回数据为空',
+											type: 'error',
+											position: 'center'
+										});
+										reject()
+									}	
 								} else {
 									this.showLoadingHint = false;
 									this.$refs.uToast.show({
@@ -645,9 +665,10 @@
 			          this.imageOnlinePathArr = [];
 								this.fileList = [];
 								if (res && res.data.code == 200) {
-			            this.$toast({
+									this.$refs.uToast.show({
 										message: '任务创建成功',
-										type: 'success'
+										type: 'error',
+										position: 'center'
 									});
 			            this.resultimageList = [];
 			            this.storeLocationMessage([]);
@@ -764,6 +785,7 @@
 						// 确定删除提示框确定事件
 						sureDeleteEvent () {
 							this.resultimageList.splice(this.imageIndex, 1);
+							this.fileList.splice(this.imageIndex, 1);
 							this.deleteInfoDialogShow = false;
 						}
 

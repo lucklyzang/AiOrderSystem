@@ -154,7 +154,7 @@
 		setCache,
 		removeAllLocalStorage
 	} from '@/common/js/utils'
-	import { addForthwithCleanTask, getViolateStandardMessage,attendanceWorkerList, getAliyunSign } from '@/api/environment.js'
+	import { editForthwithCleanTask, getViolateStandardMessage,attendanceWorkerList, getAliyunSign } from '@/api/environment.js'
 	import axios from 'axios-miniprogram'
 	import UFieldCheckbox from "@/components/uFieldCheckbox/uFieldCheckbox";
 	import navBar from "@/components/zhouWei-navBar"
@@ -185,7 +185,7 @@
 				maxDate: new Date(2050, 10, 1),
 				currentDate: new Date(),
 				selectStandard: [],
-				selectValue: [1,2],
+				selectValue: [],
 				standardColumns: [],
 				categoryOption: [
 					{
@@ -291,6 +291,22 @@
 			// 顶部导航返回事件
 			backTo () {
 				uni.navigateBack()
+			},
+			
+			// 回显环境任务编辑信息编辑的信息
+			echoTemporaryStorageMessage () {
+				let casuallyTemporaryStorageCreateEnvironmentTaskMessage = this.environmentMessage;
+				this.priorityValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['priority'].toString();
+				this.enterRemark = casuallyTemporaryStorageCreateEnvironmentTaskMessage['enterRemark'];
+				this.personNumberValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['personNumberValue'];
+				this.durationValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['durationValue'];
+				this.selectValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
+				this.resultimageList = casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
+				this.fileList = casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
+				this.workerValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
+				this.workerText =  casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
+				this.sourceValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
+				this.sourceText = casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
 			},
 			
 			// 优先级选择器确定事件
@@ -610,45 +626,38 @@
 			        proId: this.userInfo.proId, // 所属项目id
 			        proName: this.userInfo.proName // 所属项目名称
 			      };
-			      // 上传图片到阿里云服务器
-			      if (this.fileList.length > 0) {
-			        this.showLoadingHint = true;
-			        for (let imageI of this.fileList) {
-			          if (Object.keys(this.timeMessage).length > 0) {
-			            // 判断签名信息是否过期
-			            if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
-			              await this.getSign();
-			              await this.uploadImageToOss(imageI)
-			            } else {
-			              await this.uploadImageToOss(imageI)
-			            }
-			          } else {
-			            await this.getSign();
-			            await this.uploadImageToOss(imageI)
-			          }
-			        };
-			        paramsData.path = this.imageOnlinePathArr
-			      };
-			      paramsData.spaces.push({
-			        id: this.locationMessage[3]['id'],
-			        name: this.locationMessage[3]['name']
-			      });
-			      this.addForthwithCleanTask(paramsData) 
+			     // 上传图片到服务器
+				 let alreadyUploadOnlineImgArr = this.resultimageList.filter((item) => { return item.indexOf('http://') != -1 || item.indexOf('https://') != -1} );
+				 let needUploadOnlineImgArr = this.fileList.filter((item) => { return item.indexOf('http://') == -1 || item.indexOf('https://') == -1} );
+			     if (needUploadOnlineImgArr.length > 0) {
+			       for (let imgI of this.fileList) {
+			       	await this.uploadFileEvent(imgI)
+			       };
+			       paramsData.path = this.imageOnlinePathArr.concat(alreadyUploadOnlineImgArr);
+			    } else {
+				   paramsData.path = alreadyUploadOnlineImgArr;
+				};
+				  paramsData.spaces.push({
+					id: this.locationMessage[3]['id'],
+					name: this.locationMessage[3]['name']
+				  });
+				  this.editForthwithCleanTaskEvent(paramsData); 
 			    },
 			
 			    // 编辑环境任务
-			    addForthwithCleanTask (data) {
+			    editForthwithCleanTaskEvent (data) {
 					 this.infoText = '编辑中···';
 			     this.showLoadingHint = true;
-			      addForthwithCleanTask(data).then((res) => {
+			      editForthwithCleanTask(data).then((res) => {
 			         this.showLoadingHint = false;
 			          this.imageOnlinePathArr = [];
 								this.fileList = [];
 								if (res && res.data.code == 200) {
-			            this.$toast({
-										message: '任务创建成功',
-										type: 'success'
-									});
+							   this.$refs.uToast.show({
+								message: '任务创建成功',
+								type: 'error',
+								position: 'center'
+							   });
 			            this.resultimageList = [];
 			            this.storeLocationMessage([]);
 			            this.selectStandard = [];
@@ -764,6 +773,7 @@
 						// 确定删除提示框确定事件
 						sureDeleteEvent () {
 							this.resultimageList.splice(this.imageIndex, 1);
+							this.fileList.splice(this.imageIndex, 1);
 							this.deleteInfoDialogShow = false;
 						},
 						
