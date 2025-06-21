@@ -537,10 +537,10 @@
 							uni.uploadFile({
 							 url: 'https://blink.blinktech.cn/clean/oss/upload ',
 							 filePath: imgI,
-							 name: 'file',
+							 name: 'files',
 							 header: {
 								'content-type': 'multipart/form-data',
-								'Authorization': `Bearer ${store.getters.token}`
+								'Authorization': `${store.getters.token}`
 							 },
 							 success: (res) => {
 								console.log('结果',res);

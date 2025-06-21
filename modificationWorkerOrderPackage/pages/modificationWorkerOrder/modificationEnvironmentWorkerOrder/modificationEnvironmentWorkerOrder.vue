@@ -543,7 +543,7 @@
 							uni.uploadFile({
 							 url: 'https://dev.nurse.blinktech.cn/nurse/app-api/infra/file/upload',
 							 filePath: imgI,
-							 name: 'file',
+							 name: 'files',
 							 header: {
 								'content-type': 'multipart/form-data',
 								'Authorization': `Bearer ${store.getters.token}`
