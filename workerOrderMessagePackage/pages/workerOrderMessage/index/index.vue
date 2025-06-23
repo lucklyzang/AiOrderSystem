@@ -210,7 +210,7 @@
 					<view class="list-content-center-top list-content-center-bottom">
 						<view>
 							<text>问题描述:</text>
-							<text></text>
+							<text>{{ item.taskRemark }}</text>
 						</view>
 					</view>
 				</view>
@@ -413,7 +413,7 @@
 				this.getEnvironmentTaskList({
 					proId : this.proId, // 所属项目id
 					queryDate: '', // 查询时间
-					managerId: this.userInfo.depId,// 保洁主管id    
+					managerId: this.userInfo.id,//
 					taskType: 0 // 0-即时，1-专项
 				});
 			} else if (this.currentIndex == 2) {
@@ -467,7 +467,7 @@
 					this.getEnvironmentTaskList({
 						proId : this.proId, // 所属项目id
 						queryDate: '', // 查询时间
-						managerId: this.userInfo.depId,// 保洁主管id    
+						managerId: this.userInfo.id,// 保洁主管id
 						taskType: 0 // 0-即时，1-专项
 					});
 				} else if (item.name === '工程订单') {
@@ -895,7 +895,7 @@
 						this.getEnvironmentTaskList({
 							proId : this.proId, // 所属项目id
 							queryDate: '', // 查询时间
-							managerId: this.userInfo.depId,// 保洁主管id    
+							managerId: this.userInfo.id,// 保洁主管id 
 							taskType: 0 // 0-即时，1-专项
 						})
 					} else {

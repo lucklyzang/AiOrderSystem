@@ -19,7 +19,7 @@
 		</view>
     <view class="content">
       <view class="forthwith-task-number">
-        <text>即时保洁编号{{environmentTaskMessage.num}}</text>
+        <text>即时保洁编号{{environmentTaskMessage.taskNumber}}</text>
         <text :class="{
             'underwayStyle' : environmentTaskMessage.state == 3, 
             'completeStyle' : environmentTaskMessage.state == 5,
@@ -47,7 +47,7 @@
           <text class="cleaner">保洁员</text>
         </view>
 				<view class="location-other-right" v-if="environmentTaskMessage.state == 2 || environmentTaskMessage.state == 3 || environmentTaskMessage.state == 8">
-						
+					{{ !environmentTaskMessage.workerName ? '未选择' : environmentTaskMessage.workerName }}
 				</view>
 				<view class="location-other-right-other" v-if="environmentTaskMessage.state != 2 && environmentTaskMessage.state != 3 && environmentTaskMessage.state != 8">
 					{{ !environmentTaskMessage.workerName ? '未选择' : environmentTaskMessage.workerName }}
@@ -99,11 +99,13 @@
 import { cancelTask } from "@/api/environment.js";
 import { mapGetters, mapMutations } from "vuex";
 import navBar from "@/components/zhouWei-navBar"
+import SelectSearch from "@/components/selectSearch/selectSearch";
 import { setCache, removeAllLocalStorage } from "@/common/js/utils";
 import _ from 'lodash'
 export default {
   components: {
-    navBar
+    navBar,
+		SelectSearch
   },
   data() {
     return {
@@ -125,16 +127,21 @@ export default {
   },
 	onShow() {
 		this.taskId = this.environmentTaskMessage.id;
+		this.getResultimageList();
 	},
   methods: {
     ...mapMutations([
 			'storeCurrentIndex'
 		]),
-
-    // 回显图片
-    echoImage () {
-      this.problemPicturesEchoList = this.environmentTaskMessage.images.filter((item) => { return item.imageType == 0});
-    },
+		
+		// 提取图片事件
+		getResultimageList () {
+			this.problemPicturesEchoList = [];
+			if (this.environmentTaskMessage['images'].length > 0) {
+				this.problemPicturesEchoList = this.environmentTaskMessage['images'].filter((item) => { return item.imgType == 0});
+			};
+			console.log('显示的图片',this.problemPicturesEchoList);
+		},
 
 		// 顶部导航返回事件
 		backTo () {
@@ -206,14 +213,14 @@ export default {
 
     // 提取即时保洁功能区信息
     extractSpaceMessage (spaces) {
-      // if (spaces.length == 0) {
-      //     return ''
-      // };
-      // let temporaryArray = [];
-      // for (let item of spaces) {
-      //     temporaryArray.push(item.name);
-      // };
-      // return temporaryArray.join("、")
+      if (spaces.length == 0) {
+          return ''
+      };
+      let temporaryArray = [];
+      for (let item of spaces) {
+          temporaryArray.push(item.name);
+      };
+      return temporaryArray.join("、")
     },
 
     // 任务状态转换
@@ -243,7 +250,7 @@ export default {
       } 
     },
 
-    // 取消订单事件
+    // 取消订单点击事件
     cancelTaskEvent () {
 			this.environmentCancelReasonOption = this.allOrderCancelReason['environmentCancelReason'];
 			this.environmentCancelReasonShow = true

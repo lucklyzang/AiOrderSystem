@@ -20,7 +20,7 @@
         <view class="van-ellipsis van-picker__title">
 					<text v-if="max">(最多选{{max}}个)</text>
 				</view>
-        <u-button type="button" class="van-picker__confirm" @click="onConfirm">确认</u-button>
+        <u-button type="button" class="van-picker__confirm" @click="onConfirm">确定</u-button>
       </view>
       <view class="checkbox-con"  style="max-height:264px;overflow-y:auto;position:relative">
           <u-empty description="暂无数据" v-if="columnsData.length == 0" />
@@ -249,10 +249,10 @@ options: {
 				height: 44px;
 				font-size: 16px;
 				&:first-child {
-					color: #a3a3a3 !important;
+					color: #909193 !important;
 				};
 				&:last-child {
-					color: #1e1e1b !important;
+					color: #3c9cff !important;
 				}
 			};
 			.van-ellipsis {

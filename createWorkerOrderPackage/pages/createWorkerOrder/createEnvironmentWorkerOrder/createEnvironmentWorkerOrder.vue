@@ -404,7 +404,6 @@
 			
 			    // 回显位置信息
 			    echoLoactionMessage () {
-						console.log('选择地址',this.locationMessage);
 			      if (this.locationMessage.length == 4) {
 			        this.locationValue = `${this.locationMessage[0]['structName']}-${this.locationMessage[1]['departmentName']}-${this.locationMessage[2]['itemName']}-${this.locationMessage[3]['name']}`
 			      }
@@ -412,7 +411,7 @@
 			
 			    // 位置点击事件
 			    locationEvent () {
-						uni.navigateTo({
+						uni.redirectTo({
 							url: '/createWorkerOrderPackage/pages/createWorkerOrder/createEnvironmentWorkerOrder/choosePosition'
 						})
 			    },
@@ -543,13 +542,11 @@
 								'Authorization': `${store.getters.token}`
 							 },
 							 success: (res) => {
-								console.log('结果',res);
 								if (res.statusCode == 200) {
 									if (res.data != '') {
 										let temporaryData = JSON.parse(res.data);
 										if (temporaryData.code == 200) {
-											this.imageOnlinePathArr.push(temporaryData.data);
-											console.log('图片线上地址',this.imageOnlinePathArr);
+											this.imageOnlinePathArr.push(temporaryData.data[0]);
 											resolve()
 										} else {
 											this.showLoadingHint = false;
@@ -667,7 +664,6 @@
 								if (res && res.data.code == 200) {
 									this.$refs.uToast.show({
 										message: '任务创建成功',
-										type: 'error',
 										position: 'center'
 									});
 			            this.resultimageList = [];

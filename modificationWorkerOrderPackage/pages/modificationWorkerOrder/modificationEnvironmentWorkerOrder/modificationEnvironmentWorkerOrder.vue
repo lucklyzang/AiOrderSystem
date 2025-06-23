@@ -132,7 +132,7 @@
 			</view>
 		</view>
 		<view class="btn-box">
-			<text class="operate-one" @click="sureEvent">确认</text>
+			<text class="operate-one" @click="submitEvent">确认</text>
 			<text class="operate-two" @click="cancelEvent">取消</text>
 		</view>
 		<u-modal :show="deleteInfoDialogShow" title="确定删除此图片?"
@@ -158,6 +158,7 @@
 	import axios from 'axios-miniprogram'
 	import UFieldCheckbox from "@/components/uFieldCheckbox/uFieldCheckbox";
 	import navBar from "@/components/zhouWei-navBar"
+	import store from '@/store'
 	export default {
 		components: {
 			navBar,
@@ -266,7 +267,7 @@
 				"timeMessage",
 				"ossMessage",
 				"locationMessage",
-				'environmentMessage'
+				'environmentTaskMessage'
 			]),
 			userName() {
 			},
@@ -274,11 +275,18 @@
 				return this.userInfo.extendData.proId
 			}
 		},
-		onLoad() {
+		onShow() {
+			const pages = getCurrentPages(); // 获取当前页面栈的实例数组
+			const prevPage = pages[pages.length - 2]; // 获取前一个页面实例
+			if (prevPage) {
+				if (prevPage.route == 'workerOrderMessagePackage/pages/workerOrderMessage/index/index' || prevPage.route == 'workerOrderMessagePackage/pages/workerOrderMessage/environmentWorkerOrderMessage/environmentWorkerOrderMessage') {
+					 this.echoTemporaryStorageMessage(true);
+				} else {
+					this.echoTemporaryStorageMessage(false);
+					this.echoLoactionMessage();
+				}
+			};
 			this.getWorkerList();
-		},
-		onShow(){
-		  this.echoLoactionMessage();
 		},
 		methods: {
 			...mapMutations([
@@ -294,19 +302,110 @@
 			},
 			
 			// 回显环境任务编辑信息编辑的信息
-			echoTemporaryStorageMessage () {
-				let casuallyTemporaryStorageCreateEnvironmentTaskMessage = this.environmentMessage;
-				this.priorityValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['priority'].toString();
-				this.enterRemark = casuallyTemporaryStorageCreateEnvironmentTaskMessage['enterRemark'];
-				this.personNumberValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['personNumberValue'];
-				this.durationValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['durationValue'];
-				this.selectValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
-				this.resultimageList = casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
-				this.fileList = casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
-				this.workerValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
-				this.workerText =  casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
-				this.sourceValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
-				this.sourceText = casuallyTemporaryStorageCreateEnvironmentTaskMessage[''];
+			echoTemporaryStorageMessage (flag) {
+				try {
+					let casuallyTemporaryStorageCreateEnvironmentTaskMessage = this.environmentTaskMessage;
+					this.priorityValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['priority'].toString();
+					this.priorityText = this.getPriorityText(casuallyTemporaryStorageCreateEnvironmentTaskMessage['priority']);
+					this.enterRemark = casuallyTemporaryStorageCreateEnvironmentTaskMessage['taskRemark'];
+					this.personNumberValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['planPersons'];
+					this.durationValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['planUseTime'];
+					this.resultimageList = this.getResultimageList(casuallyTemporaryStorageCreateEnvironmentTaskMessage['images']);
+					this.locationValue = `${casuallyTemporaryStorageCreateEnvironmentTaskMessage.structureName}${casuallyTemporaryStorageCreateEnvironmentTaskMessage.depName}${casuallyTemporaryStorageCreateEnvironmentTaskMessage.areaImmediateName}${this.extractSpaceMessage(casuallyTemporaryStorageCreateEnvironmentTaskMessage.spaces)}`;
+					if (flag) {
+						this.storeEchoLocationMessage();
+					};
+					this.fileList = this.getResultimageList(casuallyTemporaryStorageCreateEnvironmentTaskMessage['images']);
+					this.workerValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerId'];
+					this.workerText =  casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerName'];
+					this.sourceValue = this.getSourceValueEvent(casuallyTemporaryStorageCreateEnvironmentTaskMessage['source']);
+					this.sourceText = casuallyTemporaryStorageCreateEnvironmentTaskMessage['source'];
+					this.selectValue = '';
+					this.selectStandard = casuallyTemporaryStorageCreateEnvironmentTaskMessage['standards'];
+					// 如果当前订单选择了违反标准
+					if (this.selectStandard.length > 0) {
+						this.getViolateStandardMessageEvent(casuallyTemporaryStorageCreateEnvironmentTaskMessage['spaces'][0]['id'],true);
+					}
+				} catch(err) {
+					this.$refs.uToast.show({
+						message: `${err}`,
+						type: 'error'
+					})
+				}	
+			},
+			
+			// 回显位置信息
+			echoLoactionMessage () {
+			  if (this.locationMessage.length == 4) {
+			    this.locationValue = `${this.locationMessage[0]['structName']}-${this.locationMessage[1]['departmentName']}-${this.locationMessage[2]['itemName']}-${this.locationMessage[3]['name']}`
+			  }
+			},
+			
+			// 回显的位置信息存入store
+			storeEchoLocationMessage () {
+				let selectArchitectureValue = [];
+				selectArchitectureValue.push({
+					id: this.environmentTaskMessage['structureId'],
+					structNumber: this.environmentTaskMessage['structureName']
+				});
+				let selectDepartmentValue = [];
+				selectDepartmentValue.push({
+					id: this.environmentTaskMessage['depId'],
+					departmentName: this.environmentTaskMessage['depName']
+				});
+				let selectgoalAreaValue = [];
+				selectgoalAreaValue.push({
+					id: this.environmentTaskMessage['areaImmediateId'],
+					itemName: this.environmentTaskMessage['areaImmediateName']
+				});
+				let selectFunctionAreaValue = [];
+				selectFunctionAreaValue.push({
+					id: this.environmentTaskMessage['spaces'][0]['id'],
+					name: this.environmentTaskMessage['spaces'][0]['name']
+				});
+				let temporaryMessage = [].concat(selectArchitectureValue,selectDepartmentValue,selectgoalAreaValue,selectFunctionAreaValue);
+				this.storeLocationMessage(temporaryMessage)
+			},
+			
+			// 提取图片事件
+			getResultimageList (imgArr) {
+				let returnImgArr = [];
+				let temporaryImgArr = [];
+				if (imgArr.length > 0) {
+					temporaryImgArr = imgArr.filter((item) => { return item.imgType == 0});
+					for (let item of temporaryImgArr) {
+						returnImgArr.push(item.path)
+					}
+				};
+				return returnImgArr;
+			},
+			
+			// 提取优先级text事件
+			getPriorityText (value) {
+				let temporaryPriorityArr = this.priorityOption[0].filter((item)=>{ return item.value == value });
+				if (temporaryPriorityArr.length > 0) {
+					return temporaryPriorityArr[0]['text']
+				}
+			},
+			
+			// 提取来源value事件
+			getSourceValueEvent (text) {
+				let temporarySourceValueArr = this.sourceOption[0].filter((item)=>{ return item.text == text });
+				if (temporarySourceValueArr.length > 0) {
+					return temporarySourceValueArr[0]['value']
+				}
+			},
+			
+			// 提取即时保洁功能区信息
+			extractSpaceMessage (spaces) {
+				if (spaces.length == 0) {
+						return ''
+				};
+				let temporaryArray = [];
+				for (let item of spaces) {
+						temporaryArray.push(item.name);
+				};
+				return temporaryArray.join("、")
 			},
 			
 			// 优先级选择器确定事件
@@ -374,45 +473,54 @@
 						}
 					}
 				},
+				
+				// 根据区域查询违反标准列表
+				getViolateStandardMessageEvent (id,flag) {
+					this.showLoadingHint = true;
+					getViolateStandardMessage({id}).then((res) => {
+					  this.showLoadingHint = false;
+					  if (res && res.data.code == 200) {
+					    this.standardColumns = [];
+					    if (res.data.data.length > 0) {
+					      for ( let i =0, len = res.data.data.length; i< len ; i++) {
+					        this.standardColumns.push({
+					          text: res.data.data[i],
+					          value: i+1,
+										checked: false
+					        })
+					      };
+								if(flag) {
+									let temporarySelectStandardList = [];
+									let temporarySelectStandardIdList = [];
+									for (let item of this.selectStandard) {
+										temporarySelectStandardList = temporarySelectStandardList.concat(this.standardColumns.filter((innerItem) => { return innerItem['text'] == item}));
+									};
+									for (let item of temporarySelectStandardList) {
+										temporarySelectStandardIdList.push(item.value);
+									};
+									this.selectValue = temporarySelectStandardIdList;
+								}
+					    }
+					  } else {
+					    this.$refs.uToast.show({
+					    	message: res.data.msg,
+					    	type: 'error',
+					    })
+					  }
+					}).
+					catch((err) => {
+					 this.showLoadingHint = false;
+					  this.$refs.uToast.show({
+					  	message: `${err}`,
+					  	type: 'error'
+					  })
+					})
+				},
 			
 			    // 违反标准下拉框打开事件
 			    standardOptionOpenEvent () {
 			      if (this.locationMessage.length == 4) {
-			        this.showLoadingHint = true;
-			        getViolateStandardMessage({id: this.locationMessage[3]['id']}).then((res) => {
-			          this.showLoadingHint = false;
-			          if (res && res.data.code == 200) {
-			            this.standardColumns = [];
-			            if (res.data.data.length > 0) {
-			              for ( let i =0, len = res.data.data.length; i< len ; i++) {
-			                this.standardColumns.push({
-			                  text: res.data.data[i],
-			                  value: i+1,
-												checked: false
-			                })
-			              }
-			            }
-			          } else {
-			            this.$refs.uToast.show({
-			            	message: res.data.msg,
-			            	type: 'error',
-			            })
-			          }
-			        }).
-			        catch((err) => {
-			         this.showLoadingHint = false;
-			          this.$refs.uToast.show({
-			          	message: `${err}`,
-			          	type: 'error'
-			          })
-			        })
-			      }
-			    },
-			
-			    // 回显位置信息
-			    echoLoactionMessage () {
-			      if (this.locationMessage.length == 4) {
-			        this.locationValue = `${this.locationMessage[0]['structName']}-${this.locationMessage[1]['departmentName']}-${this.locationMessage[2]['itemName']}-${this.locationMessage[3]['name']}`
+							this.getViolateStandardMessageEvent(this.locationMessage[3]['id'],false)
 			      }
 			    },
 			
@@ -541,17 +649,17 @@
 						this.showLoadingHint = true;
 						return new Promise((resolve, reject) => {
 							uni.uploadFile({
-							 url: 'https://dev.nurse.blinktech.cn/nurse/app-api/infra/file/upload',
-							 filePath: imgI,
-							 name: 'files',
-							 header: {
+							url: 'https://blink.blinktech.cn/clean/oss/upload ',
+							filePath: imgI,
+							name: 'files',
+							header: {
 								'content-type': 'multipart/form-data',
 								'Authorization': `Bearer ${store.getters.token}`
 							 },
 							 success: (res) => {
 								if (res.statusCode == 200) {
 									let temporaryData = JSON.parse(res.data);
-									this.imageOnlinePathArr.push(temporaryData.data);
+									this.imageOnlinePathArr.push(temporaryData.data[0]);
 									resolve()
 								} else {
 									this.showLoadingHint = false;
@@ -577,7 +685,7 @@
 						})
 					},
 			
-			    // 任务提交事件
+			    // 任务编辑事件
 			    async submitEvent() {
 			      // if (this.categoryOption.filter((item) => { return item.value == this.categoryValue })[0]['text'] == '请选择类别') {
 			      //   this.$toast('请选择类别');
@@ -601,6 +709,7 @@
 			        });
 			      };
 			      let paramsData = {
+							id: this.environmentTaskMessage['id'], // 任务id
 			        managerId: this.userInfo.id, // 保洁主管id，当前登陆人员id
 			        managerName: this.userInfo.name,// 保洁主管姓名，当前登陆人员姓名
 			        assignId: this.userInfo.id, // 任务分配人员id，当前登陆人员id
@@ -627,8 +736,8 @@
 			        proName: this.userInfo.proName // 所属项目名称
 			      };
 			     // 上传图片到服务器
-				 let alreadyUploadOnlineImgArr = this.resultimageList.filter((item) => { return item.indexOf('http://') != -1 || item.indexOf('https://') != -1} );
-				 let needUploadOnlineImgArr = this.fileList.filter((item) => { return item.indexOf('http://') == -1 || item.indexOf('https://') == -1} );
+				 let alreadyUploadOnlineImgArr = this.resultimageList.filter((item) => { return item.indexOf('https://') != -1} );
+				 let needUploadOnlineImgArr = this.fileList.filter((item) => { return item.indexOf('https://') == -1} );
 			     if (needUploadOnlineImgArr.length > 0) {
 			       for (let imgI of this.fileList) {
 			       	await this.uploadFileEvent(imgI)
@@ -653,10 +762,9 @@
 			          this.imageOnlinePathArr = [];
 								this.fileList = [];
 								if (res && res.data.code == 200) {
-							   this.$refs.uToast.show({
-								message: '任务创建成功',
-								type: 'error',
-								position: 'center'
+							  this.$refs.uToast.show({
+										message: '任务创建成功',
+										position: 'center'
 							   });
 			            this.resultimageList = [];
 			            this.storeLocationMessage([]);
@@ -775,10 +883,6 @@
 							this.resultimageList.splice(this.imageIndex, 1);
 							this.fileList.splice(this.imageIndex, 1);
 							this.deleteInfoDialogShow = false;
-						},
-						
-						// 确认事件
-						sureEvent () {
 						},
 						
 						// 取消事件
