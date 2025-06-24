@@ -412,7 +412,7 @@
 			
 			    // 位置点击事件
 			    locationEvent () {
-						uni.redirectTo({
+						uni.navigateTo({
 							url: '/createWorkerOrderPackage/pages/createWorkerOrder/createEnvironmentWorkerOrder/choosePosition'
 						})
 			    },
