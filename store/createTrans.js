@@ -1,9 +1,7 @@
 import { setCache, getCache } from '@/common/js/utils'
 import { getDefaultTransState } from '@/common/js/resetStore/resetStore.js'
 export default {
-  state:{
-		state: getDefaultTransState(),
-  },
+ state: getDefaultTransState(),
 
   getters:{
 		transTaskMessage:(state) => {

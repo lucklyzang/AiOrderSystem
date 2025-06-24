@@ -275,18 +275,26 @@
 				return this.userInfo.extendData.proId
 			}
 		},
-		onShow() {
-			const pages = getCurrentPages(); // 获取当前页面栈的实例数组
-			const prevPage = pages[pages.length - 2]; // 获取前一个页面实例
+		
+		onShow () {
+			const pages = getCurrentPages(); //获取当前页面栈的实例数组
+			const prevPage = pages[pages.length - 2]; //获取前一个页面实例
+			if (prevPage.route != 'workerOrderMessagePackage/pages/workerOrderMessage/index/index' && prevPage.route != 'workerOrderMessagePackage/pages/workerOrderMessage/environmentWorkerOrderMessage/environmentWorkerOrderMessage') {
+				this.echoLoactionMessage();
+			}
+		},
+		
+		onLoad () {
+			const pages = getCurrentPages(); //获取当前页面栈的实例数组
+			const prevPage = pages[pages.length - 2]; //获取前一个页面实例
+			this.getWorkerList();
 			if (prevPage) {
 				if (prevPage.route == 'workerOrderMessagePackage/pages/workerOrderMessage/index/index' || prevPage.route == 'workerOrderMessagePackage/pages/workerOrderMessage/environmentWorkerOrderMessage/environmentWorkerOrderMessage') {
-					 this.echoTemporaryStorageMessage(true);
-				} else {
-					this.echoTemporaryStorageMessage(false);
-					this.echoLoactionMessage();
+					 this.echoTemporaryStorageMessage();
+					 this.storeEchoLocationMessage();
+					 this.echoLoactionMessage();
 				}
-			};
-			this.getWorkerList();
+			}
 		},
 		methods: {
 			...mapMutations([
@@ -312,12 +320,9 @@
 					this.durationValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['planUseTime'];
 					this.resultimageList = this.getResultimageList(casuallyTemporaryStorageCreateEnvironmentTaskMessage['images']);
 					this.locationValue = `${casuallyTemporaryStorageCreateEnvironmentTaskMessage.structureName}${casuallyTemporaryStorageCreateEnvironmentTaskMessage.depName}${casuallyTemporaryStorageCreateEnvironmentTaskMessage.areaImmediateName}${this.extractSpaceMessage(casuallyTemporaryStorageCreateEnvironmentTaskMessage.spaces)}`;
-					if (flag) {
-						this.storeEchoLocationMessage();
-					};
 					this.fileList = this.getResultimageList(casuallyTemporaryStorageCreateEnvironmentTaskMessage['images']);
-					this.workerValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerId'];
-					this.workerText =  casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerName'];
+					this.workerValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerId'] == null ? 0 : casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerId'];
+					this.workerText =  casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerName'] == '请选择保洁员' ? '' : casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerName'];
 					this.sourceValue = this.getSourceValueEvent(casuallyTemporaryStorageCreateEnvironmentTaskMessage['source']);
 					this.sourceText = casuallyTemporaryStorageCreateEnvironmentTaskMessage['source'];
 					this.selectValue = '';
@@ -332,13 +337,6 @@
 						type: 'error'
 					})
 				}	
-			},
-			
-			// 回显位置信息
-			echoLoactionMessage () {
-			  if (this.locationMessage.length == 4) {
-			    this.locationValue = `${this.locationMessage[0]['structName']}-${this.locationMessage[1]['departmentName']}-${this.locationMessage[2]['itemName']}-${this.locationMessage[3]['name']}`
-			  }
 			},
 			
 			// 回显的位置信息存入store
@@ -365,6 +363,13 @@
 				});
 				let temporaryMessage = [].concat(selectArchitectureValue,selectDepartmentValue,selectgoalAreaValue,selectFunctionAreaValue);
 				this.storeLocationMessage(temporaryMessage)
+			},
+			
+			// 回显位置信息
+			echoLoactionMessage () {
+			  if (this.locationMessage.length == 4) {
+			    this.locationValue = `${this.locationMessage[0]['structName']}-${this.locationMessage[1]['departmentName']}-${this.locationMessage[2]['itemName']}-${this.locationMessage[3]['name']}`
+			  }
 			},
 			
 			// 提取图片事件
@@ -447,9 +452,10 @@
 			
 			// 保洁员选择器确定事件
 			workerPickerConfirm (e) {
+				this.workerPickerShow = false;
+				if (e.value[0] == undefined) { return };
 				this.workerValue = e.value[0]['value'];
 				this.workerText = e.value[0]['text'];
-				this.workerPickerShow = false
 			},
 			
 			// 保洁员选择器值变化事件
@@ -654,13 +660,33 @@
 							name: 'files',
 							header: {
 								'content-type': 'multipart/form-data',
-								'Authorization': `Bearer ${store.getters.token}`
+								'Authorization': `${store.getters.token}`
 							 },
-							 success: (res) => {
+							success: (res) => {
 								if (res.statusCode == 200) {
-									let temporaryData = JSON.parse(res.data);
-									this.imageOnlinePathArr.push(temporaryData.data[0]);
-									resolve()
+									if (res.data != '') {
+										let temporaryData = JSON.parse(res.data);
+										if (temporaryData.code == 200) {
+											this.imageOnlinePathArr.push(temporaryData.data[0]);
+											resolve()
+										} else {
+											this.showLoadingHint = false;
+											this.$refs.uToast.show({
+												message: temporaryData.msg,
+												type: 'error',
+												position: 'center'
+											});
+											reject()
+										}
+									} else {
+										this.showLoadingHint = false;
+										this.$refs.uToast.show({
+											message: '返回数据为空',
+											type: 'error',
+											position: 'center'
+										});
+										reject()
+									}	
 								} else {
 									this.showLoadingHint = false;
 									this.$refs.uToast.show({
@@ -670,7 +696,7 @@
 									});
 									reject()
 								}
-							 },
+							},
 							 fail: (err) => {
 								this.showLoadingHint = false;
 								this.$refs.uToast.show({
@@ -735,20 +761,24 @@
 			        proId: this.userInfo.proId, // 所属项目id
 			        proName: this.userInfo.proName // 所属项目名称
 			      };
-			     // 上传图片到服务器
-				 let alreadyUploadOnlineImgArr = this.resultimageList.filter((item) => { return item.indexOf('https://') != -1} );
-				 let needUploadOnlineImgArr = this.fileList.filter((item) => { return item.indexOf('https://') == -1} );
-			     if (needUploadOnlineImgArr.length > 0) {
-			       for (let imgI of this.fileList) {
-			       	await this.uploadFileEvent(imgI)
-			       };
-			       paramsData.path = this.imageOnlinePathArr.concat(alreadyUploadOnlineImgArr);
-			    } else {
-				   paramsData.path = alreadyUploadOnlineImgArr;
-				};
+					// 上传图片到服务器
+					if (this.resultimageList.length > 0) {
+						 let alreadyUploadOnlineImgArr = this.resultimageList.filter((item) => { return item.indexOf('https://') != -1} );
+						 let needUploadOnlineImgArr = this.fileList.filter((item) => { return item.indexOf('https://') == -1} );
+						 if (needUploadOnlineImgArr.length > 0) {
+							 for (let imgI of needUploadOnlineImgArr) {
+								await this.uploadFileEvent(imgI)
+							 };
+							 paramsData.path = this.imageOnlinePathArr.concat(alreadyUploadOnlineImgArr);
+						} else {
+						 paramsData.path = alreadyUploadOnlineImgArr;
+						};
+					} else {
+						paramsData.path = [];
+					};
 				  paramsData.spaces.push({
-					id: this.locationMessage[3]['id'],
-					name: this.locationMessage[3]['name']
+						id: this.locationMessage[3]['id'],
+						name: this.locationMessage[3]['name']
 				  });
 				  this.editForthwithCleanTaskEvent(paramsData); 
 			    },
@@ -763,7 +793,7 @@
 								this.fileList = [];
 								if (res && res.data.code == 200) {
 							  this.$refs.uToast.show({
-										message: '任务创建成功',
+										message: '任务编辑成功',
 										position: 'center'
 							   });
 			            this.resultimageList = [];
@@ -863,7 +893,6 @@
 								}).then((res) => {
 									this.imageOnlinePathArr.push(`${aliyunServerURL}/${aliyunFileKey}`);
 									resolve();
-									console.log('阿里云图片',this.imageOnlinePathArr);
 								})
 								.catch((err) => {
 									reject()

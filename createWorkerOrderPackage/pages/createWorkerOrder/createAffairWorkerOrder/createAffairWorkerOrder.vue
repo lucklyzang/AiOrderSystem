@@ -82,7 +82,7 @@
 						<text>图片</text>
 					</view>
 					<view>
-						<view v-for="(item, index) in imgArr" :key='index'>
+						<view v-for="(item, index) in resultimageList" :key='index'>
 							<image :src="item" mode="aspectFit"></image>
 							<u-icon name="close" color="#000000" @click="photoDelete(item,index)"></u-icon>
 						</view>
@@ -111,6 +111,7 @@
 	import _ from 'lodash'
 	import ScrollSelection from "@/components/scrollSelection/scrollSelection";
 	import BottomSelect from "@/components/bottomSelect/bottomSelect";
+	import store from '@/store'
 	export default {
 		components: {
 			navBar,
@@ -122,14 +123,12 @@
 				showLoadingHint: false,
 				infoText: '加载中···',
 				sureCancelShow: false,
-				content: '',
 				priorityRadioValue: '1',
 				specificAffairDescribe: '',
-				storeId: '',
-				systemId: '',
-				imgArr: [],
+				resultimageList: [],
+				imageOnlinePathArr: [],
+				fileList: [],
 				imgIndex: '',
-				srcImage: '',
 				structureOption: [],
 				showStructure: false,
 				currentStructure: '请选择',
@@ -176,10 +175,11 @@
 				uni.navigateBack()
 			},
 		
-			// 弹框确定按钮
+			// 图片删除弹框确定按钮
 			sureCancel() {
 				this.sureCancelShow = false;
-				this.imgArr.splice(this.imgIndex, 1)
+				this.fileList.splice(this.imgIndex, 1);
+				this.resultimageList.splice(this.imgIndex, 1)
 			},
 			// 弹框取消按钮
 			cancelSure() {
@@ -203,19 +203,104 @@
 							urls: res.tempFilePaths
 						});
 						for (let imgI = 0, len = res.tempFilePaths.length; imgI < len; imgI++) {
-							that.srcImage = res.tempFilePaths[imgI];
+							let url = res.tempFiles[imgI].path;
+							//获取最后一个的位置
+							let index = url.lastIndexOf(".");
+							//获取后缀
+							let jpgUrl = url.substr(index + 1);
+							if (jpgUrl != "png" && jpgUrl != "jpg" && jpgUrl != "jpeg") {
+								that.$refs.uToast.show({
+									message: '只可上传jpg或png格式的图片!',
+									type: 'error',
+									position: 'center'
+								});
+								continue
+							};
+							let isLt2M = res.tempFiles[imgI].size/1024/1024 < 5;
+							if (!isLt2M) {
+								that.$refs.uToast.show({
+									message: '图片必须小于5MB!',
+									type: 'error',
+									position: 'center'
+								});
+								continue
+							};
+							that.fileList.push(res.tempFiles[imgI]['path']);
 							uni.getFileSystemManager().readFile({
-								filePath: that.srcImage,
+								filePath: res.tempFiles[imgI]['path'],
 								encoding: 'base64',
 								success: res => {
 									let base64 = 'data:image/jpeg;base64,' + res.data;
-									that.imgArr.push(base64);
+									that.resultimageList.push(base64);
 								}
 							})
 						}
 					}
 				});
 			},
+			
+			// 上传图片到服务器
+			uploadFileEvent (imgI) {
+				this.infoText = '图片上传中···';
+				this.showLoadingHint = true;
+				return new Promise((resolve, reject) => {
+					uni.uploadFile({
+					 url: 'https://blink.blinktech.cn/clean/oss/upload ',
+					 filePath: imgI,
+					 name: 'files',
+					 header: {
+						'content-type': 'multipart/form-data',
+						'Authorization': `${store.getters.token}`
+					 },
+					 success: (res) => {
+						if (res.statusCode == 200) {
+							if (res.data != '') {
+								let temporaryData = JSON.parse(res.data);
+								if (temporaryData.code == 200) {
+									this.imageOnlinePathArr.push(temporaryData.data[0]);
+									resolve()
+								} else {
+									this.showLoadingHint = false;
+									this.$refs.uToast.show({
+										message: temporaryData.msg,
+										type: 'error',
+										position: 'center'
+									});
+									reject()
+								}
+							} else {
+								this.showLoadingHint = false;
+								this.$refs.uToast.show({
+									message: '返回数据为空',
+									type: 'error',
+									position: 'center'
+								});
+								reject()
+							}	
+						} else {
+							this.showLoadingHint = false;
+							this.$refs.uToast.show({
+								message: '上传图片失败',
+								type: 'error',
+								position: 'center'
+							});
+							reject()
+						}
+					 },
+					 fail: (err) => {
+						this.showLoadingHint = false;
+						this.$refs.uToast.show({
+							message: err.errMsg,
+							type: 'error',
+							duration: 5000,
+							position: 'center'
+						});
+						reject()
+					 }
+					})
+				})
+			},
+						
 			
 			// 目的建筑下拉选择框确认事件
 			structureSureEvent (val) {
@@ -285,12 +370,12 @@
 			this.showParticipant = false
 			},
 			
-			// 参与人下拉选择框取消事件
+			// 负责人下拉选择框取消事件
 			participantCancelEvent () {
 			this.showParticipant = false
 			},
 			
-			// 参与人下拉选择框关闭事件
+			// 负责人下拉选择框关闭事件
 			participantCloseEvent () {
 			this.showParticipant = false
 			},
@@ -434,8 +519,8 @@
 				return temporaryArray.join('、')
 			},
 			
-			// 确认事件(创建维保任务)
-			sureEvent () {
+			// 确认事件(创建事务任务)
+			async sureEvent () {
 			// 任务类型不能为空
 			if (this.currentTaskType == '请选择') {
 				this.$refs.uToast.show({
@@ -444,7 +529,7 @@
 				});
 				return
 			};
-			// 创建维修任务
+			// 创建事务任务
 			let temporaryMessage = {
 				typeId: this.taskTypeOption.filter((item) => { return item['text'] == this.currentTaskType})[0]['value'], // 任务类型
 				taskDesc: this.problemOverview, // 问题描述
@@ -462,11 +547,19 @@
 				workerId: this.currentTransporter == '请选择' ? '' : this.getCurrentTransporterIdByName(this.currentTransporter),
 				workerName: this.currentTransporter == '请选择' ? '' : this.currentTransporter,
 				spaces: [], //空间信息
+				path: [],
 				present: [], //参与者
 				tools: [],  //使用工具
 				depName: `${this.currentStructure == '请选择' ? '' : this.currentStructure}/${this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment}`, //出发地名称
 				typeName: this.currentTaskType, // 类型名称
 				materials: []        // 需要的物料
+			};
+			// 上传图片到服务器
+			if (this.fileList.length > 0) {
+			  for (let imgI of this.fileList) {
+			  	await this.uploadFileEvent(imgI)
+			  };
+				paramsData.path = this.imageOnlinePathArr
 			};
 			// 拼接参与者数据
 			if (this.currentParticipant.length > 0) {
@@ -477,48 +570,11 @@
 					})
 				}
 			};
-			// 拼接使用工具数据
-			if (this.currentUseTool.length > 0) {
-				for (let item of this.currentUseTool) {
-					temporaryMessage['tools'].push({
-						id: item.hasOwnProperty('value') ? item.value : item.id,
-						name: item.hasOwnProperty('text') ? item.text : item.name
-					})
-				}
-			};
-			// 拼接空间信息
-			if (this.currentGoalSpaces.length > 0) {
-				for (let item of this.currentGoalSpaces) {
-					temporaryMessage['spaces'].push({
-						id: item.hasOwnProperty('value') ? item.value : item.id,
-						name: item.hasOwnProperty('text') ? item.text : item.name
-					})
-				}
-			};
-			// 拼接使用耗材数据
-			if (this.consumableMsgList.length > 0) {
-				for (let item of this.consumableMsgList) {
-					if (item.number > 0) {
-						temporaryMessage['materials'].push({
-							mateNumber: item['mateNumber'],
-							storeId: item['storeId'],
-							number: item['number'],
-							mateName: item['mateName'],
-							mateId: item['mateId'],
-							proId: this.proId,
-							proName: this.proName,
-							systemId: item['systemId'],
-							unit: item['unit'],
-							model: item['model']
-						})
-					}  
-				}
-			};
-			this.postGenerateRepairsTask(temporaryMessage)
+			this.postGenerateAffairTask(temporaryMessage)
 			},
 			
-			// 生成维修任务
-			postGenerateRepairsTask (data) {
+			// 生成事务任务
+			postGenerateAffairTask (data) {
 				this.infoText = '创建中···';
 				this.showLoadingHint = true;
 				createRepairsTask(data).then((res) => {

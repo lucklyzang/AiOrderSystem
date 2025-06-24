@@ -48,13 +48,13 @@ export default {
 				state.capsuleMessage = playLoad
 			}
 		},
-		storeAllOrderCancelReason:(state,playLoad) => {
+		storeAllOrderCancelReason (state,playLoad) {
 			if (playLoad && playLoad != 'null') {
 				setCache('allOrderCancelReason', playLoad);
 				state.allOrderCancelReason = playLoad
 			}
 		},
-		storeCurrentIndex:(state,playLoad) => {
+		storeCurrentIndex (state,playLoad) {
 			if (playLoad != 'null') {
 				setCache('currentIndex', playLoad);
 				state.currentIndex = playLoad
@@ -67,7 +67,7 @@ export default {
 	},
 	actions: {
 		resetCommitState({ commit }) {
-			commit('getDefaultCommonState')
+			commit('resetCommonInfoState')
 		}
 	}
 }

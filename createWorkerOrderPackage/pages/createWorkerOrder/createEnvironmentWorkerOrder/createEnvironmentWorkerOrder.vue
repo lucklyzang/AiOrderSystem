@@ -332,9 +332,10 @@
 			
 			// 保洁员选择器确定事件
 			workerPickerConfirm (e) {
+				this.workerPickerShow = false;
+				if (e.value[0] == undefined) { return };
 				this.workerValue = e.value[0]['value'];
 				this.workerText = e.value[0]['text'];
-				this.workerPickerShow = false
 			},
 			
 			// 保洁员选择器值变化事件
@@ -618,9 +619,9 @@
 			        managerName: this.userInfo.name,// 保洁主管姓名，当前登陆人员姓名
 			        assignId: this.userInfo.id, // 任务分配人员id，当前登陆人员id
 			        assignName: this.userInfo.name,// 任务分配人员姓名，当前登陆人员姓名
-			        workerId: this.workerValue,//保洁员id
+			        workerId:  this.workerValue == 0 ? null : this.workerValue,//保洁员id
 			        priority: this.priorityValue, //优先级
-			        workerName: this.workerText,//保洁员姓名
+			        workerName: this.workerText == '请选择保洁员' ? '' : this.workerText,//保洁员姓名
 			        path: [], // 上传的问题图片，集合,
 			        taskType: 0,// 任务类型，即时保洁为 0
 			        source: this.sourceText, // 任务来源

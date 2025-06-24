@@ -1,10 +1,7 @@
 import { setCache, getCache } from '@/common/js/utils'
 import { getDefaultEnvironmentState } from '@/common/js/resetStore/resetStore.js'
 export default {
-  state:{
-		state: getDefaultEnvironmentState(),
-  },
-
+	state: getDefaultEnvironmentState(),
   getters:{
 		locationMessage:(state) => {
 			state.locationMessage = getCache('locationMessage') ? getCache('locationMessage') : [];
@@ -19,7 +16,7 @@ export default {
 			return state.ossMessage
 		},
 		environmentTaskMessage:(state) => {
-			state.environmentTaskDetails = getCache('environmentTaskMessage') ? getCache('environmentTaskMessage') : {};
+			state.environmentTaskMessage = getCache('environmentTaskMessage') ? getCache('environmentTaskMessage') : {};
 			return state.environmentTaskMessage
 		}
   },
@@ -49,11 +46,19 @@ export default {
 		//保存环境订单详情
 		changeEnvironmentTaskMessage (state, playLoad) {
 			if (playLoad && playLoad != 'null') {
-				setCache('environmentTaskDetails', playLoad);
+				setCache('environmentTaskMessage', playLoad);
 				state.environmentTaskMessage = playLoad
 			}
+		},
+		//重置环境管理信息的状态
+		resetEnvironmentInfoState(state) {
+				Object.assign(state, getDefaultEnvironmentState())
 		}
   },
   
-  actions:{}
+  actions:{
+		resetEnvironmentState({ commit }) {
+			commit('resetEnvironmentInfoState')
+		}
+	}
 }

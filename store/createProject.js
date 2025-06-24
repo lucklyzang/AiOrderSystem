@@ -1,10 +1,8 @@
 import { setCache, getCache } from '@/common/js/utils'
 import { getDefaultProjectState } from '@/common/js/resetStore/resetStore.js'
 export default {
-  state:{
-		state: getDefaultProjectState(),
-  },
-
+  state: getDefaultProjectState(),
+	
   getters:{
 		projectTaskMessage:(state) => {
 			state.projectTaskMessage = getCache('projectTaskMessage') ? getCache('projectTaskMessage') : {};

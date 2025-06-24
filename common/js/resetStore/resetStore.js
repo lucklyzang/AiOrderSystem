@@ -1,4 +1,4 @@
-// 登录信息store的初始值getDefaultCommonState
+// 登录信息store的初始值
 export function getDefaultLoginState() {
 	return {
 		userInfo: {},
@@ -53,7 +53,7 @@ export function getDefaultEnvironmentState() {
 		timeMessage: {},
 		ossMessage: {},
 		locationMessage: [],
-		environmentMessage: {}
+		environmentTaskMessage: {}
 	}	
 }
 

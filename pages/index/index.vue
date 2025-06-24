@@ -300,7 +300,7 @@
 						url: '/createWorkerOrderPackage/pages/createWorkerOrder/createAffairWorkerOrder/createAffairWorkerOrder'
 					})
 				} else if (item == '环境') {
-					// this.storeLocationMessage({});
+					this.storeLocationMessage({});
 					uni.navigateTo({
 						url: '/createWorkerOrderPackage/pages/createWorkerOrder/createEnvironmentWorkerOrder/createEnvironmentWorkerOrder'
 					})

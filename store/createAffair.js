@@ -1,9 +1,7 @@
 import { setCache, getCache } from '@/common/js/utils'
 import { getDefaultAffairState } from '@/common/js/resetStore/resetStore.js'
 export default {
-  state:{
-		state: getDefaultAffairState(),
-  },
+  state: getDefaultAffairState(),
 
   getters:{
 		affairTaskMessage:(state) => {
