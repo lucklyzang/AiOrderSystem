@@ -13,15 +13,15 @@
 		</view>
 		<!-- 优先级picker -->
 		<view class="priority-picker">
-			<u-picker :closeOnClickOverlay="true" :show="priorityPickerShow" :columns="priorityOption" keyName="text" @close="priorityPickerCancel" @cancel="priorityPickerCancel" @confirm="priorityPickerConfirm"></u-picker>
+			<u-picker :closeOnClickOverlay="true" :show="priorityPickerShow" :defaultIndex="priorityPickerDefaultIndex" :columns="priorityOption" keyName="text" @close="priorityPickerCancel" @cancel="priorityPickerCancel" @confirm="priorityPickerConfirm"></u-picker>
 		</view>
 		<!-- 来源picker -->
 		<view class="source-picker">
-			<u-picker :closeOnClickOverlay="true" :show="sourcePickerShow" :columns="sourceOption" keyName="text" @close="sourcePickerCancel" @cancel="sourcePickerCancel" @confirm="sourcePickerConfirm"></u-picker>
+			<u-picker :closeOnClickOverlay="true" :defaultIndex="sourcePickerDefaultIndex" :show="sourcePickerShow" :columns="sourceOption" keyName="text" @close="sourcePickerCancel" @cancel="sourcePickerCancel" @confirm="sourcePickerConfirm"></u-picker>
 		</view>
 		<!-- 保洁员picker -->
 		<view class="worker-picker">
-			<u-picker :closeOnClickOverlay="true" :show="workerPickerShow" :columns="workerOption" keyName="text" @close="workerPickerCancel" @cancel="workerPickerCancel" @confirm="workerPickerConfirm"></u-picker>
+			<u-picker :closeOnClickOverlay="true" :show="workerPickerShow" :defaultIndex="workerPickerDefaultIndex" :columns="workerOption" keyName="text" @close="workerPickerCancel" @cancel="workerPickerCancel" @confirm="workerPickerConfirm"></u-picker>
 		</view>
 		<view class="content">
 			<view class="result-picture">
@@ -204,10 +204,12 @@
 			 workerPickerShow: false,
 			 workerValue: 0,
 			 workerText: '请选择保洁员',
+			 workerPickerDefaultIndex: [0],
 			 workerOption: [[]],
 			 
 			 sourcePickerShow: false,
 			 sourceValue: 0,
+			 sourcePickerDefaultIndex: [0],
 			 sourceText: '请选择来源',
 			 sourceOption: [[
 					{
@@ -231,10 +233,11 @@
 							
 					}
 				]],
-				locationValue: '',
+				locationValue: '请选择位置',
 				
 				priorityPickerShow: false,
 				priorityValue: 1,
+				priorityPickerDefaultIndex: [0],
 				priorityText: '正常',
 				priorityOption: [[
 					{
@@ -315,6 +318,7 @@
 					let casuallyTemporaryStorageCreateEnvironmentTaskMessage = this.environmentTaskMessage;
 					this.priorityValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['priority'].toString();
 					this.priorityText = this.getPriorityText(casuallyTemporaryStorageCreateEnvironmentTaskMessage['priority']);
+					this.priorityPickerDefaultIndex = [this.priorityOption[0].findIndex((item) => { return item.text == this.priorityText })];
 					this.enterRemark = casuallyTemporaryStorageCreateEnvironmentTaskMessage['taskRemark'];
 					this.personNumberValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['planPersons'];
 					this.durationValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['planUseTime'];
@@ -323,8 +327,10 @@
 					this.fileList = this.getResultimageList(casuallyTemporaryStorageCreateEnvironmentTaskMessage['images']);
 					this.workerValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerId'] == null ? 0 : casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerId'];
 					this.workerText =  casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerName'] == '请选择保洁员' ? '' : casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerName'];
+					this.workerPickerDefaultIndex = [this.workerOption[0].findIndex((item) => { return item.text == this.workerText })];
 					this.sourceValue = this.getSourceValueEvent(casuallyTemporaryStorageCreateEnvironmentTaskMessage['source']);
 					this.sourceText = casuallyTemporaryStorageCreateEnvironmentTaskMessage['source'];
+					this.sourcePickerDefaultIndex = [this.sourceOption[0].findIndex((item) => { return item.text == this.sourceText })];
 					this.selectValue = '';
 					this.selectStandard = casuallyTemporaryStorageCreateEnvironmentTaskMessage['standards'];
 					// 如果当前订单选择了违反标准
@@ -344,7 +350,7 @@
 				let selectArchitectureValue = [];
 				selectArchitectureValue.push({
 					id: this.environmentTaskMessage['structureId'],
-					structNumber: this.environmentTaskMessage['structureName']
+					structName: this.environmentTaskMessage['structureName']
 				});
 				let selectDepartmentValue = [];
 				selectDepartmentValue.push({
@@ -362,7 +368,7 @@
 					name: this.environmentTaskMessage['spaces'][0]['name']
 				});
 				let temporaryMessage = [].concat(selectArchitectureValue,selectDepartmentValue,selectgoalAreaValue,selectFunctionAreaValue);
-				this.storeLocationMessage(temporaryMessage)
+				this.storeLocationMessage(temporaryMessage);
 			},
 			
 			// 回显位置信息
@@ -794,7 +800,8 @@
 								if (res && res.data.code == 200) {
 							  this.$refs.uToast.show({
 										message: '任务编辑成功',
-										position: 'center'
+										position: 'center',
+										type: 'success'
 							   });
 			            this.resultimageList = [];
 			            this.storeLocationMessage([]);

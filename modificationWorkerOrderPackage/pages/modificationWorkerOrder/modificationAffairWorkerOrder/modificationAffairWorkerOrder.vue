@@ -12,11 +12,11 @@
 		<u-toast ref="uToast"></u-toast>
 		<!-- 目的建筑 -->
 		<view class="transport-rice-box" v-if="showStructure">
-			<ScrollSelection v-model="showStructure" :columns="structureOption" title="目的建筑" @sure="structureSureEvent" @cancel="structureCancelEvent" @close="structureCloseEvent" />
+			<ScrollSelection v-model="showStructure" :pickerValues="structureDefaultIndex" :columns="structureOption" title="目的建筑" @sure="structureSureEvent" @cancel="structureCancelEvent" @close="structureCloseEvent" />
 		</view>
 		<!-- 目的科室 -->
 		<view class="transport-rice-box" v-if="showGoalDepartment">
-			<ScrollSelection v-model="showGoalDepartment" :columns="goalDepartmentOption" title="目的科室" @sure="goalDepartmentSureEvent" @cancel="goalDepartmentCancelEvent" @close="goalDepartmentCloseEvent" :isShowSearch="true" />
+			<ScrollSelection v-model="showGoalDepartment" :pickerValues="goalDepartmentDefaultIndex" :columns="goalDepartmentOption" title="目的科室" @sure="goalDepartmentSureEvent" @cancel="goalDepartmentCancelEvent" @close="goalDepartmentCloseEvent" :isShowSearch="true" />
 		</view>
 		<!-- 负责人 -->
 		<view class="transport-rice-box" v-if="showParticipant">
@@ -130,11 +130,13 @@
 				imageOnlinePathArr: [],
 				imgIndex: '',
 				structureOption: [],
+				structureDefaultIndex: [0],
 				showStructure: false,
 				currentStructure: '请选择',
 				
 				goalDepartmentOption: [],
 				showGoalDepartment: false,
+				goalDepartmentDefaultIndex: [0],
 				currentGoalDepartment: '请选择',
 				
 				participantOption: [],
@@ -186,6 +188,12 @@
 					this.resultimageList = this.getResultimageList(casuallyTemporaryStorageCreateEnvironmentTaskMessage['images']);
 					this.locationValue = `${casuallyTemporaryStorageCreateEnvironmentTaskMessage.structureName}${casuallyTemporaryStorageCreateEnvironmentTaskMessage.depName}${casuallyTemporaryStorageCreateEnvironmentTaskMessage.areaImmediateName}${this.extractSpaceMessage(casuallyTemporaryStorageCreateEnvironmentTaskMessage.spaces)}`;
 					this.fileList = this.getResultimageList(casuallyTemporaryStorageCreateEnvironmentTaskMessage['images']);
+					// 处理目的建筑、目的科室显示信息
+					let trmporaryMessage = casuallyTemporaryStorageCreateEnvironmentTaskMessage['depName'].split("/");
+					this.currentStructure = trmporaryMessage[0] ? trmporaryMessage[0] : '请选择';
+					this.currentGoalDepartment = trmporaryMessage[1] ? trmporaryMessage[1] : '请选择';
+					// 显示目的建筑索引
+					this.structureDefaultIndex = [this.structureOption.findIndex((item) => { return item.value ==  this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value']})];
 					this.workerValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerId'] == null ? 0 : casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerId'];
 					this.workerText =  casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerName'] == '' ? '请选择保洁员' : casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerName'];
 				} catch(err) {
@@ -261,8 +269,9 @@
 			},
 			
 			// 目的建筑下拉选择框确认事件
-			structureSureEvent (val) {
+			structureSureEvent (val,value,id) {
 			if (val) {
+				this.structureDefaultIndex = [id];
 				this.currentStructure =  val;
 				this.currentGoalDepartment = '请选择';
 				this.currentGoalSpaces = [];
@@ -285,8 +294,9 @@
 			},
 			
 			// 目的科室下拉选择框确认事件
-			goalDepartmentSureEvent (val) {
+			goalDepartmentSureEvent (val,value,id) {
 			if (val) {
+				this.goalDepartmentDefaultIndex = [id];
 				this.currentGoalDepartment =  val;
 				this.currentGoalSpaces = [];
 				// this.getSpacesByDepartmentId(this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'],false)
@@ -357,6 +367,10 @@
 								value: res.data.data[i].id,
 								id: i
 							})
+						};
+						// 显示目的科室索引
+						if (this.currentGoalDepartment != '请选择') {
+							this.goalDepartmentDefaultIndex = [this.goalDepartmentOption.findIndex((item) => { return item.value ==  this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value']})];
 						};
 						if (isInitial) {
 							if (this.currentGoalDepartment != '请选择') {
@@ -606,7 +620,7 @@
 				this.showLoadingHint = false;
 				if (res && res.data.code == 200) {
 					this.$refs.uToast.show({
-						message: `${res.data.msg}`,
+						message: '任务编辑成功',
 						type: 'success',
 						position: 'center'
 					});

@@ -9,11 +9,11 @@
 		<u-toast ref="uToast"></u-toast>
 		<!-- 目的建筑 -->
 		<view class="transport-rice-box" v-if="showStructure">
-			<ScrollSelection v-model="showStructure" :columns="structureOption" title="目的建筑" @sure="structureSureEvent" @cancel="structureCancelEvent" @close="structureCloseEvent" />
+			<ScrollSelection v-model="showStructure" :pickerValues="structureDefaultIndex" :columns="structureOption" title="目的建筑" @sure="structureSureEvent" @cancel="structureCancelEvent" @close="structureCloseEvent" />
 		</view>
 		<!-- 目的科室 -->
 		<view class="transport-rice-box" v-if="showGoalDepartment">
-			<ScrollSelection v-model="showGoalDepartment" :columns="goalDepartmentOption" title="目的科室" @sure="goalDepartmentSureEvent" @cancel="goalDepartmentCancelEvent" @close="goalDepartmentCloseEvent" :isShowSearch="true" />
+			<ScrollSelection v-model="showGoalDepartment" :pickerValues="goalDepartmentDefaultIndex" :columns="goalDepartmentOption" title="目的科室" @sure="goalDepartmentSureEvent" @cancel="goalDepartmentCancelEvent" @close="goalDepartmentCloseEvent" :isShowSearch="true" />
 		</view>
 		<!-- 目的房间 -->
 		<view class="transport-rice-box" v-if="showGoalSpaces">
@@ -21,11 +21,11 @@
 		</view>
 		<!-- 任务类型 -->
 		<view class="transport-rice-box" v-if="showTaskType">
-			<ScrollSelection v-model="showTaskType" :isShowSearch="true" :columns="taskTypeOption" title="任务类型" @sure="taskTypeSureEvent" @cancel="taskTypeCancelEvent" @close="taskTypeCloseEvent" />
+			<ScrollSelection v-model="showTaskType" :pickerValues="taskTypeDefaultIndex" :isShowSearch="true" :columns="taskTypeOption" title="任务类型" @sure="taskTypeSureEvent" @cancel="taskTypeCancelEvent" @close="taskTypeCloseEvent" />
 		</view>
 		<!-- 维修员 -->
 		<view class="transport-rice-box" v-if="showTransporter">
-			<ScrollSelection v-model="showTransporter" :columns="transporterOption" title="维修员" @sure="transporterSureEvent" @cancel="transporterCancelEvent" @close="transporterCloseEvent" />
+			<ScrollSelection v-model="showTransporter" :pickerValues="transporterDefaultIndex" :columns="transporterOption" title="维修员" @sure="transporterSureEvent" @cancel="transporterCancelEvent" @close="transporterCloseEvent" />
 		</view>
 		<!-- 使用工具 -->
 		<view class="transport-rice-box" v-if="showUseTool">
@@ -324,6 +324,7 @@
 				currentParticipant: [],
 	
 				goalDepartmentOption: [],
+				goalDepartmentDefaultIndex: [0],
 				showGoalDepartment: false,
 				currentGoalDepartment: '请选择',
 	
@@ -332,14 +333,17 @@
 				currentGoalSpaces: [],
 	
 				taskTypeOption: [],
+				taskTypeDefaultIndex: [0],
 				showTaskType: false,
 				currentTaskType: '请选择',
 	
 				structureOption: [],
+				structureDefaultIndex: [0],
 				showStructure: false,
 				currentStructure: '请选择',
 	
 				transporterOption: [],
+				transporterDefaultIndex: [0],
 				showTransporter: false,
 				currentTransporter: '请选择',
 				priorityRadioValue: '1',
@@ -777,9 +781,9 @@
 				},
 
 				// 任务类型下拉选择框确认事件
-				taskTypeSureEvent (val) {
-				console.log(val);
+				taskTypeSureEvent (val,value,id) {
 				if (val) {
+					this.taskTypeDefaultIndex = [id];
 					this.currentTaskType =  val
 				} else {
 					this.currentTaskType = '请选择'
@@ -798,12 +802,13 @@
 				},
 
 				// 目的建筑下拉选择框确认事件
-				structureSureEvent (val) {
+				structureSureEvent (val,value,id) {
 				if (val) {
 					this.currentStructure =  val;
 					this.currentGoalDepartment = '请选择';
 					this.currentGoalSpaces = [];
 					this.goalSpacesOption = [];
+					this.structureDefaultIndex = [id];
 					this.getDepartmentByStructureId(this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value'],false,false)
 				} else {
 					this.currentStructure = '请选择'
@@ -822,10 +827,11 @@
 				},
 
 				// 目的科室下拉选择框确认事件
-				goalDepartmentSureEvent (val) {
+				goalDepartmentSureEvent (val,value,id) {
 				if (val) {
 					this.currentGoalDepartment =  val;
 					this.currentGoalSpaces = [];
+					this.goalDepartmentDefaultIndex = [id];
 					this.getSpacesByDepartmentId(this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'],false)
 				} else {
 					this.currentGoalDepartment = '请选择'
@@ -889,8 +895,9 @@
 
 
 				// 运送员下拉选择框确认事件
-				transporterSureEvent (val) {
+				transporterSureEvent (val,value,id) {
 				if (val) {
+					this.transporterDefaultIndex = [id];
 					this.currentTransporter =  val
 				} else {
 					this.currentTransporter = '请选择'
@@ -1005,7 +1012,7 @@
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
 						this.$refs.uToast.show({
-							message: `${res.data.msg}`,
+							message: '任务创建成功',
 							type: 'success',
 							position: 'center'
 						});

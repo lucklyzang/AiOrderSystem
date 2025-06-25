@@ -105,15 +105,15 @@
 		</view>
     <!-- 运送大类 -->
     <view class="transport-rice-box" v-if="showTransportRice">
-      <ScrollSelection v-model="showTransportRice" :columns="transportRiceList" title="运送大类" @sure="transportRiceSureEvent" @cancel="transportRiceCancelEvent" @close="transportRiceCloseEvent" />
+      <ScrollSelection v-model="showTransportRice" :pickerValues="transportDefaultIndex" :columns="transportRiceList" title="运送大类" @sure="transportRiceSureEvent" @cancel="transportRiceCancelEvent" @close="transportRiceCloseEvent" />
     </view>
     <!-- 起点科室 -->
     <view class="transport-rice-box" v-if="showStartDepartment">
-      <ScrollSelection v-model="showStartDepartment" :columns="startDepartmentList" title="起点科室" @sure="startDepartmentSureEvent" @cancel="startDepartmentCancelEvent" @close="startDepartmentCloseEvent" :isShowSearch="true"/>
+      <ScrollSelection v-model="showStartDepartment" :pickerValues="startDepartmentDefaultIndex" :columns="startDepartmentList" title="起点科室" @sure="startDepartmentSureEvent" @cancel="startDepartmentCancelEvent" @close="startDepartmentCloseEvent" :isShowSearch="true"/>
     </view>
     <!-- 终点科室(模板一单选) -->
     <view class="transport-rice-box" v-if="showEndDepartment">
-      <ScrollSelection v-model="showEndDepartment" :columns="endDepartmentList" title="终点科室" @sure="endDepartmentSureEvent" @cancel="endDepartmentCancelEvent" @close="endDepartmentCloseEvent" :isShowSearch="true" />
+      <ScrollSelection v-model="showEndDepartment"  :pickerValues="endDepartmentDefaultIndex" :columns="endDepartmentList" title="终点科室" @sure="endDepartmentSureEvent" @cancel="endDepartmentCancelEvent" @close="endDepartmentCloseEvent" :isShowSearch="true" />
     </view>
     <!-- 终点科室(模板二多选) -->
     <view class="transport-rice-box" v-if="showGoalSpaces">
@@ -121,15 +121,15 @@
     </view>
     <!-- 运送员 -->
     <view class="transport-rice-box" v-if="showTransporter">
-      <ScrollSelection v-model="showTransporter" :columns="transporterList" title="运送员" @sure="transporterSureEvent" @cancel="transporterCancelEvent" @close="transporterCloseEvent" />
+      <ScrollSelection v-model="showTransporter" :pickerValues="transporterDefaultIndex" :columns="transporterList" title="运送员" @sure="transporterSureEvent" @cancel="transporterCancelEvent" @close="transporterCloseEvent" />
     </view>
     <!-- 转运工具 -->
     <view class="transport-rice-box" v-if="showTransportTool">
-      <ScrollSelection v-model="showTransportTool" :columns="transportToolList" title="转运工具" @sure="transportToolSureEvent" @cancel="transportToolCancelEvent" @close="transportToolCloseEvent" />
+      <ScrollSelection v-model="showTransportTool" :pickerValues="transportToolDefaultIndex" :columns="transportToolList" title="转运工具" @sure="transportToolSureEvent" @cancel="transportToolCancelEvent" @close="transportToolCloseEvent" />
     </view>
      <!-- 性别 -->
     <view class="transport-rice-box" v-if="showGender">
-      <ScrollSelection v-model="showGender" :columns="genderList" title="性别" @sure="genderSureEvent" @cancel="genderCancelEvent" @close="genderCloseEvent" />
+      <ScrollSelection v-model="showGender" :pickerValues="genderDefaultIndex" :columns="genderList" title="性别" @sure="genderSureEvent" @cancel="genderCancelEvent" @close="genderCloseEvent" />
     </view>
 	<view class="message-box">
 		<view class="message-one">
@@ -400,36 +400,42 @@ export default {
 			showStartDepartment: false,
 			currentStartDepartment: '请选择',
 			startDepartmentList: [],
+			startDepartmentDefaultIndex: [0],
 			showEndDepartment: false,
 			currentEndDepartment: '请选择',
 			endDepartmentList: [],
+			endDepartmentDefaultIndex: [0],
 			showTransporter: false,
 			currentTransporter: '请选择',
 			currentTransporterValue: '',
 			transporterList: [],
+			transporterDefaultIndex: [0],
 			showTransportTool: false,
 			currentTransportTool: '无工具',
+			transportToolDefaultIndex: [0],
 			transportToolList: [],
 			showGender: false,
-			currentGender: '未选择',
+			currentGender: '请选择',
+			genderDefaultIndex: [0],
 			genderList: [
-				{ 
-					id: '2',
-					text: '女'
-				},
-				{ 
-					id: '1',
-					text: '男'
-				},
 				{
 					id: '0',
 					text: '未知'
+				},
+				{
+					id: '1',
+					text: '男'
+				},
+				{ 
+					id: '2',
+					text: '女'
 				}
 			],
 			showTransportRice: false,
 			currentTransportRice: '请选择',
 			currentTransportRiceValue: '',
 			transportRiceList: [],
+			transportDefaultIndex: [0],
 			transportTypeIndex: null,
 			currentTransportType: '',
 			transportTypeList: [],
@@ -467,7 +473,7 @@ export default {
     }
   },
 
-  mounted() {
+  onLoad() {
 		this.echoTemporaryStorageMessage();
     this.parallelFunction();
   },
@@ -590,6 +596,7 @@ export default {
 				this.admissionNumberValue = casuallyTemporaryStorageCreateDispathTaskMessage['number'];
 				this.transportNumberValue = casuallyTemporaryStorageCreateDispathTaskMessage['actualCount'];
 				this.currentGender = casuallyTemporaryStorageCreateDispathTaskMessage['sex'] == 0 ? '未知' : casuallyTemporaryStorageCreateDispathTaskMessage['sex'] == 1 ? '男' : '女';
+				this.genderDefaultIndex = [this.genderList.findIndex((item) => { return item.text == this.currentGender })];
 				this.isBackRadioValue = casuallyTemporaryStorageCreateDispathTaskMessage['isBack'].toString();
 				this.taskDescribe = casuallyTemporaryStorageCreateDispathTaskMessage['taskRemark'];
 				this.querytransportChildByTransportParent(0, casuallyTemporaryStorageCreateDispathTaskMessage.parentTypeId, this.templateType,true);
@@ -960,13 +967,17 @@ export default {
 									value: item,
 									id: index
 								});
+								// 显示起点科室索引
+								this.startDepartmentDefaultIndex = [this.startDepartmentList.findIndex((item) => { return item.value == this.getDepartmentIdByName(this.currentStartDepartment)})];
 								if (this.templateType === 'template_one') {
 									// 终点科室(模板一)
 									this.endDepartmentList.push({
 										text: item1[item],
 										value: item,
 										id: index
-									})
+									});
+									// 显示终点科室索引
+									this.endDepartmentDefaultIndex = [this.endDepartmentList.findIndex((item) => { return item.value == this.getDepartmentIdByName(this.currentEndDepartment)})];
 								} else {
 									// 终点科室(模板二)
 									this.goalSpacesOption.push({
@@ -1007,6 +1018,8 @@ export default {
 								})
 							}
 						};
+						// 显示转运工具索引
+						this.transportToolDefaultIndex = [this.transportToolList.findIndex((item) => { return item.value == this.transportToolList.filter((item) => { return item.text == this.currentTransportTool })[0]['value']})];
 						if (item3) {
 							// 运送大类
 							for (let i = 0, len = item3.length; i < len; i++) {
@@ -1019,7 +1032,9 @@ export default {
 									value: item3[i].id,
 									id: i
 								})
-							}
+							};
+							// 显示当前运送大类索引
+							this.transportDefaultIndex = [this.transportRiceList.findIndex((item) => { return item.value == this.currentTransportRiceValue })];
 						};
 						if (item4) {
 							for (let i = 0, len = item4.length; i < len; i++) {
@@ -1030,7 +1045,9 @@ export default {
 									ongoing: item4[i].ongoing, // 进行中数量
 									id: i
 								})
-							}
+							};
+							// 显示当前运送员索引
+							this.transporterDefaultIndex = [this.transporterList.findIndex((item) => { return item.value == this.currentTransporterValue })];
 						}
 					}
 				})
@@ -1116,8 +1133,9 @@ export default {
 		},
 
 		// 运送大类下拉选择框确认事件
-		transportRiceSureEvent (val,value) {
+		transportRiceSureEvent (val,value,id) {
 			if (val) {
+				this.transportDefaultIndex = [id];
 				this.currentTransportRice = val;
 				this.currentTransportRiceValue = value;
 				this.synchronizationPatientTransportType(val);
@@ -1150,9 +1168,10 @@ export default {
 		},
 
 		// 起点科室下拉选择框确认事件
-		startDepartmentSureEvent (val) {
+		startDepartmentSureEvent (val,value,id) {
 			if (val) {
-				this.currentStartDepartment =  val
+				this.currentStartDepartment =  val;
+				this.startDepartmentDefaultIndex = [id];
 			} else {
 				this.currentStartDepartment = '请选择'
 			};
@@ -1170,9 +1189,10 @@ export default {
 		},
 
 		// 终点科室下拉选择框确认事件(模板一)
-		endDepartmentSureEvent (val) {
+		endDepartmentSureEvent (val,value,id) {
 			if (val) {
-				this.currentEndDepartment =  val
+				this.currentEndDepartment =  val;
+				this.endDepartmentDefaultIndex = [id];
 			} else {
 				this.currentEndDepartment = '请选择'
 			};
@@ -1190,10 +1210,11 @@ export default {
 		},
 
 		// 运送员下拉选择框确认事件
-		transporterSureEvent (val,value) {
+		transporterSureEvent (val,value,id) {
 			if (val) {
 				this.currentTransporter =  val;
-				this.currentTransporterValue = value
+				this.currentTransporterValue = value;
+				this.transporterDefaultInde = [id];
 			} else {
 				this.currentTransporter = '请选择';
 				this.currentTransporterValue = ''
@@ -1212,10 +1233,12 @@ export default {
 		},
 
 		// 转运工具下拉选择框确认事件
-		transportToolSureEvent (val) {
+		transportToolSureEvent (val,value,id) {
 			if (val) {
-				this.currentTransportTool =  val
+				this.currentTransportTool =  val;
+				this.transportToolDefaultIndex = [id];
 			} else {
+				this.transportToolDefaultIndex = [0];
 				this.currentTransportTool = '无工具'
 			};
 			this.showTransportTool = false
@@ -1232,9 +1255,10 @@ export default {
 		},
 
 		// 性别下拉选择框确认事件
-		genderSureEvent (val) {
+		genderSureEvent (val,value,id) {
 			if (val) {
-				this.currentGender =  val
+				this.currentGender =  val;
+				this.genderDefaultIndex = [id];
 			} else {
 				this.currentGender = '请选择'
 			};
@@ -1381,7 +1405,7 @@ export default {
 					toolName: this.currentTransportTool, //运送工具名称
 					actualCount: this.transportNumberValue,   //实际数量
 					patientName: this.patientNameValue,  //病人姓名
-					sex: this.currentGender == '未选择' || this.currentGender == '未知' ? 0 : this.currentGender == '男' ? 1 : 2,    //病人性别  0-未指定,1-男, 2-女
+					sex: this.currentGender == '未选择' || this.currentGender == '未知' || this.currentGender == '请选择' ? 0 : this.currentGender == '男' ? 1 : 2,    //病人性别  0-未指定,1-男, 2-女
 					age: this.patientAgeValue,   //年龄
 					quarantine: this.isContactisolationValue === null ? -1 : this.isContactisolationValue, // 接触隔离
 					number: this.admissionNumberValue,   //住院号
@@ -1498,7 +1522,9 @@ export default {
 			editDispathTaskSingle(data).then((res) => {
 				if (res && res.data.code == 200) {
 					this.$refs.uToast.show({
-						message: '编辑成功',
+						message: '任务编辑成功',
+						type: 'success',
+						position: 'center'
 					});
 					this.storeCurrentIndex(0);
 					uni.redirectTo({
@@ -1529,6 +1555,8 @@ export default {
 				if (res && res.data.code == 200) {
 					this.$refs.uToast.show({
 						message: '编辑成功',
+						type: 'success',
+						position: 'center'
 					});
 					this.storeCurrentIndex(0);
 					uni.redirectTo({

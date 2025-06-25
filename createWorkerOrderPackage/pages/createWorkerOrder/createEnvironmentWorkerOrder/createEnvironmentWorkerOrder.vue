@@ -228,7 +228,7 @@
 							
 					}
 				]],
-				locationValue: '',
+				locationValue: '请选择位置',
 				
 				priorityPickerShow: false,
 				priorityValue: 1,
@@ -665,6 +665,7 @@
 								if (res && res.data.code == 200) {
 									this.$refs.uToast.show({
 										message: '任务创建成功',
+										type: 'success',
 										position: 'center'
 									});
 			            this.resultimageList = [];

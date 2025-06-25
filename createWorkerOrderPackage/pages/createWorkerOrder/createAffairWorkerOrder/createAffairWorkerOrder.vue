@@ -12,11 +12,11 @@
 		<u-toast ref="uToast"></u-toast>
 		<!-- 目的建筑 -->
 		<view class="transport-rice-box" v-if="showStructure">
-			<ScrollSelection v-model="showStructure" :columns="structureOption" title="目的建筑" @sure="structureSureEvent" @cancel="structureCancelEvent" @close="structureCloseEvent" />
+			<ScrollSelection v-model="showStructure" :pickerValues="structureDefaultIndex" :columns="structureOption" title="目的建筑" @sure="structureSureEvent" @cancel="structureCancelEvent" @close="structureCloseEvent" />
 		</view>
 		<!-- 目的科室 -->
 		<view class="transport-rice-box" v-if="showGoalDepartment">
-			<ScrollSelection v-model="showGoalDepartment" :columns="goalDepartmentOption" title="目的科室" @sure="goalDepartmentSureEvent" @cancel="goalDepartmentCancelEvent" @close="goalDepartmentCloseEvent" :isShowSearch="true" />
+			<ScrollSelection v-model="showGoalDepartment" :pickerValues="goalDepartmentDefaultIndex" :columns="goalDepartmentOption" title="目的科室" @sure="goalDepartmentSureEvent" @cancel="goalDepartmentCancelEvent" @close="goalDepartmentCloseEvent" :isShowSearch="true" />
 		</view>
 		<!-- 负责人 -->
 		<view class="transport-rice-box" v-if="showParticipant">
@@ -34,10 +34,10 @@
 					</view>
 					<view class="message-one-right">
 						<u-radio-group v-model="priorityRadioValue">
-							<u-radio name="1" activeColor="#8af08a" labelColor="#8af08a" label="正常"></u-radio>
-							<u-radio name="2" activeColor="#fcd388" labelColor="#fcd388" label="重要"></u-radio>
-							<u-radio name="3" activeColor="#ea7171" labelColor="#ea7171" label="紧急"></u-radio>
-							<u-radio name="4" activeColor="#b62b2b" labelColor="#b62b2b" label="紧急重要"></u-radio>
+							<u-radio name="1" activeColor="#289E8E" labelColor="#289E8E" label="正常"></u-radio>
+							<u-radio name="2" activeColor="#F2A15F" labelColor="#F2A15F" label="重要"></u-radio>
+							<u-radio name="3" activeColor="#E8CB51" labelColor="#E8CB51" label="紧急"></u-radio>
+							<u-radio name="4" activeColor="#E86F50" labelColor="#E86F50" label="紧急重要"></u-radio>
 						</u-radio-group>
 					</view>
 				</view>
@@ -130,11 +130,13 @@
 				fileList: [],
 				imgIndex: '',
 				structureOption: [],
+				structureDefaultIndex: [0],
 				showStructure: false,
 				currentStructure: '请选择',
 				
 				goalDepartmentOption: [],
 				showGoalDepartment: false,
+				goalDepartmentDefaultIndex: [0],
 				currentGoalDepartment: '请选择',
 				
 				participantOption: [],
@@ -303,8 +305,9 @@
 						
 			
 			// 目的建筑下拉选择框确认事件
-			structureSureEvent (val) {
+			structureSureEvent (val,value,id) {
 			if (val) {
+				this.structureDefaultIndex = [id];
 				this.currentStructure =  val;
 				this.currentGoalDepartment = '请选择';
 				this.currentGoalSpaces = [];
@@ -327,8 +330,9 @@
 			},
 			
 			// 目的科室下拉选择框确认事件
-			goalDepartmentSureEvent (val) {
+			goalDepartmentSureEvent (val,value,id) {
 			if (val) {
+				this.goalDepartmentDefaultIndex = [id];
 				this.currentGoalDepartment =  val;
 				this.currentGoalSpaces = [];
 				// this.getSpacesByDepartmentId(this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'],false)
@@ -581,7 +585,7 @@
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
 						this.$refs.uToast.show({
-							message: `${res.data.msg}`,
+							message: '任务创建成功',
 							type: 'success',
 							position: 'center'
 						});

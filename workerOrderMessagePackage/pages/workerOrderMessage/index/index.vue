@@ -455,7 +455,7 @@
 					this.affairOrderShow = false;
 					this.getTransTaskList({
 						proId:this.proId, 
-						workerId:this.workerId,
+						workerId: '',
 						state: -1,
 						departmentId: this.userInfo.depId
 					});

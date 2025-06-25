@@ -89,7 +89,7 @@
 		data() {
 			return {
 				searchValue: '', // 搜索值
-				setValues: [0], // picker 选择值
+				setValues: [0], // picker 选中的项
 				form: { //要传过去的值
 					id: '',
 					text: ''
@@ -98,7 +98,6 @@
 			}
 		},
 		mounted () {
-			console.log('初始数据',this.columns)
 		},
 		watch: {
 			columns: {
@@ -110,6 +109,20 @@
 			},
 			value(newValue, oldValue) {
 				this.init()
+			},
+			pickerValues: {
+				handler(newValue, oldValue) {
+					this.setValues = newValue;
+					this.list.forEach((item, index) => {
+						if (this.setValues == index) {
+							this.form.id = item.id;
+							this.form.text = item.text;
+							this.form.value = item.value;
+						}
+					})
+				},
+				deep: true,
+				immediate: true,
 			}
 		},
 		methods: {
@@ -126,7 +139,7 @@
 						this.form.text = item.text;
 						this.form.value = item.value;
 					}
-				});
+				})
 			},
 			hiddeDatePicker() {
 				this.$emit('input',false)
@@ -141,7 +154,7 @@
 					};
 				};
 				this.hiddeDatePicker();
-				this.$emit('sure', this.form.text,this.form.value);
+				this.$emit('sure', this.form.text,this.form.value,this.form.id);
 			},
 			// 搜索查询
 			async searchChange(e) {
