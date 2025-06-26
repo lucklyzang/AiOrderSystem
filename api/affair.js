@@ -25,3 +25,11 @@ export function queryAffairTaskCancelReason(proId) {
     method: 'get'
   })
 };
+
+// 事务任务任务详情
+export function getAffairTaskDetails(id) {
+    return request({
+        url: `clean/cleanTask/query/${id}`,
+        method: 'get'
+    })
+}

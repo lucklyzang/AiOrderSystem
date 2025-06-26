@@ -96,7 +96,7 @@
   </view>
 </template>
 <script>
-import { cancelTask } from "@/api/environment.js";
+import { cancelTask, getForthwithCleanTaskDetails } from "@/api/environment.js";
 import { mapGetters, mapMutations } from "vuex";
 import navBar from "@/components/zhouWei-navBar"
 import SelectSearch from "@/components/selectSearch/selectSearch";
@@ -112,6 +112,7 @@ export default {
 			showLoadingHint: false,
 			infoText: '加载中···',
 			taskId: '',
+			tierNum: 0,
       environmentSelectCancelReason: {},
       environmentCancelReasonShow: false,
       environmentCancelReasonValue: null,
@@ -126,26 +127,60 @@ export default {
     ...mapGetters(["userInfo","environmentTaskMessage",'statusBarHeight','navigationBarHeight','allOrderCancelReason']),
   },
 	onShow() {
+		const pages = getCurrentPages(); //获取当前页面栈的实例数组
+		if (pages.length == 1) {
+			this.tierNum = 1
+		} else {
+			this.tierNum = pages.length;
+		};
 		this.taskId = this.environmentTaskMessage.id;
-		this.getResultimageList();
+		this.getForthwithCleanTaskDetailsEvent(this.taskId);
 	},
   methods: {
     ...mapMutations([
-			'storeCurrentIndex'
+			'storeCurrentIndex',
+			'changeEnvironmentTaskMessage'
 		]),
 		
 		// 提取图片事件
 		getResultimageList () {
 			this.problemPicturesEchoList = [];
-			if (this.environmentTaskMessage['images'].length > 0) {
-				this.problemPicturesEchoList = this.environmentTaskMessage['images'].filter((item) => { return item.imgType == 0});
-			};
-			console.log('显示的图片',this.problemPicturesEchoList);
+			if (this.environmentTaskMessage.hasOwnProperty('images')) {
+				if (this.environmentTaskMessage['images'].length > 0) {
+					this.problemPicturesEchoList = this.environmentTaskMessage['images'].filter((item) => { return item.imgType == 0});
+				}
+			}	
 		},
 
 		// 顶部导航返回事件
 		backTo () {
 			uni.navigateBack()
+		},
+		
+		// 查询环境管理任务详情
+		getForthwithCleanTaskDetailsEvent (id) {
+			this.showLoadingHint = true;
+			this.infoText = '加载中···'
+			getForthwithCleanTaskDetails(id)
+			.then((res) => {
+				this.showLoadingHint = false;
+				if (res && res.data.code == 200) {
+					this.changeEnvironmentTaskMessage(res.data.data);
+					this.getResultimageList();
+				} else {
+				 this.$refs.uToast.show({
+					message: `${res.data.msg}`,
+					type: 'error'
+				 })
+				}
+			})
+			.catch((err) => {
+				this.showLoadingHint = false;
+				this.$refs.uToast.show({
+					message: `${err.message}`,
+					type: 'error'
+				})
+			})
 		},
 	
     // 环境订单的取消
@@ -162,9 +197,7 @@ export default {
     				type: 'success'
     			});
 					this.storeCurrentIndex(1);
-					uni.redirectTo({
-						url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
-					});
+					this.backTo();
     		} else {
     		 this.$refs.uToast.show({
     			message: `${res.data.msg}`,
@@ -258,9 +291,15 @@ export default {
 		
 		// 修改订单事件
 		editEvent () {
-			uni.navigateTo({
-				url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationEnvironmentWorkerOrder/modificationEnvironmentWorkerOrder'
-			})
+			if (this.tierNum == 10) {
+				uni.redirectTo({
+					url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationEnvironmentWorkerOrder/modificationEnvironmentWorkerOrder'
+				})
+			} else {
+				uni.navigateTo({
+					url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationEnvironmentWorkerOrder/modificationEnvironmentWorkerOrder'
+				})
+			}
 		},
 
     // 格式化时间

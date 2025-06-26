@@ -369,7 +369,8 @@
 					{
 						name: '事务订单'
 					},
-				]
+				],
+				tierNum: 0
 			}
 		},
 		computed: {
@@ -392,6 +393,13 @@
 			}
 		},
 		onShow() {
+			const pages = getCurrentPages(); //获取当前页面栈的实例数组
+			if (pages.length == 1) {
+				this.tierNum = 1
+			} else {
+				this.tierNum = pages.length;
+			};
+			console.log('页面栈1',pages);
 			this.parallelQueryCancelReasonFunction();
 			this.current = this.currentIndex;
 			if (this.currentIndex == 0) {
@@ -442,7 +450,9 @@
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.navigateBack()
+				uni.navigateBack({
+					delta: this.tierNum
+				})
 			},
 			
 			// 标签索引改变事件
@@ -1205,24 +1215,48 @@
 			enterOrderDetailsEvent (item, text) {
 				if (text == 'trans') {
 					this.changeTransTaskMessage(item);
-					uni.navigateTo({
-						url: '/workerOrderMessagePackage/pages/workerOrderMessage/transportWorkerOrderMessage/transportWorkerOrderMessage'
-					})
+					if (this.tierNum == 10) {
+						uni.redirectTo({
+							url: '/workerOrderMessagePackage/pages/workerOrderMessage/transportWorkerOrderMessage/transportWorkerOrderMessage'
+						})
+					} else {
+						uni.navigateTo({
+							url: '/workerOrderMessagePackage/pages/workerOrderMessage/transportWorkerOrderMessage/transportWorkerOrderMessage'
+						})
+					};
 				} else if (text == 'environment') {
 					this.changeEnvironmentTaskMessage(item);
-					uni.navigateTo({
-						url: '/workerOrderMessagePackage/pages/workerOrderMessage/environmentWorkerOrderMessage/environmentWorkerOrderMessage'
-					})
+					if (this.tierNum == 10) {
+						uni.redirectTo({
+							url: '/workerOrderMessagePackage/pages/workerOrderMessage/environmentWorkerOrderMessage/environmentWorkerOrderMessage'
+						})
+					} else {
+						uni.navigateTo({
+							url: '/workerOrderMessagePackage/pages/workerOrderMessage/environmentWorkerOrderMessage/environmentWorkerOrderMessage'
+						})
+					}
 				} else if (text == 'project') {
 					this.changeProjectTaskMessage(item);
-					uni.navigateTo({
-						url: '/workerOrderMessagePackage/pages/workerOrderMessage/projectWorkerOrderMessage/projectWorkerOrderMessage'
-					});
+					if (this.tierNum == 10) {
+						uni.redirectTo({
+							url: '/workerOrderMessagePackage/pages/workerOrderMessage/projectWorkerOrderMessage/projectWorkerOrderMessage'
+						})
+					} else {
+						uni.navigateTo({
+							url: '/workerOrderMessagePackage/pages/workerOrderMessage/projectWorkerOrderMessage/projectWorkerOrderMessage'
+						})
+					}
 				} else if (text == 'affair') {
 					this.changeAffairTaskMessage(item);
-					uni.navigateTo({
-						url: '/workerOrderMessagePackage/pages/workerOrderMessage/affairWorkerOrderMessage/affairWorkerOrderMessage'
-					})
+					if (this.tierNum == 10) {
+						uni.redirectTo({
+							url: '/workerOrderMessagePackage/pages/workerOrderMessage/affairWorkerOrderMessage/affairWorkerOrderMessage'
+						})
+					} else {
+						uni.navigateTo({
+							url: '/workerOrderMessagePackage/pages/workerOrderMessage/affairWorkerOrderMessage/affairWorkerOrderMessage'
+						})
+					}
 				}
 			},
 			
@@ -1230,24 +1264,48 @@
 			modificationOrderEvent (item,text) {
 				if (text == 'trans') {
 					this.changeTransTaskMessage(item);
-					uni.navigateTo({
-						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/index/index'
-					})
+					if (this.tierNum == 10) {
+						uni.redirectTo({
+							url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/index/index'
+						})
+					} else {
+						uni.navigateTo({
+							url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/index/index'
+						})
+					}
 				} else if (text == 'environment') {
 					this.changeEnvironmentTaskMessage(item);
-					uni.navigateTo({
-						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationEnvironmentWorkerOrder/modificationEnvironmentWorkerOrder'
-					})
+					if (this.tierNum == 10) {
+						uni.redirectTo({
+							url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationEnvironmentWorkerOrder/modificationEnvironmentWorkerOrder'
+						})
+					} else {
+						uni.navigateTo({
+							url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationEnvironmentWorkerOrder/modificationEnvironmentWorkerOrder'
+						})
+					}
 				} else if (text == 'project') {
 					this.changeProjectTaskMessage(item);
-					uni.navigateTo({
-						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationProjectWorkerOrder/modificationProjectWorkerOrder'
-					})
+					if (this.tierNum == 10) {
+						uni.redirectTo({
+							url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationProjectWorkerOrder/modificationProjectWorkerOrder'
+						})
+					} else {
+						uni.navigateTo({
+							url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationProjectWorkerOrder/modificationProjectWorkerOrder'
+						})
+					}
 				} else if (text == 'affair') {
 					this.changeAffairTaskMessage(item);
-					uni.navigateTo({
-						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationAffairWorkerOrder/modificationAffairWorkerOrder'
-					})
+					if (this.tierNum == 10) {
+						uni.redirectTo({
+							url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationProjectWorkerOrder/modificationProjectWorkerOrder'
+						})
+					} else {
+						uni.navigateTo({
+							url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationAffairWorkerOrder/modificationAffairWorkerOrder'
+						})
+					}
 				}
 			},
 			

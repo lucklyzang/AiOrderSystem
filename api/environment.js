@@ -19,6 +19,14 @@ export function editForthwithCleanTask(data) {
     })
 }
 
+// 即时保洁任务详情
+export function getForthwithCleanTaskDetails(id) {
+    return request({
+        url: `clean/cleanTask/query/${id}`,
+        method: 'get'
+    })
+}
+
 // 查询当天保洁员(保洁管理)
 export function attendanceWorkerList(proId) {
     return request({

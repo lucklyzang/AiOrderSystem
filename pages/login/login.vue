@@ -130,7 +130,7 @@
 							if (res.data.data.mobile) {
 								this.changeTemplateType(res.data.data.mobile);
 							};
-							uni.navigateTo({
+							uni.redirectTo({
 								url: '/pages/index/index'
 							})
 					  } else {

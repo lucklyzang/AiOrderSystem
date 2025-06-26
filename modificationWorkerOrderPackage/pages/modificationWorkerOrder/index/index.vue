@@ -1527,9 +1527,7 @@ export default {
 						position: 'center'
 					});
 					this.storeCurrentIndex(0);
-					uni.redirectTo({
-						url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
-					});
+					this.backTo();
 				} else {
 					this.$refs.uToast.show({
 						message: res.data.msg,
@@ -1559,9 +1557,7 @@ export default {
 						position: 'center'
 					});
 					this.storeCurrentIndex(0);
-					uni.redirectTo({
-						url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
-					});
+					this.backTo();
 				} else {
 					this.$refs.uToast.show({
 						message: res.data.msg,

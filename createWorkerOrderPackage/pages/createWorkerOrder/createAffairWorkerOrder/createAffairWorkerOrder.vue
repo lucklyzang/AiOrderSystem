@@ -364,7 +364,7 @@
 			this.showGoalDepartment = false
 			},
 			
-			// 参与人下拉选择框确认事件
+			// 负责人下拉选择框确认事件
 			participantSureEvent (val) {
 			if (val.length > 0) {
 				this.currentParticipant =  val
@@ -535,28 +535,19 @@
 			};
 			// 创建事务任务
 			let temporaryMessage = {
-				typeId: this.taskTypeOption.filter((item) => { return item['text'] == this.currentTaskType})[0]['value'], // 任务类型
-				taskDesc: this.problemOverview, // 问题描述
-				destinationId: '', // 目的地id
 				depId: this.currentGoalDepartment == '请选择' ? '' : this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'], // 目的科室id
-				select: '',
-				isMe: this.isMe, // 是否我方解决 0-否，1-是
 				priority: this.priorityRadioValue,
-				taskRemark: this.taskDescribe, //任务描述
 				proId: this.proId,
 				proName: this.proName,
 				createId: this.workerId,
 				createName: this.userName,
+				taskRemark: this.specificAffairDescribe, //具体事项
 				createType: 0, // 创建类型 0-调度员 2-医务人员 3-巡检人员
 				workerId: this.currentTransporter == '请选择' ? '' : this.getCurrentTransporterIdByName(this.currentTransporter),
 				workerName: this.currentTransporter == '请选择' ? '' : this.currentTransporter,
-				spaces: [], //空间信息
 				path: [],
-				present: [], //参与者
-				tools: [],  //使用工具
-				depName: `${this.currentStructure == '请选择' ? '' : this.currentStructure}/${this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment}`, //出发地名称
-				typeName: this.currentTaskType, // 类型名称
-				materials: []        // 需要的物料
+				present: [], //负责人
+				depName: `${this.currentStructure == '请选择' ? '' : this.currentStructure}/${this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment}`, //目的科室名称
 			};
 			// 上传图片到服务器
 			if (this.fileList.length > 0) {
@@ -565,7 +556,7 @@
 			  };
 				paramsData.path = this.imageOnlinePathArr
 			};
-			// 拼接参与者数据
+			// 拼接负责人数据
 			if (this.currentParticipant.length > 0) {
 				for (let item of this.currentParticipant) {
 					temporaryMessage['present'].push({

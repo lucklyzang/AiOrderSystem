@@ -817,9 +817,7 @@
 			            this.personNumberValue = '';
 			            this.durationValue = '';
 									this.storeCurrentIndex(1);
-									uni.redirectTo({
-										url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
-									});
+									this.backTo();
 								} else {
 									this.$refs.uToast.show({
 										message: res.data.msg,

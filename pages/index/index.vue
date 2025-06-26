@@ -177,7 +177,6 @@
 		},
 		
 		onShow() {
-			console.log('sa',this.capsuleMessage);
 			// 获取用户基本信息
 			// getUserMessage().then((res) => {
 			// 	if ( res && res.data.code == 0) {

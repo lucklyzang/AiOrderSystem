@@ -159,7 +159,7 @@
 </template>
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import { cancelRepairsTask } from "@/api/project.js";
+import { cancelRepairsTask, repairsDetails } from "@/api/project.js";
 import { setCache, removeAllLocalStorage, } from '@/common/js/utils'
 import SelectSearch from "@/components/selectSearch/selectSearch";
 import navBar from "@/components/zhouWei-navBar"
@@ -174,6 +174,7 @@ export default {
 			showLoadingHint: false,
       currentimageUrl: '',
       imageBoxShow: false,
+			tierNum: 0,
 			projectSelectCancelReason: {},
 			projectCancelReasonShow: false,
 			projectCancelReasonValue: null,
@@ -181,7 +182,15 @@ export default {
     }
   },
 	
-	onShow () {},
+	onShow () {
+		const pages = getCurrentPages(); //获取当前页面栈的实例数组
+		if (pages.length == 1) {
+			this.tierNum = 1
+		} else {
+			this.tierNum = pages.length;
+		};
+		this.getRepairsDetails(this.projectTaskMessage['id']);
+	},
 	
   watch: {},
 
@@ -194,13 +203,38 @@ export default {
 
   methods: {
     ...mapMutations([
-			'storeCurrentIndex'
+			'storeCurrentIndex',
+			'changeProjectTaskMessage'
 		]),
 
      // 顶部导航返回事件
      backTo () {
      	uni.navigateBack()
      },
+		 
+		 // 查询工程任务详情
+		getRepairsDetails (id) {
+			this.showLoadingHint = true;
+			this.infoText = '加载中···';
+			repairsDetails(id).then((res) => {
+				this.showLoadingHint = false;
+				if (res && res.data.code == 200) {
+					this.changeProjectTaskMessage(res.data.data)
+				} else {
+					this.$refs.uToast.show({
+						message: res.data.msg,
+						type: 'error',
+					})
+				}
+			})
+			.catch((err) => {
+				this.showLoadingHint = false;
+				this.$refs.uToast.show({
+					message: `${err.message}`,
+					type: 'error'
+				})
+			})
+		 },
 
     // 处理维修任务空间信息
     disposeCheckType (item) {
@@ -249,10 +283,10 @@ export default {
           return '正常'
           break;
         case 2 :
-          return '紧急'
+          return '重要'
           break;
         case 3 :
-          return '重要'
+          return '紧急'
           break;
         case 4 :
           return '紧急重要'
@@ -262,9 +296,15 @@ export default {
 		
 		// 修改点击事件
 		editEvent () {
-			uni.navigateTo({
-				url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationProjectWorkerOrder/modificationProjectWorkerOrder'
-			})
+			if (this.tierNum == 10) {
+				uni.redirectTo({
+					url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationProjectWorkerOrder/modificationProjectWorkerOrder'
+				})
+			} else {
+				uni.navigateTo({
+					url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationProjectWorkerOrder/modificationProjectWorkerOrder'
+				})
+			}
 		},
 		
 		// 工程订单的取消
@@ -281,9 +321,7 @@ export default {
 						type: 'success'
 					});
 					this.storeCurrentIndex(2);
-					uni.redirectTo({
-						url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
-					});
+					this.backTo();
 				} else {
 				 this.$refs.uToast.show({
 					message: `${res.data.msg}`,

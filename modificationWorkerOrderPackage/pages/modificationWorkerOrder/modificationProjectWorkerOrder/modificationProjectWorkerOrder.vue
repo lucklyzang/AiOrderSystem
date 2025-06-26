@@ -370,7 +370,13 @@
 				return this.userInfo.extendData.userId
 			}
 		},
-		onShow() {
+		onLoad() {
+			const pages = getCurrentPages(); //获取当前页面栈的实例数组
+			if (pages.length == 1) {
+				this.tierNum = 1
+			} else {
+				this.tierNum = pages.length;
+			};
 			this.parallelFunction();
 		},
 		methods: {
@@ -650,7 +656,7 @@
 									this.currentUseTool = []
 								} else {
 									if (this.projectTaskMessage['tools'].length == 0) {
-										this.currentUseTool = []
+										this.currentUseTool = [] 
 									} else {
 										this.currentUseTool = this.projectTaskMessage['tools']
 									}
@@ -1085,9 +1091,7 @@
 							type: 'success'
 						});
 						this.storeCurrentIndex(2);
-						uni.redirectTo({
-							url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
-						});
+						this.backTo();
 					} else {
 						this.$refs.uToast.show({
 							message: `${res.data.msg}`,

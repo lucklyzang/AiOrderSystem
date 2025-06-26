@@ -181,15 +181,14 @@
 			// 回显事务任务编辑信息编辑的信息
 			echoTemporaryStorageMessage () {
 				try {
-					let casuallyTemporaryStorageCreateEnvironmentTaskMessage = this.environmentTaskMessage;
-					this.priorityValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['priority'].toString();
-					this.priorityText = this.getPriorityText(casuallyTemporaryStorageCreateEnvironmentTaskMessage['priority']);
-					this.enterRemark = casuallyTemporaryStorageCreateEnvironmentTaskMessage['taskRemark'];
-					this.resultimageList = this.getResultimageList(casuallyTemporaryStorageCreateEnvironmentTaskMessage['images']);
-					this.locationValue = `${casuallyTemporaryStorageCreateEnvironmentTaskMessage.structureName}${casuallyTemporaryStorageCreateEnvironmentTaskMessage.depName}${casuallyTemporaryStorageCreateEnvironmentTaskMessage.areaImmediateName}${this.extractSpaceMessage(casuallyTemporaryStorageCreateEnvironmentTaskMessage.spaces)}`;
-					this.fileList = this.getResultimageList(casuallyTemporaryStorageCreateEnvironmentTaskMessage['images']);
+					let casuallyTemporaryStorageCreateAffairTaskMessage = this.affairTaskMessage;
+					this.priorityValue = casuallyTemporaryStorageCreateAffairTaskMessage['priority'].toString();
+					this.priorityText = this.getPriorityText(casuallyTemporaryStorageCreateAffairTaskMessage['priority']);
+					this.specificAffairDescribe = casuallyTemporaryStorageCreateAffairTaskMessage['taskRemark'];
+					this.resultimageList = this.getResultimageList(casuallyTemporaryStorageCreateAffairTaskMessage['images']);
+					this.fileList = this.getResultimageList(casuallyTemporaryStorageCreateAffairTaskMessage['images']);
 					// 处理目的建筑、目的科室显示信息
-					let trmporaryMessage = casuallyTemporaryStorageCreateEnvironmentTaskMessage['depName'].split("/");
+					let trmporaryMessage = casuallyTemporaryStorageCreateAffairTaskMessage['depName'].split("/");
 					this.currentStructure = trmporaryMessage[0] ? trmporaryMessage[0] : '请选择';
 					this.currentGoalDepartment = trmporaryMessage[1] ? trmporaryMessage[1] : '请选择';
 					// 显示目的建筑索引
@@ -202,6 +201,27 @@
 						type: 'error'
 					})
 				}	
+			},
+			
+			// 提取图片事件
+			getResultimageList (imgArr) {
+				let returnImgArr = [];
+				let temporaryImgArr = [];
+				if (imgArr.length > 0) {
+					temporaryImgArr = imgArr.filter((item) => { return item.imgType == 0});
+					for (let item of temporaryImgArr) {
+						returnImgArr.push(item.path)
+					}
+				};
+				return returnImgArr;
+			},
+			
+			// 提取优先级text事件
+			getPriorityText (value) {
+				let temporaryPriorityArr = this.priorityOption[0].filter((item)=>{ return item.value == value });
+				if (temporaryPriorityArr.length > 0) {
+					return temporaryPriorityArr[0]['text']
+				}
 			},
 		
 			// 图片删除弹框确定按钮
@@ -328,7 +348,7 @@
 			this.showGoalDepartment = false
 			},
 			
-			// 参与人下拉选择框确认事件
+			// 负责人下拉选择框确认事件
 			participantSureEvent (val) {
 			if (val.length > 0) {
 				this.currentParticipant =  val
@@ -338,12 +358,12 @@
 			this.showParticipant = false
 			},
 			
-			// 参与人下拉选择框取消事件
+			// 负责人下拉选择框取消事件
 			participantCancelEvent () {
 			this.showParticipant = false
 			},
 			
-			// 参与人下拉选择框关闭事件
+			// 负责人下拉选择框关闭事件
 			participantCloseEvent () {
 			this.showParticipant = false
 			},
@@ -553,7 +573,7 @@
 				})
 			},
 			
-			// 确认事件(编辑环境管理任务)
+			// 确认事件(编辑事务任务)
 			async sureEvent () {
 			// 任务类型不能为空
 			if (this.currentTaskType == '请选择') {
@@ -566,28 +586,19 @@
 			// 编辑事务管理任务
 			let temporaryMessage = {
 				id: this.affairTaskMessage.id,
-				typeId: this.taskTypeOption.filter((item) => { return item['text'] == this.currentTaskType})[0]['value'], // 任务类型
-				taskDesc: this.problemOverview, // 问题描述
-				destinationId: '', // 目的地id
 				depId: this.currentGoalDepartment == '请选择' ? '' : this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'], // 目的科室id
-				select: '',
-				isMe: this.isMe, // 是否我方解决 0-否，1-是
 				priority: this.priorityRadioValue,
-				taskRemark: this.taskDescribe, //任务描述
 				proId: this.proId,
 				proName: this.proName,
+				taskRemark: this.specificAffairDescribe, //具体事项
 				createId: this.workerId,
 				createName: this.userName,
 				createType: 0, // 创建类型 0-调度员 2-医务人员 3-巡检人员
 				workerId: this.currentTransporter == '请选择' ? '' : this.getCurrentTransporterIdByName(this.currentTransporter),
 				workerName: this.currentTransporter == '请选择' ? '' : this.currentTransporter,
-				spaces: [], //空间信息
-				present: [], //参与者
 				path: [],
-				tools: [],  //使用工具
-				depName: `${this.currentStructure == '请选择' ? '' : this.currentStructure}/${this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment}`, //出发地名称
-				typeName: this.currentTaskType, // 类型名称
-				materials: []        // 需要的物料
+				present: [], //负责人
+				depName: `${this.currentStructure == '请选择' ? '' : this.currentStructure}/${this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment}`, //目的科室名称
 			};
 			// 上传图片到服务器
 			 let alreadyUploadOnlineImgArr = this.resultimageList.filter((item) => { return item.indexOf('https://') != -1} );
@@ -625,9 +636,7 @@
 						position: 'center'
 					});
 					this.storeCurrentIndex(3);
-					uni.redirectTo({
-						url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
-					});
+					this.backTo();
 				} else {
 					this.$refs.uToast.show({
 						message: res.data.msg,

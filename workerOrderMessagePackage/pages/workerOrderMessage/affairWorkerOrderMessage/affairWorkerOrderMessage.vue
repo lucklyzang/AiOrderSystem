@@ -100,8 +100,8 @@
 							<view class="issue-image-left">
 									<text>图片</text>
 							</view>
-							<view class="issue-image-list" v-if="affairTaskMessage.images && affairTaskMessage.images.length > 0">
-									<text v-for="(innerItem,innerIndex) in affairTaskMessage.images" :key="innerIndex" >
+							<view class="issue-image-list" v-if="problemPicturesEchoList.length > 0">
+									<text v-for="(innerItem,innerIndex) in problemPicturesEchoList" :key="innerIndex" >
 											<image alt="" :src="innerItem.path" @click="enlareEvent(innerItem.path)"
 											>
 									</text>
@@ -117,7 +117,7 @@
 </template>
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import { cancelAffairTask } from "@/api/affair.js";
+import { cancelAffairTask, getAffairTaskDetails } from "@/api/affair.js";
 import { setCache, removeAllLocalStorage } from '@/common/js/utils'
 import SelectSearch from "@/components/selectSearch/selectSearch";
 import navBar from "@/components/zhouWei-navBar"
@@ -130,9 +130,11 @@ export default {
     return {
 			infoText: '加载中···',
 			taskId: '',
+			tierNum: 0,
 			showLoadingHint: false,
       currentimageUrl: '',
       imageBoxShow: false,
+			problemPicturesEchoList: [],
       affairSelectCancelReason: {},
       affairCancelReasonShow: false,
       affairCancelReasonValue: null,
@@ -141,7 +143,14 @@ export default {
   },
 
   onShow() {
+		const pages = getCurrentPages(); //获取当前页面栈的实例数组
+		if (pages.length == 1) {
+			this.tierNum = 1
+		} else {
+			this.tierNum = pages.length;
+		};
     this.taskId = this.affairTaskMessage.id;
+		this.getAffairTaskDetailsEvent(this.taskId);
   },
 
   watch: {},
@@ -155,14 +164,51 @@ export default {
 
   methods: {
     ...mapMutations([
-			'storeCurrentIndex'
+			'storeCurrentIndex',
+			'changeAffairTaskMessage'
 		]),
 
      // 顶部导航返回事件
      backTo () {
      	uni.navigateBack()
      },
-
+		 
+		 // 查询事务管理任务详情
+		 getAffairTaskDetailsEvent (id) {
+		 	this.showLoadingHint = true;
+		 	this.infoText = '加载中···'
+		 	getAffairTaskDetails(id)
+		 	.then((res) => {
+		 		this.showLoadingHint = false;
+		 		if (res && res.data.code == 200) {
+		 			this.changeAffairTaskMessage(res.data.data);
+		 			this.getResultimageList();
+		 		} else {
+		 		 this.$refs.uToast.show({
+		 			message: `${res.data.msg}`,
+		 			type: 'error'
+		 		 })
+		 		}
+		 	})
+		 	.catch((err) => {
+		 		this.showLoadingHint = false;
+		 		this.$refs.uToast.show({
+		 			message: `${err.message}`,
+		 			type: 'error'
+		 		})
+		 	})
+		 },
+		 	
+		// 提取图片事件
+		getResultimageList () {
+			this.problemPicturesEchoList = [];
+			if (this.affairTaskMessage.hasOwnProperty('images')) {
+				if (this.affairTaskMessage['images'].length > 0) {
+					this.problemPicturesEchoList = this.affairTaskMessage['images'].filter((item) => { return item.imgType == 0});
+				}
+			}	
+		},
+			
     // 处理维修任务空间信息
     disposeCheckType (item) {
       if (!item) { return };
@@ -222,9 +268,15 @@ export default {
 		
 		// 修改点击事件
 		editEvent () {
-			uni.navigateTo({
-				url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationAffairWorkerOrder/modificationAffairWorkerOrder'
-			})
+			if (this.tierNum == 10) {
+				uni.redirectTo({
+					url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationProjectWorkerOrder/modificationProjectWorkerOrder'
+				})
+			} else {
+				uni.navigateTo({
+					url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationAffairWorkerOrder/modificationAffairWorkerOrder'
+				})
+			}
 		},
 
     // 取消点击事件
@@ -247,9 +299,7 @@ export default {
    				type: 'success'
    			});
    			this.storeCurrentIndex(3);
-   			uni.redirectTo({
-   				url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
-   			});
+				this.backTo();
    		} else {
    		 this.$refs.uToast.show({
    			message: `${res.data.msg}`,

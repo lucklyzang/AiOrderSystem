@@ -89,7 +89,7 @@ instance.interceptors.request.use(function (config) {
 					removeAllLocalStorage();
 					store.dispatch('resetDeviceState');
 					store.dispatch('resetLoginState');
-					uni.redirectTo({
+					uni.reLaunch({
 						url: '/pages/login/login'
 					}); // 失败就跳转登陆
 					isRefreshing = true
@@ -99,7 +99,7 @@ instance.interceptors.request.use(function (config) {
 				removeAllLocalStorage();
 				store.dispatch('resetDeviceState');
 				store.dispatch('resetLoginState');
-				uni.redirectTo({
+				uni.reLaunch({
 					url: '/pages/login/login'
 				}); // 失败就跳转登陆
 				isRefreshing = true
@@ -143,7 +143,7 @@ instance.interceptors.response.use(function (response) {
 				duration: 1000
 			});
 			setTimeout(() => {
-				uni.redirectTo({
+				uni.reLaunch({
 				 url: '/pages/login/login'
 				})
 			},2000);
@@ -166,12 +166,12 @@ instance.interceptors.response.use(function (response) {
 						duration: 1000
 					});
 					setTimeout(() => {
-						uni.redirectTo({
+						uni.reLaunch({
 						 url: '/pages/login/login'
 						})
 					},2000);
 				 } else {
-					uni.redirectTo({
+					uni.reLaunch({
 						url: '/pages/login/login'
 					})
 				}

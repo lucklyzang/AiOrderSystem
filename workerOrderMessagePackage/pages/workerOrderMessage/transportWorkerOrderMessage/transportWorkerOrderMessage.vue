@@ -196,6 +196,7 @@
 				infoText: '加载中···',
 				transportList: [],
 				taskId: '',
+				tierNum: 0, 
 				selectCancelReason: {},
 				cancelReasonShow: false,
 				cancelReasonValue: null,
@@ -225,6 +226,12 @@
 			}
 		},
 		onShow() {
+			const pages = getCurrentPages(); //获取当前页面栈的实例数组
+			if (pages.length == 1) {
+				this.tierNum = 1
+			} else {
+				this.tierNum = pages.length;
+			};
 			this.taskId = this.transTaskMessage.id;
 			this.getTaskMessage();
 		},
@@ -241,9 +248,15 @@
 			
 			// 修改点击事件
 			editEvent () {
-				uni.navigateTo({
-					url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/index/index'
-				})
+				if (this.tierNum == 10) {
+					uni.redirectTo({
+						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/index/index'
+					})
+				} else {
+					uni.navigateTo({
+						url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/index/index'
+					})
+				}
 			},
 			
 			// 转换性别
@@ -271,9 +284,7 @@
 							type: 'success'
 						});
 						this.storeCurrentIndex(0);
-						uni.redirectTo({
-							url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
-						});
+						this.backTo();
 					} else {
 					 this.$refs.uToast.show({
 						message: `${res.data.msg}`,
@@ -378,7 +389,6 @@
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
 						this.changeTransTaskMessage(res.data.data);
-						console.log('运送订单详情',res.data.data,this.transTaskMessage);
 						this.transportList = mergeMethods(this.transTaskMessage['patientInfoList']);
 					}
 				})
@@ -496,12 +506,13 @@
 		};
 		.content {
 			flex: 1;
-			overflow: auto;
 			padding: 0 0 10px 0;
 			box-sizing: border-box;
 		};
 		.basic-message {
 			width: 93%;
+			height: 100%;
+			overflow: auto;
 			margin: 0 auto;
 			margin-top: 14px;
 			position: relative;
