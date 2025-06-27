@@ -18,10 +18,6 @@
 		<view class="transport-rice-box" v-if="showGoalDepartment">
 			<ScrollSelection v-model="showGoalDepartment" :pickerValues="goalDepartmentDefaultIndex" :columns="goalDepartmentOption" title="目的科室" @sure="goalDepartmentSureEvent" @cancel="goalDepartmentCancelEvent" @close="goalDepartmentCloseEvent" :isShowSearch="true" />
 		</view>
-		<!-- 负责人 -->
-		<view class="transport-rice-box" v-if="showParticipant">
-			<BottomSelect :columns="participantOption" title="参与人" :currentSelectData="currentParticipant" @sure="participantSureEvent" @cancel="participantCancelEvent" @close="participantCloseEvent" />
-		</view>
 		<view class="nav">
 			<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="创建订单" @backClick="backTo">
 			</nav-bar>
@@ -47,7 +43,7 @@
 						<text>具体事项</text>
 					</view>
 					<view class="transport-type-right">
-						<u--textarea v-model="specificAffairDescribe" placeholder="请输入具体事项描述" height="120" :autoHeight="true" border="none"></u--textarea>
+						<u--textarea v-model="specificAffairDescribe" placeholder="请输入具体事项描述" border="none"></u--textarea>
 					</view>
 				</view>
 				<view class="select-box end-select-box">
@@ -68,13 +64,13 @@
 						<u-icon name="arrow-right" color="#989999" size="20" /></u-icon>
 					</view>
 				</view>
-				<view class="select-box end-select-box">
+				<view class="select-box end-select-box current-participant-box">
 					<view class="select-box-left">
 						<text>负责人</text>
 					</view>
-					<view class="select-box-right" @click="showParticipant = true">
-						<text>{{ disposeTaskPresent(currentParticipant) }}</text>
-						<u-icon name="arrow-right" color="#989999" size="20" /></u-icon>
+					<view class="select-box-right">
+						<u-input v-model="currentParticipant" border="none" :clearable="true" placeholder="请输入负责人姓名" type="text">
+						</u-input>
 					</view>
 				</view>
 				<view class="view-photoList">
@@ -84,7 +80,9 @@
 					<view>
 						<view v-for="(item, index) in resultimageList" :key='index'>
 							<image :src="item" mode="aspectFit"></image>
-							<u-icon name="close" color="#000000" @click="photoDelete(item,index)"></u-icon>
+							<view class="icon-box"  @click="photoDelete(item,index)">
+									<u-icon name="trash" color="#d70000"></u-icon>
+							</view>    
 						</view>
 						<view>
 							<image class="" mode="aspectFit" :lazy-load="true" src="/static/img/plus.png"  @click="getImg"/>
@@ -138,10 +136,7 @@
 				showGoalDepartment: false,
 				goalDepartmentDefaultIndex: [0],
 				currentGoalDepartment: '请选择',
-				
-				participantOption: [],
-				showParticipant: false,
-				currentParticipant: []
+				currentParticipant: ''
 			}
 		},
 		computed: {
@@ -310,8 +305,6 @@
 				this.structureDefaultIndex = [id];
 				this.currentStructure =  val;
 				this.currentGoalDepartment = '请选择';
-				this.currentGoalSpaces = [];
-				this.goalSpacesOption = [];
 				this.getDepartmentByStructureId(this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value'],false,false)
 			} else {
 				this.currentStructure = '请选择'
@@ -334,8 +327,6 @@
 			if (val) {
 				this.goalDepartmentDefaultIndex = [id];
 				this.currentGoalDepartment =  val;
-				this.currentGoalSpaces = [];
-				// this.getSpacesByDepartmentId(this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'],false)
 			} else {
 				this.currentGoalDepartment = '请选择'
 			};
@@ -362,26 +353,6 @@
 			// 目的科室下拉选择框关闭事件
 			goalDepartmentCloseEvent () {
 			this.showGoalDepartment = false
-			},
-			
-			// 负责人下拉选择框确认事件
-			participantSureEvent (val) {
-			if (val.length > 0) {
-				this.currentParticipant =  val
-			} else {
-				this.currentParticipant = []
-			};
-			this.showParticipant = false
-			},
-			
-			// 负责人下拉选择框取消事件
-			participantCancelEvent () {
-			this.showParticipant = false
-			},
-			
-			// 负责人下拉选择框关闭事件
-			participantCloseEvent () {
-			this.showParticipant = false
 			},
 			
 			// 根据建筑查询科室信息
@@ -425,16 +396,15 @@
 			},
 			
 			
-			// 并行查询目的建筑、负责人
+			// 并行查询目的建筑
 			parallelFunction (type) {
 				this.showLoadingHint = true;
-				Promise.all([this.getStructure(),this.queryTransporter()])
+				Promise.all([this.getStructure()])
 				.then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.length > 0) {
 						this.structureOption = [];
-						this.participantOption = [];
-						let [item1,item2] = res;
+						let [item1] = res;
 						if (item1) {
 							// 目的建筑
 							for (let i = 0, len = item1.length; i < len; i++) {
@@ -446,16 +416,6 @@
 							};
 							if (this.currentStructure != '请选择') {
 								this.getDepartmentByStructureId(this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value'],false,true)
-							}
-						};
-						if (item2) {
-							// 负责人
-							for (let i = 0, len = item2.length; i < len; i++) {
-								this.participantOption.push({
-									text: item2[i].workerName,
-									value: item2[i]['id'],
-									selected: false
-								})
 							}
 						}
 					}
@@ -490,45 +450,13 @@
 				})
 			},
 			
-			// 查询维修员
-			queryTransporter () {
-				return new Promise((resolve,reject) => {
-					getTransporter(this.proId, this.workerId)
-					.then((res) => {
-						if (res && res.data.code == 200) {
-							resolve(res.data.data)
-						} else {
-								reject({message:res.data.msg});
-								this.showLoadingHint = false;
-								this.$refs.uToast.show({
-									message: res.data.msg,
-									type: 'error',
-								})
-							}
-					})
-					.catch((err) => {
-						reject({message:err.message})
-					})
-				})
-			},
-			
-			// 处理维修任务参与者
-			disposeTaskPresent (item) {
-				if (!item) { return '请选择'};
-				if (item.length == 0) { return '请选择'};
-				let temporaryArray = [];
-				for (let innerItem of item) {
-					temporaryArray.push(innerItem.text)
-				};
-				return temporaryArray.join('、')
-			},
 			
 			// 确认事件(创建事务任务)
 			async sureEvent () {
-			// 任务类型不能为空
-			if (this.currentTaskType == '请选择') {
+			// 具体事项不能为空
+			if (this.specificAffairDescribe == '') {
 				this.$refs.uToast.show({
-					message: '任务类型不能为空',
+					message: '具体事项不能为空',
 					position: 'center'
 				});
 				return
@@ -546,7 +474,7 @@
 				workerId: this.currentTransporter == '请选择' ? '' : this.getCurrentTransporterIdByName(this.currentTransporter),
 				workerName: this.currentTransporter == '请选择' ? '' : this.currentTransporter,
 				path: [],
-				present: [], //负责人
+				present: this.currentParticipant, //负责人
 				depName: `${this.currentStructure == '请选择' ? '' : this.currentStructure}/${this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment}`, //目的科室名称
 			};
 			// 上传图片到服务器
@@ -555,15 +483,6 @@
 			  	await this.uploadFileEvent(imgI)
 			  };
 				paramsData.path = this.imageOnlinePathArr
-			};
-			// 拼接负责人数据
-			if (this.currentParticipant.length > 0) {
-				for (let item of this.currentParticipant) {
-					temporaryMessage['present'].push({
-						id: item.hasOwnProperty('value') ? item.value : item.id,
-						name: item.hasOwnProperty('text') ? item.text : item.name
-					})
-				}
 			};
 			this.postGenerateAffairTask(temporaryMessage)
 			},
@@ -666,7 +585,7 @@
 				width: 100%;
 				.message-one {
 					width: 100%;
-					padding: 10px 6px 10px 16px;
+					padding: 10px 6px;
 					box-sizing: border-box;
 					background: #fff;
 					display: flex;
@@ -675,7 +594,9 @@
 					font-size: 14px;
 					margin-top: 6px;
 					.message-one-left {
-						width: 20%;
+						width: 22%;
+						padding-left: 6px;
+						box-sizing: border-box;
 						color: #101010
 					};
 					.message-one-right {
@@ -685,8 +606,15 @@
 							justify-content: space-between;
 							.u-radio {
 								flex: 1 0 auto !important;
+								justify-content: flex-end;
 								.u-radio__label {
 									margin-right: 9px;
+								};
+								&:first-child {
+									justify-content: flex-start !important;
+								};
+								&:nth-child(2) {
+									justify-content: center !important;
 								}
 							}
 						}
@@ -702,8 +630,7 @@
 					font-size: 14px;
 					margin-top: 6px;
 					.transport-type-left {
-						padding: 0 10px;
-						box-sizing: border-box;
+						width: 22%;
 						>text {
 							color: #101010;
 							&:nth-child(1) {
@@ -726,7 +653,7 @@
 				};
 				.select-box {
 					width: 100%;
-					padding: 8px 6px;
+					padding: 8px 2px;
 					box-sizing: border-box;
 					background: #fff;
 					display: flex;
@@ -760,7 +687,7 @@
 							flex: 1;
 							@include no-wrap();
 						}
-					}
+					};
 				};
 				.end-select-box {
 					.select-box-left {
@@ -775,6 +702,23 @@
 						}
 					}
 				};
+				.current-participant-box {
+					padding: 10px 6px;
+					box-sizing: border-box;
+					.select-box-left {
+						padding-right: 0 !important;
+						padding-left: 6px !important;
+						width: 22% !important;
+					};
+					.select-box-right {
+						flex: 1;
+						::v-deep .u-input {
+							background: #f9f9f9;
+							padding: 6px 4px !important;
+							box-sizing: border-box;
+						}
+					}
+				}
 				.view-photoList {
 					width: 100%;
 					padding: 8px 6px;
@@ -789,10 +733,11 @@
 						display: inline-block;
 						&:first-child {
 							color: $color-text-left;
-							width: 80px;
+							padding-left: 6px!important;
+							width: 22%!important;
+							box-sizing: border-box;
 							vertical-align: top;
 							height: 100px;
-							padding-left: 10px;
 							line-height: 100px;
 						};
 						&:nth-child(2) {
@@ -818,10 +763,18 @@
 								&:nth-child(3n+3) {
 									margin-right: 0;
 								};
-								> /deep/ .u-icon {
+								.icon-box {
 									position: absolute;
-									top: -12px;
-									right: 0
+									bottom: 0;
+									right: 0;
+									display: flex;
+									width: 100%;
+									padding: 2px 0;
+									box-sizing: border-box;
+									justify-content: center;
+									align-items: center;
+									background: #616161;
+									/deep/ .van-icon {}  
 								};
 								image {
 									width: 100%;

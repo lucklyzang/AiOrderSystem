@@ -343,7 +343,7 @@
 		</view>
 		<view class="task-describe">
 			<text>任务描述</text>
-			<u--textarea v-model="taskDescribe" placeholder="请输入任务描述" height="140" :autoHeight="true" border="none"></u--textarea>
+			<u--textarea v-model="taskDescribe" placeholder="请输入任务描述" border="none"></u--textarea>
 		</view>
 	</view>
 	<view class="btn-box">
@@ -1845,6 +1845,9 @@ export default {
 						.u-modal__button-group__wrapper__text {
 							color: #43c3f4 !important;
 						}
+					};
+					.u-line {
+						display: none;
 					}
 				}
 			}
@@ -1891,6 +1894,7 @@ export default {
 						justify-content: space-between;
 						.u-radio {
 							flex: 1 0 auto !important;
+							justify-content: center;
 							.u-radio__label {
 								margin-right: 9px;
 							}

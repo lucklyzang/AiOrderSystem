@@ -606,7 +606,7 @@
 										temporaryWorkerMessageArray.push(item[innerItem])
 									}
 								};
-								this.cancelReasonOption.push({text: temporaryWorkerMessageArray[1], value: temporaryWorkerMessageArray[1]})
+								this.cancelReasonOption.push({text: temporaryWorkerMessageArray[1], value: temporaryWorkerMessageArray[0]})
 							};
 							// 保存任务取消原因列表信息
 							let temporaryMessage = this.allOrderCancelReason;
@@ -1414,10 +1414,10 @@
 						width: 40%;
 						background: #3B9DF9;
 						border-radius: 10px;
+					};
+					.u-line {
+						display: none;
 					}
-				  };
-				  .u-hairline--top::after {
-					border-top-width: 0 !important
 				  }
 				}
 			}	  

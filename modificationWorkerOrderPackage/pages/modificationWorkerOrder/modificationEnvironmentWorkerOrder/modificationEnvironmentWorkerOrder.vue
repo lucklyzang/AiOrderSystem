@@ -126,8 +126,7 @@
 					问题描述
 				</view>
 				<view class="remark-box">
-					<u--textarea v-model="enterRemark" placeholder="请输入问题简要概述" rows="3"
-							autosiz :autoHeight="true"></u--textarea>
+					<u--textarea v-model="enterRemark" placeholder="请输入问题简要概述"></u--textarea>
 				</view>
 			</view>
 		</view>

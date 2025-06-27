@@ -96,8 +96,7 @@
 						<text>问题概述</text>
 					</view>
 					<view class="transport-type-right">
-						<u--textarea v-model="problemOverview" placeholder="请输入问题简要概述" rows="1"
-							autosiz :autoHeight="true" border="none"></u--textarea>
+						<u--textarea v-model="problemOverview" :autoHeight="true" placeholder="请输入问题简要概述" border="none"></u--textarea>
 					</view>
 				</view>
 				<view class="select-box end-select-box">
@@ -143,7 +142,7 @@
 						<text>任务描述</text>
 					</view>
 					<view class="transport-type-right">
-						<u--textarea v-model="taskDescribe" placeholder="请输入任务描述" height="120" :autoHeight="true" border="none"></u--textarea>
+						<u--textarea v-model="taskDescribe" placeholder="请输入任务描述" border="none"></u--textarea>
 					</view>
 				</view>
 				<view class="consumable-management-area">
@@ -1458,10 +1457,10 @@
 							.u-modal__button-group__wrapper__text {
 									color: #fff !important;
 							}
-					}
 					};
-					.van-hairline--top::after {
-						border-top-width: 0 !important
+					.u-line {
+						display: none;
+					}
 					}
 				}
 		};
@@ -1513,10 +1512,10 @@
 							.u-modal__button-group__wrapper__text {
 								color: #fff !important;
 							}
-					}
 					};
-					.van-hairline--top::after {
-						border-top-width: 0 !important
+					.u-line {
+						display: none;
+					}
 					}
 			}
 		};
@@ -1573,6 +1572,7 @@
 								justify-content: space-between;
 								.u-radio {
 									flex: 1 0 auto !important;
+									justify-content: center;
 									.u-radio__label {
 										margin-right: 9px;
 									}

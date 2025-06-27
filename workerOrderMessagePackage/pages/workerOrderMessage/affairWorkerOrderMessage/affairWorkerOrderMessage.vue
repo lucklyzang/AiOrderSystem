@@ -467,10 +467,10 @@ page {
  						width: 40%;
  						background: #3B9DF9;
  						border-radius: 10px;
- 					}
- 				  };
- 				  .u-hairline--top::after {
- 					border-top-width: 0 !important
+ 					};
+					.u-line {
+						display: none;
+					}
  				  }
  				}
  			}	  
