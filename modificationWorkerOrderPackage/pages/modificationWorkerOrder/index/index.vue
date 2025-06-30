@@ -622,7 +622,7 @@ export default {
 						isContactisolationValue: casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList'][i]['quarantine'].toString(),
 						sampleList: [], //病人信息模态框中运送大类列表 
 						sampleValue: this.currentTransportRice, //病人信息模态框中选中的运送大类名称
-						sampleId: casuallyTemporaryStorageCreateDispathTaskMessage['parentTypeId'], //病人信息模态框中选中的运送大类id
+						sampleId: this.currentTransportRiceValue, //病人信息模态框中选中的运送大类id
 						transportList: [],
 						generList: []
 					});
@@ -635,7 +635,7 @@ export default {
 						})
 					}
 				};
-				this.querytransportChildByTransportParent(0, casuallyTemporaryStorageCreateDispathTaskMessage['parentTypeId'], this.templateType,true);
+				this.querytransportChildByTransportParent(0, this.currentTransportRiceValue,this.templateType,true);
 			}
 		},
 
@@ -686,11 +686,13 @@ export default {
 			this.xflSelectShow = true;
 			this.patienModalShow = true;
 			this.patienModalMessage = {};
-			this.patienModalMessage = _.cloneDeep(this.templatelistTwo[index]);
-			// 过滤掉运送类型小类值为空的情况
-			this.patienModalMessage['transportList'] = this.patienModalMessage['transportList'].filter((item) => { return !item['text'] != true });
-			this.transferGenderTwo();
-			//病人信息展示框运送大类、运送小类为空时,给编辑病人信息模态框的运送大类和小类赋值)
+			this.$nextTick(() => {
+			  this.patienModalMessage = _.cloneDeep(this.templatelistTwo[index]);
+			  // 过滤掉运送类型小类值为空的情况
+			  this.patienModalMessage['transportList'] = this.patienModalMessage['transportList'].filter((item) => { return !item['text'] != true });
+				this.transferGenderTwo();
+			});
+			//病人信息展示框中的运送大类、运送小类为空时,给编辑病人信息模态框的运送大类和小类赋值
 			if (!this.templatelistTwo[index]['sampleValue']) {
 				this.patienModalMessage['sampleList']  = this.transportTypeParent; //病人信息模态框中运送大类列表 
 				this.patienModalMessage['sampleValue'] = this.currentTransportRice; //病人信息模态框中选中的运送大类名称
@@ -846,8 +848,7 @@ export default {
 							}
 						} else {
 							this.transportTypeIndex = null
-						};
-						console.log('运送类型',this.transportTypeList);
+						}
 					}
 				} else {
 					this.$refs.uToast.show({
