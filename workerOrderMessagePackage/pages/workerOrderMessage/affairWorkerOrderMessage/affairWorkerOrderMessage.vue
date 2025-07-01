@@ -325,13 +325,15 @@ export default {
    
    // 事务订单取消原因弹框确定事件
    affairCancelReasonDialogSure () {
-   	this.affairCancelReasonShow = false;
      if (this.affairSelectCancelReason.value == null) {
    		this.$refs.uToast.show({
-   			message: '请选择取消原因'
+   			message: '请选择取消原因',
+				position: 'bottom'
    		});
    		return 
-   	};
+   	} else {
+			this.affairCancelReasonShow = false;
+		};
     // 事务订单取消
    	this.cancelAffairWorkerOrderMessageTask({
    		taskId: this.taskId, //任务id

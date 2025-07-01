@@ -310,12 +310,14 @@
 			
 			// 运送订单取消原因弹框确定事件
 			cancelReasonDialogSure () {
-				this.cancelReasonShow = false;
 			  if (this.selectCancelReason.value == null) {
 					this.$refs.uToast.show({
-						message: '请选择取消原因'
+						message: '请选择取消原因',
+						position: 'bottom'
 					});
 					return 
+				} else {
+					this.cancelReasonShow = false;
 				};
 				
 			  // 运送订单取消

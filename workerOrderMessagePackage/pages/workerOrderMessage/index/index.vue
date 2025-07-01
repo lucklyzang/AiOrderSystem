@@ -864,12 +864,14 @@
 			
 			// 运送订单取消原因弹框确定事件
 			cancelReasonDialogSure () {
-				this.cancelReasonShow = false;
 			  if (this.selectCancelReason.value == null) {
 					this.$refs.uToast.show({
-						message: '请选择取消原因'
+						message: '请选择取消原因',
+						position: 'bottom'
 					});
 					return 
+				} else {
+					this.cancelReasonShow = false;
 				};
 			  // 运送订单取消
 				this.cancelDispatchTask({
@@ -933,12 +935,14 @@
 			
 			// 环境订单取消原因弹框确定事件
 			environmentCancelReasonDialogSure () {
-				this.environmentCancelReasonShow = false;
 			  if (this.environmentSelectCancelReason.value == null) {
 					this.$refs.uToast.show({
-						message: '请选择取消原因'
+						message: '请选择取消原因',
+						position: 'bottom'
 					});
 					return 
+				} else {
+					this.environmentCancelReasonShow = false;
 				};
 			  // 环境订单取消
 				this.cancelEnvironmentWorkerOrderMessageTask({
@@ -993,12 +997,14 @@
 			
 			// 工程订单取消原因弹框确定事件
 			projectCancelReasonDialogSure () {
-				this.projectCancelReasonShow = false;
 			  if (this.projectSelectCancelReason.value == null) {
 					this.$refs.uToast.show({
-						message: '请选择取消原因'
+						message: '请选择取消原因',
+						position: 'bottom'
 					});
 					return 
+				} else {
+					this.projectCancelReasonShow = false;
 				};
 			  // 工程订单取消
 				this.cancelProjectWorkerOrderMessageTask({
@@ -1054,12 +1060,14 @@
 			
 			// 事务订单取消原因弹框确定事件
 			affairCancelReasonDialogSure () {
-				this.affairCancelReasonShow = false;
 			  if (this.affairSelectCancelReason.value == null) {
 					this.$refs.uToast.show({
-						message: '请选择取消原因'
+						message: '请选择取消原因',
+						position: 'bottom'
 					});
 					return 
+				} else {
+					this.affairCancelReasonShow = false;
 				};
 			  // 事务订单取消
 				this.cancelAffairWorkerOrderMessageTask({

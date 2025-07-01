@@ -618,7 +618,7 @@
 			        managerName: this.userInfo.name,// 保洁主管姓名，当前登陆人员姓名
 			        assignId: this.userInfo.id, // 任务分配人员id，当前登陆人员id
 			        assignName: this.userInfo.name,// 任务分配人员姓名，当前登陆人员姓名
-			        workerId:  this.workerValue == 0 ? null : this.workerValue,//保洁员id
+			        workerId: this.workerValue == 0 ? '' :  this.workerValue,//保洁员id
 			        priority: this.priorityValue, //优先级
 			        workerName: this.workerText == '请选择保洁员' ? '' : this.workerText,//保洁员姓名
 			        path: [], // 上传的问题图片，集合,
@@ -834,6 +834,7 @@
 		    overflow: auto;
 		    .category-box {
 		      padding: 0 8px;
+					min-height: 38px;
 		      margin-bottom: 6px;
 		      height: 40px;
 		      box-sizing: border-box;

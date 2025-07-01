@@ -223,13 +223,15 @@ export default {
     
     // 环境订单取消原因弹框确定事件
     environmentCancelReasonDialogSure () {
-    	this.environmentCancelReasonShow = false;
       if (this.environmentSelectCancelReason.value == null) {
     		this.$refs.uToast.show({
-    			message: '请选择取消原因'
+    			message: '请选择取消原因',
+					position: 'bottom'
     		});
     		return 
-    	};
+    	} else {
+				this.environmentCancelReasonShow = false;
+			};
       // 环境订单取消
     	this.cancelEnvironmentWorkerOrderMessageTask({
     		id: this.taskId, //当前任务ID
