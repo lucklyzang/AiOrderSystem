@@ -12,7 +12,7 @@ const instance = axios.create({
 	retryDelay: 1000, // 每次重试间隔时间
 	timeout: 30000,
   headers: {
-    // common: {    
+    // common: {
     //   'Accept': 'application/json, test/plain,'
     // }
     // post: {

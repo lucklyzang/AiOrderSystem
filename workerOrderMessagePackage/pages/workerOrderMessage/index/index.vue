@@ -1057,7 +1057,6 @@
 			  this.affairCancelReasonValue = item.value;	
 			  this.affairSelectCancelReason = item;
 			},
-			
 			// 事务订单取消原因弹框确定事件
 			affairCancelReasonDialogSure () {
 			  if (this.affairSelectCancelReason.value == null) {
