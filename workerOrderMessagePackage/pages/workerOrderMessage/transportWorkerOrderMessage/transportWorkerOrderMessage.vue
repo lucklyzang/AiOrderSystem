@@ -118,13 +118,13 @@
 					 </view>
 						<view class="handle-message-line-wrapper">
 							<view class="describe-line-wrapper">
-								<text class="message-tit">语音备注 :&nbsp;</text>
-								<text class="message-tit-real-audio" v-if="showChildrenComponent">
+								<view class="message-tit">语音备注 :&nbsp;</view>
+								<view class="message-tit-real-audio" v-if="showChildrenComponent">
 									<MyAudio v-if="!transTaskMessage.recordTime != true" :src="`http://show.blinktech.cn/trans/${transTaskMessage.taskNumber}.mp3`"></MyAudio>
-								</text>
-								<text class="message-tit-real" v-show="!transTaskMessage.recordTime">
+								</view>
+								<view class="message-tit-real" v-show="!transTaskMessage.recordTime">
 									无语音信息
-								</text>
+								</view>
 							</view>
 						</view>
 				 </view>
@@ -155,8 +155,8 @@
 				 <view class="wait-handle-message-bottom">
 						<view class="handle-message-line-wrapper">
 						 <view class="describe-line-wrapper">
-							 <text class="message-tit">任务描述 :&nbsp;</text>
-							 <text class="message-tit-real">{{transTaskMessage.taskRemark ? transTaskMessage.taskRemark : '无'}}</text>
+							 <view class="message-tit">任务描述 :&nbsp;</view>
+							 <view class="message-tit-real">{{transTaskMessage.taskRemark ? transTaskMessage.taskRemark : '无'}}</view>
 						 </view>
 						</view>
 				 </view>
@@ -183,12 +183,12 @@
 	import { updateDispatchTask, getDispatchTaskMessageById } from '@/api/transport.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import SelectSearch from "@/components/selectSearch/selectSearch";
-	// import MyAudio from '@/components/myAudio'
+	import MyAudio from '@/components/myAudio/myAudio';
 	export default {
 		components: {
 			navBar,
-			SelectSearch
-			// MyAudio
+			SelectSearch,
+			MyAudio
 		},
 		data() {
 			return {
@@ -196,7 +196,8 @@
 				infoText: '加载中···',
 				transportList: [],
 				taskId: '',
-				tierNum: 0, 
+				tierNum: 0,
+				showChildrenComponent: false,
 				selectCancelReason: {},
 				cancelReasonShow: false,
 				cancelReasonValue: null,
@@ -390,6 +391,7 @@
 				.then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
+						this.showChildrenComponent = true;
 						this.changeTransTaskMessage(res.data.data);
 						this.transportList = mergeMethods(this.transTaskMessage['patientInfoList']);
 					}
@@ -593,6 +595,19 @@
 					};
 					.describe-line-wrapper {
 						width: 100%;
+						display: flex;
+						height: 40px;
+						align-items: center;
+						>view {
+							&:first-child {
+								width: 25%;
+								color: #a0a0a0;
+							};
+							&:last-child {
+								flex: 1;
+								color: black;
+							}
+						};
 						.message-tit-real-audio {
 							margin-left: 4px
 						}

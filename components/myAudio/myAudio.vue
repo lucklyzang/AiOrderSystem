@@ -31,7 +31,8 @@ export default {
             audio: null,
             animate: false,
             timer: null,
-            duration: null
+            duration: null,
+						audioContext: null
         }
     },
     watch: {
@@ -41,49 +42,78 @@ export default {
     },
 
     mounted () {
-        this.audio = new Audio();
-        this.audio.src = this.src;
-        this.audio.addEventListener('canplaythrough',() => {
-            this.duration = this.format(this.audio.duration)
-        });
-        this.audio.onplay = () => {
-            this.animate = true;
-            this.timer = setInterval(() => {
-                this.animate = false;
-                setTimeout(() => {
-                    this.animate=true
-                },50)
-            }, 1250)
-        };
-        this.audio.onpause = () => {
-            this.animate = false;
-            this.timer&&clearInterval(this.timer)
-        };
-        this.audio.onended = () =>{
-            this.animate = false;
-            this.timer&&clearInterval(this.timer)
-        };
+				this.audioContext = uni.createInnerAudioContext();
+				this.audioContext.src = this.src;
+				this.audioContext.onCanplay(() => {
+				  this.duration = this.format(this.audioContext.duration);
+				});
+				this.audioContext.onPlay(() => {
+				  this.animate = true;
+					this.timer = setInterval(() => {
+							this.animate = false;
+							setTimeout(() => {
+									this.animate=true
+							},50)
+					}, 1250)
+				});
+				this.audioContext.onPause(() => {
+				  this.animate = false;
+				  this.timer&&clearInterval(this.timer)
+				});
+				this.audioContext.onEnded(() => {
+				  this.animate = false;
+				  this.timer&&clearInterval(this.timer)
+				});
+        // this.audio = new Audio();
+        // this.audio.src = this.src;
+        // this.audio.addEventListener('canplaythrough',() => {
+        //     this.duration = this.format(this.audio.duration)
+        // });
+        // this.audio.onplay = () => {
+        //     this.animate = true;
+        //     this.timer = setInterval(() => {
+        //         this.animate = false;
+        //         setTimeout(() => {
+        //             this.animate=true
+        //         },50)
+        //     }, 1250)
+        // };
+        // this.audio.onpause = () => {
+        //     this.animate = false;
+        //     this.timer&&clearInterval(this.timer)
+        // };
+        // this.audio.onended = () =>{
+        //     this.animate = false;
+        //     this.timer&&clearInterval(this.timer)
+        // };
     },
     methods:{
         play () {
-            if(this.audio.paused) {
-                this.audio.play()
+            if(this.audioContext.paused) {
+                this.audioContext.play()
             } else {
-                this.audio.pause()
+                this.audioContext.pause()
             }
         },
-        format (s) {
-            var t='';
-            if(s > -1){
-                var min = Math.floor(s/60) % 60;
-                var sec = s % 60;
-                if(min < 10){t += "0";}
-                t += min + "'";
-                if(sec < 10){t += "0";}
-                t += sec.toFixed(2);
-            };
-            t=t.replace('.','\"');
-            return t
+        format (seconds) {
+          // 计算小时
+					let hours = Math.floor(seconds / 3600);
+					if (hours < 10) {
+						hours = '0' + hours
+					};
+					seconds %= 3600;
+					// 计算分钟
+					let minutes = Math.floor(seconds / 60);
+					if (minutes < 10) {
+						minutes = '0' + minutes
+					};
+					// 计算剩余秒数
+					let remainingSeconds = Math.floor(seconds + 0.5);
+					if (remainingSeconds < 10) {
+						remainingSeconds = '0' + remainingSeconds
+					};
+					// 返回格式化字符串
+					return `${hours}:${minutes}:${remainingSeconds}`;
         }
     }
 }
@@ -145,7 +175,7 @@ export default {
     .x-time{
         color: #999;
         font-size: 12px;
-        margin-right: 10px;
+        margin-right: 12px;
     }
     &.inline{
         display: inline-flex

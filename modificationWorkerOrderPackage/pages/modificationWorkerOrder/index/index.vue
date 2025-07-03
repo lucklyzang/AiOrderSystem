@@ -586,7 +586,7 @@ export default {
 				this.currentTransportRiceValue = casuallyTemporaryStorageCreateDispathTaskMessage['parentTypeId'];
 				this.currentStartDepartment = casuallyTemporaryStorageCreateDispathTaskMessage['setOutPlaceName'];
 				this.currentEndDepartment = casuallyTemporaryStorageCreateDispathTaskMessage['destinationName'];
-				this.currentTransporter = casuallyTemporaryStorageCreateDispathTaskMessage['workerName'];
+				this.currentTransporter = casuallyTemporaryStorageCreateDispathTaskMessage['workerName'] === '' ? '请选择' : casuallyTemporaryStorageCreateDispathTaskMessage['workerName'];
 				this.patientAgeValue = !casuallyTemporaryStorageCreateDispathTaskMessage['age'] ? '' : casuallyTemporaryStorageCreateDispathTaskMessage['age'];
 				this.currentTransporterValue = casuallyTemporaryStorageCreateDispathTaskMessage['workerId'];
 				this.currentTransportTool = casuallyTemporaryStorageCreateDispathTaskMessage['toolName'];
@@ -605,7 +605,7 @@ export default {
 				this.currentTransportRice = this.extractTransTypeName(casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList']);
 				this.currentTransportRiceValue = this.extractTransTypeValue(casuallyTemporaryStorageCreateDispathTaskMessage['patientInfoList']);
 				this.currentStartDepartment = casuallyTemporaryStorageCreateDispathTaskMessage['setOutPlaceName'];
-				this.currentTransporter = casuallyTemporaryStorageCreateDispathTaskMessage['workerName'];
+				this.currentTransporter = casuallyTemporaryStorageCreateDispathTaskMessage['workerName'] === '' ? '请选择' : casuallyTemporaryStorageCreateDispathTaskMessage['workerName'];
 				this.currentTransporterValue = casuallyTemporaryStorageCreateDispathTaskMessage['workerId'];
 				this.currentTransportTool = casuallyTemporaryStorageCreateDispathTaskMessage['toolName'];
 				this.taskTransportTotal = casuallyTemporaryStorageCreateDispathTaskMessage['actualCount'];
