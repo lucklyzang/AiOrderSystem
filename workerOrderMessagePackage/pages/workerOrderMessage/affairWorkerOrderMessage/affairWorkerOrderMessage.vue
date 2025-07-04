@@ -486,8 +486,6 @@ page {
 		 padding: 0 0 10px 0;
 		 box-sizing: border-box;
 		.message-box {
-			height: 100%;
-			overflow: auto;
 				.message-one {
 						width: 100%;
 						padding: 4px 6px;

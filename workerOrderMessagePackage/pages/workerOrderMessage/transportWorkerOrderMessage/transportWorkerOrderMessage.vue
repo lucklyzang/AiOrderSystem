@@ -510,13 +510,12 @@
 		};
 		.content {
 			flex: 1;
+			overflow: auto;
 			padding: 0 0 10px 0;
 			box-sizing: border-box;
 		};
 		.basic-message {
 			width: 93%;
-			height: 100%;
-			overflow: auto;
 			margin: 0 auto;
 			margin-top: 14px;
 			position: relative;
