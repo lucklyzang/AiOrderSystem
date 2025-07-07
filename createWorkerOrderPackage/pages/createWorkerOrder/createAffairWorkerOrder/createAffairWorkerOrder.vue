@@ -103,7 +103,7 @@
 		mapGetters,
 		mapMutations
 	} from 'vuex'
-	import { createRepairsTask, getTransporter, queryDepartment, queryStructure } from '@/api/project.js'
+	import { createAffairTask, queryDepartment, queryStructure } from '@/api/affair.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import { setCache,removeAllLocalStorage } from '@/common/js/utils'
 	import _ from 'lodash'
@@ -491,7 +491,7 @@
 			postGenerateAffairTask (data) {
 				this.infoText = '创建中···';
 				this.showLoadingHint = true;
-				createRepairsTask(data).then((res) => {
+				createAffairTask(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
 						this.$refs.uToast.show({
