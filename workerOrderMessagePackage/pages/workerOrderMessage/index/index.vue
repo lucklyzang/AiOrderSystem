@@ -269,11 +269,11 @@
 			<view class="transport-order-list" @click="enterOrderDetailsEvent(item,'affair')" v-for="(item,index) in affairOrderList" :key="index">
 				<view class="list-content-top">
 					<view class="list-content-top-left">
-						<image :src="item.createType == 1 ? '/static/img/ai-create-order-icon.png' : '/static/img/manual-create-icon.png'"></image>
-						<text>{{ item.createType == 1 ? 'Ai下单' : '手动下单' }}</text>
+						<image :src="item.source == '手动创建' ? '/static/img/manual-create-icon.png' : '/static/img/ai-create-order-icon.png'"></image>
+						<text>{{ item.source == '手动创建' ?  '手动下单' : 'Ai下单' }}</text>
 						<text>{{ item.createTime }}</text>
 					</view>
-					<view class="list-content-top-right">
+					<view class="list-content-top-right" :class="{'noLookupStyle':affairTaskMessage.state == 1,'underwayStyle':affairTaskMessage.state == 2,'tobeSigned':affairTaskMessage.state == 3}">
 						<text>{{ affairTaskStatusTransition(item.state) }}</text>
 					</view>
 				</view>
@@ -289,7 +289,7 @@
 					<view class="modification-btn" @click.stop="modificationOrderEvent(item,'affair')">
 						修改
 					</view>
-					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'affair')" v-if="item.state < 5">
+					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'affair')" v-if="item.state = 1">
 						取消订单
 					</view>
 				</view>
@@ -771,33 +771,15 @@
 			// 事务任务状态转换
 			affairTaskStatusTransition (state) {
 				switch(state) {
-					case 0 :
-						return '未分配'
-						break;
 					case 1 :
-						return '未查阅'
+						return '待处理'
 						break;
 					case 2 :
-						return '未开始'
-						break;
-					case 3 :
-						return '进行中'
-						break;
-					case 4 :
-						return '待签字'
-						break;
-					case 5 :
 						return '已完成'
 						break;
-					case 6 :
+					case 3 :
 						return '已取消'
-						break;
-					case 7 :
-						return '已延迟'
-						break;
-					 case 8 :
-						return '待审核'
-						break;
+						break
 				}
 			},
 			
@@ -1070,10 +1052,9 @@
 				};
 			  // 事务订单取消
 				this.cancelAffairWorkerOrderMessageTask({
-					taskId: this.taskId, //任务id
-					state: 6,
-					proId: this.proId, // 医院id
-					reason: this.affairSelectCancelReason['text'] //取消原因
+					id: this.taskId, //任务id
+					state: 3,
+					cancelReason: this.affairSelectCancelReason['text'] //取消原因
 				})
 			},
 			
@@ -1178,13 +1159,18 @@
 			this.infoText = '加载中···';
 			this.showLoadingHint = true;
 			this.isShowAffairNoData = false;
-			affairList(-3,this.proId,1)
+			affairList({
+				proId: this.proId,
+				system: 6,
+				startDate: '',
+				endDate: ''
+			})
 			.then((res) => {
 				this.showLoadingHint = false;
 				if (res && res.data.code == 200) {
 					this.affairOrderList = res.data.data;
-					// 显示未完成(不包括已取消)的任务状态(0-未分配，1-未查阅,2-未开始，3-进行中，4-待签字，5-已完成，6-已取消)
-					this.affairOrderList = this.affairOrderList.filter(( item ) => { return item.state != 5 && item.state != 6});
+					// 显示未完成(不包括已取消)的任务状态(1-待处理，2-已完成, 3-已取消)
+					this.affairOrderList = this.affairOrderList.filter(( item ) => { return item.state != 2});
 					if (this.affairOrderList.length == 0) {
 						this.isShowAffairNoData = true;
 						this.affairOrderList = [];

@@ -242,7 +242,7 @@
 				this.showLoadingHint = true;
 				return new Promise((resolve, reject) => {
 					uni.uploadFile({
-					 url: 'https://blink.blinktech.cn/clean/oss/upload ',
+					 url: 'https://blink.blinktech.cn/patrol/oss/getSign',
 					 filePath: imgI,
 					 name: 'files',
 					 header: {
@@ -463,26 +463,26 @@
 			};
 			// 创建事务任务
 			let temporaryMessage = {
-				depId: this.currentGoalDepartment == '请选择' ? '' : this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'], // 目的科室id
 				priority: this.priorityRadioValue,
 				proId: this.proId,
-				proName: this.proName,
+				structureId: this.currentStructure == '请选择' ? '' : this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value'], // 建筑id
+				structureName: this.currentStructure == '请选择' ? '' : this.currentStructure, // 建筑名称
 				createId: this.workerId,
 				createName: this.userName,
-				taskRemark: this.specificAffairDescribe, //具体事项
-				createType: 0, // 创建类型 0-调度员 2-医务人员 3-巡检人员
-				workerId: this.currentTransporter == '请选择' ? '' : this.getCurrentTransporterIdByName(this.currentTransporter),
-				workerName: this.currentTransporter == '请选择' ? '' : this.currentTransporter,
-				path: [],
-				present: this.currentParticipant, //负责人
-				depName: `${this.currentStructure == '请选择' ? '' : this.currentStructure}/${this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment}`, //目的科室名称
+				details: this.specificAffairDescribe, //具体事项
+				images: [],
+				source: '手动创建',
+				system: 6,
+				manager: this.currentParticipant, //负责人
+				departmentName: this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment, //目的科室名称
+				departmentId: this.currentGoalDepartment == '请选择' ? '' : this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'] // 目的科室id
 			};
 			// 上传图片到服务器
 			if (this.fileList.length > 0) {
 			  for (let imgI of this.fileList) {
 			  	await this.uploadFileEvent(imgI)
 			  };
-				paramsData.path = this.imageOnlinePathArr
+				paramsData.images = this.imageOnlinePathArr
 			};
 			this.postGenerateAffairTask(temporaryMessage)
 			},

@@ -43,9 +43,9 @@
 					<view class="message-one">
 							<view class="message-one-left">
 									<text>编号:</text>
-									<text>{{ affairTaskMessage.taskNumber }}</text>
+									<text>{{ affairTaskMessage.number }}</text>
 							</view>
-							<view class="message-one-right" :class="{'noAllocationStyle':affairTaskMessage.state == 0,'noLookupStyle':affairTaskMessage.state == 1,'noStartStyle': affairTaskMessage.state == 2,'underwayStyle':affairTaskMessage.state == 3,'tobeSigned':affairTaskMessage.state == 4}">
+							<view class="message-one-right" :class="{'noLookupStyle':affairTaskMessage.state == 1,'underwayStyle':affairTaskMessage.state == 2,'tobeSigned':affairTaskMessage.state == 3}">
 									{{ taskStatusTransition(affairTaskMessage.state) }}
 							</view>
 					</view>
@@ -69,7 +69,7 @@
 									<text>具体事项</text>
 							</view>
 							<view class="message-two-right">
-									{{ affairTaskMessage.depName == '/' ? '' : affairTaskMessage.depName }}
+									{{ affairTaskMessage.details }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -77,7 +77,7 @@
 									<text>目的建筑</text>
 							</view>
 							<view class="message-two-right">
-								 {{ disposeCheckType(affairTaskMessage.spaces) }}
+								 {{ affairTaskMessage.structureName }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -85,7 +85,7 @@
 									<text>目的科室</text>
 							</view>
 							<view class="message-two-right">
-									{{ affairTaskMessage.workerName }}
+									{{ affairTaskMessage.departmentName }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -93,7 +93,7 @@
 									<text>负责人</text>
 							</view>
 							<view class="message-two-right">
-									{{ disposeTaskPresent(affairTaskMessage.present) }}
+									{{ affairTaskMessage.manager }}
 							</view>
 					</view>
 					<view class="issue-image">
@@ -204,21 +204,10 @@ export default {
 			this.problemPicturesEchoList = [];
 			if (this.affairTaskMessage.hasOwnProperty('images')) {
 				if (this.affairTaskMessage['images'].length > 0) {
-					this.problemPicturesEchoList = this.affairTaskMessage['images'].filter((item) => { return item.imgType == 0});
+					this.problemPicturesEchoList = this.affairTaskMessage['images'];
 				}
 			}	
 		},
-			
-    // 处理维修任务空间信息
-    disposeCheckType (item) {
-      if (!item) { return };
-      if (item.length == 0) { return };
-      let temporaryArray = [];
-      for (let innerItem of item) {
-        temporaryArray.push(innerItem.name)
-      };
-      return temporaryArray.join('、')
-    },
 		
     // 计算已经历时间
     elapsedTime (planStartTme) {
@@ -230,17 +219,6 @@ export default {
         return `${this.$moment(currentTime).diff(transferPlanStartTme, 'minutes')}分钟`
       }
     },
-	
-	// 处理维修任务参与者
-	disposeTaskPresent (item) {
-		if (!item) { return };
-		if (item.length == 0) { return };
-		let temporaryArray = [];
-		for (let innerItem of item) {
-			temporaryArray.push(innerItem.name)
-		};
-		return temporaryArray.join('、')
-	},
 
     // 图片放大事件
     enlareEvent (item) {
@@ -292,7 +270,7 @@ export default {
      cancelAffairTask(data)
      .then((res) => {
    		this.showLoadingHint = false;
-   		this.$refs['affairCancelOption'].clearSelectValue()
+   		this.$refs['affairCancelOption'].clearSelectValue();
    		if (res && res.data.code == 200) {
    			this.$refs.uToast.show({
    				message: `${res.data.msg}`,
@@ -336,10 +314,9 @@ export default {
 		};
     // 事务订单取消
    	this.cancelAffairWorkerOrderMessageTask({
-   		taskId: this.taskId, //任务id
-   		state: 6,
-   		proId: this.proId, // 医院id
-   		reason: this.affairSelectCancelReason['text'] //取消原因
+   		id: this.taskId, //任务id
+   		state: 3,
+   		cancelReason: this.affairSelectCancelReason['text'] //取消原因
    	})
    },
    
@@ -352,24 +329,15 @@ export default {
     // 任务状态转换
     taskStatusTransition (state) {
       switch(state) {
-        case 0 :
-          return '未分配'
-          break;
         case 1 :
-          return '未查阅'
+          return '待处理'
           break;
         case 2 :
-          return '未开始'
+          return '已完成'
           break;
         case 3 :
-          return '进行中'
+          return '已取消'
           break;
-        case 4 :
-          return '待签字'
-          break;
-    		case 5 :
-    			return '已完成'
-    			break
       }
     },
 

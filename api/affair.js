@@ -2,17 +2,18 @@ import request from '@/api/request';
 import Qs from 'qs'
 
 // 事务任务列表查询
-export function affairList (state,proId,flag) {
+export function affairList (data) {
 	return request({
-		url: `project/bxTask/new/queryTask?state=${state}&proId=${proId}&flag=${flag}`,
-		method: 'get'
+		url: 'patrol/transactionManagement/initRtTask',
+		method: 'get',
+		params: data
 	})
 };
 
 // 事务任务取消
 export function cancelAffairTask (data) {
   return request({
-    url: 'project/bxTask/cancelTask',
+    url: 'patrol/transactionManagement',
     method: 'put',
     data
   })
@@ -21,7 +22,7 @@ export function cancelAffairTask (data) {
 // 维修任务编辑
 export function editAffairTask (data) {
   return request({
-    url: 'project/bxTask/update',
+    url: 'patrol/transactionManagement',
     method: 'put',
     data
   })
@@ -31,16 +32,16 @@ export function editAffairTask (data) {
 // 事务任务创建
 export function createAffairTask (data) {
   return request({
-    url: 'project/bxTask/cancelTask',
-    method: 'put',
+    url: 'patrol/transactionManagement',
+    method: 'post',
     data
   })
 };
 
 // 事务任务取消原因查询
-export function queryAffairTaskCancelReason(proId) {
+export function queryAffairTaskCancelReason() {
   return request({
-    url: `project/cancel/queryAll?proId=${proId}`,
+    url: 'patrol/cancel/list',
     method: 'get'
   })
 };
@@ -48,7 +49,7 @@ export function queryAffairTaskCancelReason(proId) {
 // 事务任务任务详情
 export function getAffairTaskDetails(id) {
     return request({
-        url: `clean/cleanTask/query/${id}`,
+        url: `patrol/transactionManagement/${id}`,
         method: 'get'
     })
 }

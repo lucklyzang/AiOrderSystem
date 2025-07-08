@@ -162,7 +162,7 @@
 			}
 		},
 		onLoad() {
-			this.parallelFunction();
+			this.parallelFunction()
 		},
 		methods: {
 			...mapMutations([
@@ -180,18 +180,14 @@
 					let casuallyTemporaryStorageCreateAffairTaskMessage = this.affairTaskMessage;
 					this.priorityValue = casuallyTemporaryStorageCreateAffairTaskMessage['priority'].toString();
 					this.priorityText = this.getPriorityText(casuallyTemporaryStorageCreateAffairTaskMessage['priority']);
-					this.specificAffairDescribe = casuallyTemporaryStorageCreateAffairTaskMessage['taskRemark'];
+					this.specificAffairDescribe = casuallyTemporaryStorageCreateAffairTaskMessage['details'];
 					this.resultimageList = this.getResultimageList(casuallyTemporaryStorageCreateAffairTaskMessage['images']);
 					this.fileList = this.getResultimageList(casuallyTemporaryStorageCreateAffairTaskMessage['images']);
-					this.currentParticipant = casuallyTemporaryStorageCreateAffairTaskMessage['taskRemark'];
-					// 处理目的建筑、目的科室显示信息
-					let trmporaryMessage = casuallyTemporaryStorageCreateAffairTaskMessage['depName'].split("/");
-					this.currentStructure = trmporaryMessage[0] ? trmporaryMessage[0] : '请选择';
-					this.currentGoalDepartment = trmporaryMessage[1] ? trmporaryMessage[1] : '请选择';
+					this.currentParticipant = casuallyTemporaryStorageCreateAffairTaskMessage['manager'];
+					this.currentStructure = casuallyTemporaryStorageCreateAffairTaskMessage['structureName'] == '' ? '请选择' : casuallyTemporaryStorageCreateAffairTaskMessage['structureName'];
+					this.currentGoalDepartment = casuallyTemporaryStorageCreateAffairTaskMessage['departmentName'] == '' ? '请选择' : casuallyTemporaryStorageCreateAffairTaskMessage['departmentName'];
 					// 显示目的建筑索引
 					this.structureDefaultIndex = [this.structureOption.findIndex((item) => { return item.value ==  this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value']})];
-					this.workerValue = casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerId'] == null ? 0 : casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerId'];
-					this.workerText =  casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerName'] == '' ? '请选择保洁员' : casuallyTemporaryStorageCreateEnvironmentTaskMessage['workerName'];
 				} catch(err) {
 					this.$refs.uToast.show({
 						message: `${err}`,
@@ -404,6 +400,8 @@
 									id: i
 								})
 							};
+							// 回显编辑信息
+							this.echoTemporaryStorageMessage();
 							if (this.currentStructure != '请选择') {
 								this.getDepartmentByStructureId(this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value'],false,true)
 							}
@@ -446,7 +444,7 @@
 				this.showLoadingHint = true;
 				return new Promise((resolve, reject) => {
 					uni.uploadFile({
-					url: 'https://blink.blinktech.cn/clean/oss/upload ',
+					url: 'https://blink.blinktech.cn/patrol/oss/getSign',
 					filePath: imgI,
 					name: 'files',
 					header: {
@@ -515,19 +513,20 @@
 			// 编辑事务管理任务
 			let temporaryMessage = {
 				id: this.affairTaskMessage.id,
-				depId: this.currentGoalDepartment == '请选择' ? '' : this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'], // 目的科室id
+				number: this.affairTaskMessage['number'],
 				priority: this.priorityRadioValue,
 				proId: this.proId,
-				proName: this.proName,
-				taskRemark: this.specificAffairDescribe, //具体事项
+				structureId: this.currentStructure == '请选择' ? '' : this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value'], // 建筑id
+				structureName: this.currentStructure == '请选择' ? '' : this.currentStructure, // 建筑名称
 				createId: this.workerId,
 				createName: this.userName,
-				createType: 0, // 创建类型 0-调度员 2-医务人员 3-巡检人员
-				workerId: this.currentTransporter == '请选择' ? '' : this.getCurrentTransporterIdByName(this.currentTransporter),
-				workerName: this.currentTransporter == '请选择' ? '' : this.currentTransporter,
-				path: [],
-				present: this.currentParticipant, //负责人
-				depName: `${this.currentStructure == '请选择' ? '' : this.currentStructure}/${this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment}`, //目的科室名称
+				details: this.specificAffairDescribe, //具体事项
+				images: [],
+				source: '手动创建',
+				system: 6,
+				manager: this.currentParticipant, //负责人
+				departmentName: this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment, //目的科室名称
+				departmentId: this.currentGoalDepartment == '请选择' ? '' : this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'] // 目的科室id
 			};
 			// 上传图片到服务器
 			 let alreadyUploadOnlineImgArr = this.resultimageList.filter((item) => { return item.indexOf('https://') != -1} );
@@ -536,9 +535,9 @@
 			     for (let imgI of needUploadOnlineImgArr) {
 			     	await this.uploadFileEvent(imgI)
 			     };
-			     paramsData.path = this.imageOnlinePathArr.concat(alreadyUploadOnlineImgArr);
+			     paramsData.images = this.imageOnlinePathArr.concat(alreadyUploadOnlineImgArr);
 			  } else {
-			   paramsData.path = alreadyUploadOnlineImgArr;
+			   paramsData.images = alreadyUploadOnlineImgArr;
 			};
 			this.postEditAffairTask(temporaryMessage)
 			},
