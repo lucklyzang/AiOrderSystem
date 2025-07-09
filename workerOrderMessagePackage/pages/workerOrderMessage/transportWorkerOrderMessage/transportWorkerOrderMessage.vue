@@ -164,8 +164,8 @@
 		</view>
 	</view>
 	<view class="btn-box">
-		<text class="operate-one" @click="editEvent">修改</text>
-		<text class="operate-two" @click="cancelReasonEvent">取消订单</text>
+		<text class="operate-one" @click="editEvent" v-if="projectTaskMessage.state != 3 && projectTaskMessage.state != 4 && projectTaskMessage.state != 6 && projectTaskMessage.state != 7">修改</text>
+		<text class="operate-two" @click="cancelReasonEvent" v-if="projectTaskMessage.state != 6 && projectTaskMessage.state != 7">取消订单</text>
 	</view> 
 	</view>
 </template>
@@ -202,6 +202,8 @@
 				cancelReasonShow: false,
 				cancelReasonValue: null,
 				cancelReasonOption: [{text: "请选择取消原因",value: null}],
+				noAllotPng: require('@/static/img/no-allot.png'),
+				taskDelayPng: require('@/static/img/task-delay.png'),
 				noEndPng: require('@/static/img/no-end.png'),
 				noReferPng: require('@/static/img/no-refer.png'),
 				noStartPng: require('@/static/img/no-start.png'),
@@ -363,6 +365,9 @@
 			// 任务状态转换图片
 			stateTransferimage (index) {
 				switch(index) {
+					case 0 :
+						return this.noAllotPng
+						break;
 					case 1 :
 						return this.noReferPng
 						break;
@@ -374,6 +379,9 @@
 						break;
 					case 4 :
 						return  this.noEndPng
+						break;
+					case 5 :
+						return  this.taskDelayPng
 						break;
 					case 6 :
 						return this.taskCancelPng

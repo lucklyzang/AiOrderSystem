@@ -45,7 +45,7 @@
 									<text>编号:</text>
 									<text>{{ affairTaskMessage.number }}</text>
 							</view>
-							<view class="message-one-right" :class="{'noLookupStyle':affairTaskMessage.state == 1,'underwayStyle':affairTaskMessage.state == 2,'tobeSigned':affairTaskMessage.state == 3}">
+							<view class="message-one-right" :class="{'waitDisposeStyle':affairTaskMessage.state == 1,'completeStyle':affairTaskMessage.state == 2,'cancelStyle':affairTaskMessage.state == 3}">
 									{{ taskStatusTransition(affairTaskMessage.state) }}
 							</view>
 					</view>
@@ -110,8 +110,8 @@
 			</view>
     </view>
 		<div class="btn-box">
-			<text class="operate-one" @click="editEvent">修改</text>
-			<text class="operate-two" @click="cancelReasonEvent">取消订单</text>
+			<text class="operate-one" @click="editEvent" v-if="affairTaskMessage.state != 2 && affairTaskMessage.state != 3">修改</text>
+			<text class="operate-two" @click="cancelReasonEvent" v-if="affairTaskMessage.state == 1">取消订单</text>
 		</div> 
   </view>
 </template>
@@ -476,20 +476,17 @@ page {
 							background: #E86F50;
 							border-radius: 4px
 						};
-						.noAllocationStyle {
-							background: #E86F50 !important
+						.waitDisposeStyle {
+							background: #E86F50 !important;
+							color: #fff !important;
 						};
-						.noLookupStyle {
-							background: #E8CB51 !important
+						.cancelStyle {
+							background: #E8CB51 !important;
+							color: #fff !important;
 						};
-						.noStartStyle {
-							background: #174E97 !important
-						};
-						.underwayStyle {
-							background: #289E8E !important
-						};
-						.tobeSigned {
-							background: #40f9e0 !important
+						.completeStyle {
+							background: #101010 !important;
+							color: #fff !important;
 						}
 				};
 				.message-two {

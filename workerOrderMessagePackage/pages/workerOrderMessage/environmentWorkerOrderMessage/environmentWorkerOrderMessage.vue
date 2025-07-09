@@ -21,10 +21,13 @@
       <view class="forthwith-task-number">
         <text>即时保洁编号{{environmentTaskMessage.taskNumber}}</text>
         <text :class="{
-            'underwayStyle' : environmentTaskMessage.state == 3, 
+            'noStartStyle ' : environmentTaskMessage.state == 1 || environmentTaskMessage.state == 2,
+            'underwayStyle' : environmentTaskMessage.state == 3,
+            'waitReviewStyle' : environmentTaskMessage.state == 4,
             'completeStyle' : environmentTaskMessage.state == 5,
-            'reviewStyle' : environmentTaskMessage.state == 4 || environmentTaskMessage.state == 8,
-            'haveReviewStyle' : environmentTaskMessage.state == 6
+            'haveReviewStyle' : environmentTaskMessage.state == 6,
+            'cancelStyle' : environmentTaskMessage.state == 7,
+            'reviewStyle' : environmentTaskMessage.state == 8
           }">
             {{stausTransfer(environmentTaskMessage.state)}}
         </text>
@@ -69,8 +72,8 @@
       </view>
     </view>
 		<view class="btn-box">
-			<text class="operate-one" @click="editEvent">修改</text>
-			<text class="operate-two" @click="cancelTaskEvent">取消订单</text>
+			<text class="operate-one" @click="editEvent" v-if="environmentTaskMessage.state != 3 && environmentTaskMessage.state != 4 && environmentTaskMessage.state != 5 && environmentTaskMessage.state != 6 && environmentTaskMessage.state != 7 && environmentTaskMessage.state != 8">修改</text>
+			<text class="operate-two" @click="cancelTaskEvent" v-if="environmentTaskMessage.state != 7 && environmentTaskMessage.state != 5">取消订单</text>
 		</view> 
     <!-- 环境订单取消原因弹框 -->
     <view class="trans-box">
@@ -279,6 +282,9 @@ export default {
         case 6:
             return '已复核'
             break;
+				case 7:
+				    return '已取消'
+				    break;
         case 8:
             return '复核中'
             break
@@ -468,29 +474,40 @@ page {
           justify-content: center;
           border-radius: 4px;
           background: #f3f3f3;
-          border: 1px solid #c4c4c4
         }
       };
+       .noStartStyle {
+					background: #BBBBBB !important;
+					color: #fff !important;
+       };
        .underwayStyle {
-          background: #289E8E !important;
-          color: #fff !important;
-          border: 1px solid #289E8E !important
-        };
-        .completeStyle {
-          background: #242424 !important;
-          color: #fff !important;
-          border: 1px solid #242424 !important
-        };
-        .reviewStyle {
-          background: #F2A15F !important;
-          color: #fff !important;
-          border: 1px solid #F2A15F !important
-        };
-        .haveReviewStyle {
-          background: #9B7D31 !important;
-          color: #fff !important;
-          border: 1px solid #9B7D31 !important
-        }
+					background: #289E8E !important;
+					color: #fff !important;
+       };
+       .completeStyle {
+					background: #242424 !important;
+					color: #fff !important;
+       };
+       .reviewStyle {
+					background: #F2A15F !important;
+					color: #fff !important;
+       };
+       .haveReviewStyle {
+					background: #9B7D31 !important;
+					color: #fff !important;
+       };
+       .waitReviewStyle {
+					background: orange !important;
+					color: #fff !important;
+       };
+       .cancelStyle {
+					background: #E8CB51 !important;
+					color: #fff !important;
+       };
+       .completeStyle {
+					background: #101010 !important;
+					color: #fff !important;
+       }
     };
     .location {
       padding: 14px 8px;

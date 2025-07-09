@@ -45,9 +45,19 @@
 									<text>编号:</text>
 									<text>{{ projectTaskMessage.taskNumber }}</text>
 							</view>
-							<view class="message-one-right" :class="{'noAllocationStyle':projectTaskMessage.state == 0,'noLookupStyle':projectTaskMessage.state == 1,'noStartStyle': projectTaskMessage.state == 2,
-							'underwayStyle':projectTaskMessage.state == 3,'tobeSigned':projectTaskMessage.state == 4,'waitCheck':item.state == 8
-							}">
+							<view class="message-one-right"
+								:class="{
+									'noAllocation':projectTaskMessage.state == 0,
+									'waitSureStyle':projectTaskMessage.state == 1,
+									'waitFinishStyle': projectTaskMessage.state == 2,
+									'underwayStyle':projectTaskMessage.state == 3,
+									'waitSignatureStyle':projectTaskMessage.state == 4,
+									'completeStyle':projectTaskMessage.state == 5,
+									'cancelStyle':projectTaskMessage.state == 6,
+									'delayStyle':projectTaskMessage.state == 7,
+									'waitCheckStyle':projectTaskMessage.state == 8
+								}"
+							>
 									{{ projectTaskStatusTransition(projectTaskMessage.state) }}
 							</view>
 					</view>
@@ -152,8 +162,8 @@
 			</view>
     </view>
 		<view class="btn-box">
-			<text class="operate-one" @click="editEvent">修改</text>
-			<text class="operate-two" @click="cancelReasonEvent">取消订单</text>
+			<text class="operate-one" @click="editEvent" v-if="projectTaskMessage.state != 3 && projectTaskMessage.state != 4 && projectTaskMessage.state != 5 && projectTaskMessage.state != 6 && projectTaskMessage.state != 8">修改</text>
+			<text class="operate-two" @click="cancelReasonEvent" v-if="projectTaskMessage.state != 5 && projectTaskMessage.state != 6">取消订单</text>
 		</view> 
   </view>
 </template>
@@ -379,36 +389,36 @@ export default {
 		
     // 任务状态转换
     projectTaskStatusTransition (state) {
-    	switch(state) {
-    		case 0 :
-    			return '未分配'
-    			break;
-    		case 1 :
-    			return '未查阅'
-    			break;
-    		case 2 :
-    			return '未开始'
-    			break;
-    		case 3 :
-    			return '进行中'
-    			break;
-    		case 4 :
-    			return '待签字'
-    			break;
-    		case 5 :
-    			return '已完成'
-    			break;
-    		case 6 :
-    			return '已取消'
-    			break;
-    		case 7 :
-    			return '已延迟'
-    			break;
-    		 case 8 :
-    			return '待审核'
-    			break;
-    	}
-    }
+    	switch(index) {
+				case 0 :
+					return '未分配'
+					break;
+				case 1 :
+					return '待确认'
+					break;
+				case 2 :
+					return '待完成'
+					break;
+				case 3 :
+					return '进行中'
+					break;
+				case 4 :
+					return '待签字'
+					break;
+				case 5 :
+					return '已完成'
+					break;
+				case 6 :
+					return '已取消'
+					break;
+				case 7 :
+					return '已延迟'
+					break;
+				 case 8 :
+					return '待审核'
+					break;
+			}	
+		}
   }
 };
 </script>
@@ -568,23 +578,32 @@ page {
 							background: #E86F50;
 							border-radius: 4px
 						};
-						.noAllocationStyle {
-							background: #E86F50 !important
+						.noAllocation {
+							background: #E86F50 !important;
 						};
-						.noLookupStyle {
-							background: #E8CB51 !important
-						};
-						.noStartStyle {
-							background: #174E97 !important
+						.waitSureStyle {
+							background: #FF0000 !important;
 						};
 						.underwayStyle {
-							background: #289E8E !important
+							background: #289E8E !important;
 						};
-						.tobeSigned {
-							background: #40f9e0 !important
+						.waitFinishStyle {
+							background: #298CF8 !important;
 						};
-						.waitCheck {
-							background: orange !important
+						.waitSignatureStyle {
+							background: #06e606 !important;
+						};
+						.waitCheckStyle {
+							background: #F2A15F !important;
+						};
+						.delayStyle {
+							background: #be4330 !important;
+						};
+						.cancelStyle {
+							background: #E8CB51 !important;
+						};
+						.completeStyle {
+							background: #101010 !important
 						}
 				};
 				.message-two {

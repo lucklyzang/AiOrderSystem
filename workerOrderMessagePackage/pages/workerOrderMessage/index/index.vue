@@ -122,7 +122,16 @@
 						<text>{{ item.createType == 1 ? 'Ai下单' : '手动下单' }}</text>
 						<text>{{ item.createTime }}</text>
 					</view>
-					<view class="list-content-top-right" :class="{'noLookupStyle':item.state == 1,'noStartStyle':item.state == 2,'underwayStyle':item.state == 3,'noEndStyle':item.state == 4}">
+					<view class="list-content-top-right" :class="{
+							'noAllocation' : item.state == 0,
+							'noLookupStyle' : item.state == 1,
+							'noStartStyle' : item.state == 2,
+							'underwayStyle' : item.state == 3,
+							'noEndStyle' : item.state == 4,
+							'delayStyle' : item.state == 5,
+							'cancelStyle' : item.state == 6,
+							'completeStyle' : item.state == 7
+						}">
 						<text>{{stateTransfer(item.state)}}</text>
 					</view>
 				</view>
@@ -173,10 +182,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view class="modification-btn" @click.stop="modificationOrderEvent(item,'trans')">
+					<view class="modification-btn" @click.stop="modificationOrderEvent(item,'trans')" v-if="item.state != 3 && item.state != 4 && item.state != 6 && item.state != 7">
 						修改
 					</view>
-					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'trans')" v-if="item.state < 5">
+					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'trans')" v-if="item.state != 6 && item.state != 7">
 						取消订单
 					</view>
 				</view>
@@ -192,10 +201,13 @@
 						<text>{{ item.createTime }}</text>
 					</view>
 					<view class="list-content-top-right" :class="{
-						'underwayStyle' : item.state == 3, 
+						'noStartStyle ' : item.state == 1 || item.state == 2, 
+						'underwayStyle' : item.state == 3,
+						'waitReviewStyle' : item.state == 4,
 						'completeStyle' : item.state == 5,
-						'reviewStyle' : item.state == 4 || item.state == 8,
-						'haveReviewStyle' : item.state == 6
+						'haveReviewStyle' : item.state == 6,
+						'cancelStyle' : item.state == 7,
+						'reviewStyle' : item.state == 8
 						}">
 						<text>{{ environmentStausTransfer(item.state) }}</text>
 					</view>
@@ -215,10 +227,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view class="modification-btn" @click.stop="modificationOrderEvent(item,'environment')">
+					<view class="modification-btn" @click.stop="modificationOrderEvent(item,'environment')" v-if="item.state != 3 && item.state != 4 && item.state != 5 && item.state != 6 && item.state != 7 && item.state != 8">
 						修改
 					</view>
-					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'environment')" v-if="item.state < 5">
+					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'environment')" v-if="item.state != 7 && item.state != 5">
 						取消订单
 					</view>
 				</view>
@@ -233,9 +245,18 @@
 						<text>{{ item.createType == 1 ? 'Ai下单' : '手动下单' }}</text>
 						<text>{{ item.createTime }}</text>
 					</view>
-					<view class="list-content-top-right" :class="{'noAllocationStyle':item.state == 0,'noLookupStyle':item.state == 1,'noStartStyle': item.state == 2,
-					'underwayStyle':item.state == 3,'tobeSigned':item.state == 4,'waitCheck':item.state == 8
-					}"
+					<view class="list-content-top-right" 
+						:class="{
+							'noAllocation':item.state == 0,
+							'waitSureStyle':item.state == 1,
+							'waitFinishStyle': item.state == 2,
+							'underwayStyle':item.state == 3,
+							'waitSignatureStyle':item.state == 4,
+							'completeStyle':item.state == 5,
+							'cancelStyle':item.state == 6,
+							'delayStyle':item.state == 7,
+							'waitCheckStyle':item.state == 8
+						}"
 					>
 						<text>{{ projectTaskStatusTransition(item.state) }}</text>
 					</view>
@@ -255,10 +276,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view class="modification-btn" @click.stop="modificationOrderEvent(item,'project')">
+					<view class="modification-btn" @click.stop="modificationOrderEvent(item,'project')" v-if="item.state != 3 && item.state != 4 && item.state != 5 && item.state != 6 && item.state != 8">
 						修改
 					</view>
-					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'project')" v-if="item.state < 5">
+					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'project')" v-if="item.state != 5 && item.state != 6">
 						取消订单
 					</view>
 				</view>
@@ -273,7 +294,7 @@
 						<text>{{ item.source == '手动创建' ?  '手动下单' : 'Ai下单' }}</text>
 						<text>{{ item.createTime }}</text>
 					</view>
-					<view class="list-content-top-right" :class="{'noLookupStyle':affairTaskMessage.state == 1,'underwayStyle':affairTaskMessage.state == 2,'tobeSigned':affairTaskMessage.state == 3}">
+					<view class="list-content-top-right" :class="{'waitDisposeStyle':affairTaskMessage.state == 1,'completeStyle':affairTaskMessage.state == 2,'cancelStyle':affairTaskMessage.state == 3}">
 						<text>{{ affairTaskStatusTransition(item.state) }}</text>
 					</view>
 				</view>
@@ -286,10 +307,10 @@
 					</view>
 				</view>
 				<view class="list-content-bottom">
-					<view class="modification-btn" @click.stop="modificationOrderEvent(item,'affair')">
+					<view class="modification-btn" @click.stop="modificationOrderEvent(item,'affair')" v-if="item.state != 2 && item.state != 3">
 						修改
 					</view>
-					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'affair')" v-if="item.state = 1">
+					<view class="cancel-btn" @click.stop="cancelOrderEvent(item,'affair')" v-if="item.state == 1">
 						取消订单
 					</view>
 				</view>
@@ -728,6 +749,9 @@
 								break;
 						case 6:
 								return '已复核'
+								break;
+						case 7:
+								return '已取消'
 								break
 						case 8:
 								return '复核中'
@@ -737,15 +761,15 @@
 			
 			// 工程任务状态转换
 			projectTaskStatusTransition (state) {
-				switch(state) {
+				 switch(state) {
 					case 0 :
 						return '未分配'
 						break;
 					case 1 :
-						return '未查阅'
+						return '待确认'
 						break;
 					case 2 :
-						return '未开始'
+						return '待完成'
 						break;
 					case 3 :
 						return '进行中'
@@ -765,7 +789,7 @@
 					 case 8 :
 						return '待审核'
 						break;
-				}
+					}	
 			},
 			
 			// 事务任务状态转换
@@ -1541,6 +1565,9 @@
 			}	
 		};
 		.transport-order-content {
+			.noAllocation {
+				background: #E86F50 !important;
+			};
 			.noLookupStyle {
 				background: #E8CB51 !important
 			};
@@ -1552,9 +1579,21 @@
 			};
 			.noEndStyle {
 				background: #F2A15F !important
+			};
+			.delayStyle {
+				background: #be4330 !important;
+			};
+			.cancelStyle {
+				background: #E8CB51 !important;
+			};
+			.completeStyle {
+				background: #101010 !important
 			}
 		};
 		.environment-order-content {
+			.noStartStyle {
+				background: #BBBBBB !important
+			};
 			.underwayStyle {
 				background: #289E8E !important
 			};
@@ -1566,47 +1605,56 @@
 			};
 			.haveReviewStyle {
 				background: #9B7D31 !important
+			};
+			.waitReviewStyle {
+				background: orange !important
+			};
+			.cancelStyle {
+				background: #E8CB51 !important
+			};
+			.completeStyle {
+				background: #101010 !important
 			}
 		};
 		.project-order-content {
-			.noAllocationStyle {
-				background: #E86F50 !important
-			};
-			.noLookupStyle {
-				background: #E8CB51 !important
-			};
-			.noStartStyle {
-				background: #174E97 !important
-			};
-			.underwayStyle {
-				background: #289E8E !important
-			};
-			.tobeSigned {
-				background: #40f9e0 !important
-			};
-			.waitCheck {
-				background: orange !important
-			}
+			 .noAllocation {
+					background: #E86F50 !important;
+				};
+			 .waitSureStyle {
+					background: #FF0000 !important;
+				};
+				.underwayStyle {
+					background: #289E8E !important;
+				};
+				.waitFinishStyle {
+					background: #298CF8 !important;
+				};
+				.waitSignatureStyle {
+					background: #06e606 !important;
+				};
+				.waitCheckStyle {
+					background: #F2A15F !important;
+				};
+				.delayStyle {
+					background: #be4330 !important;
+				};
+				.cancelStyle {
+					background: #E8CB51 !important;
+				};
+				.completeStyle {
+					background: #101010 !important
+				}
 		};
 		.affair-order-content {
-			.noAllocationStyle {
+			.waitDisposeStyle {
 				background: #E86F50 !important
 			};
-			.noLookupStyle {
+			.cancelStyle {
 				background: #E8CB51 !important
 			};
-			.noStartStyle {
-				background: #174E97 !important
-			};
-			.underwayStyle {
-				background: #289E8E !important
-			};
-			.tobeSigned {
-				background: #40f9e0 !important
-			};
-			.waitCheck {
-				background: orange !important
+			.completeStyle {
+				background: #101010 !important
 			}
-		};
+		}
 	}
 </style>
