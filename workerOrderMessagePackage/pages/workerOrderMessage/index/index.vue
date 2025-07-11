@@ -420,7 +420,6 @@
 			} else {
 				this.tierNum = pages.length;
 			};
-			console.log('页面栈1',pages);
 			this.parallelQueryCancelReasonFunction();
 			this.current = this.currentIndex;
 			if (this.currentIndex == 0) {
@@ -675,7 +674,7 @@
 				.catch((err) => {
 					this.showLoadingHint = false;
 					this.$refs.uToast.show({
-						message: `${err}`,
+						message: `${err.message}`,
 						type: 'error'
 					})
 				})

@@ -51,6 +51,7 @@
 <script>
 	import { mapGetters, mapMutations } from 'vuex'
 	import {logIn} from '@/api/login.js'
+	import Qs from 'qs'
 	import { setCache, getCache, removeCache } from '@/common/js/utils'
 	export default {
 	components: {
@@ -104,10 +105,10 @@
           
 			// 账号密码事件
 			sure () {
-				let loginMessage = {
+				let loginMessage = Qs.stringify({
 				  username: this.form.username,
 				  password: this.form.password
-				};
+				});
 				this.showLoadingHint = true;
 				logIn(loginMessage).then((res) => {
 					if (res) {

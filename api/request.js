@@ -54,10 +54,12 @@ function addSubscriber(callback) {
 // 添加请求拦截器
 instance.interceptors.request.use(function (config) {
 	config.headers['tenant-id'] = 1;
-  if (config['url'] == 'auth/login') {
-  	config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-  };
-	// 请求头添加Bearer token
+	if (config['url'] == 'nblink/auth/login') {
+		config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+	};
+	if (config['url'].indexOf('nblink') != -1 && config['url'] != 'nblink/auth/login') {
+		config.headers['Http_request_type'] = 'new';
+	};
 	if (store.getters.token) {
 	  config.headers['Authorization'] = `${store.getters.token}`
 	};
@@ -85,23 +87,21 @@ instance.interceptors.request.use(function (config) {
 						onAccessTokenFetched(result.accessToken)
 					}
 				} else {
+					uni.redirectTo({
+						url: '/pages/login/login'
+					});
+					isRefreshing = true;
 					// 清空store和localStorage
 					removeAllLocalStorage();
-					store.dispatch('resetDeviceState');
 					store.dispatch('resetLoginState');
-					uni.reLaunch({
-						url: '/pages/login/login'
-					}); // 失败就跳转登陆
-					isRefreshing = true
 				}
 			}).catch((err) => {
+				uni.redirectTo({
+					url: '/pages/login/login'
+				});
 				// 清空store和localStorage
 				removeAllLocalStorage();
-				store.dispatch('resetDeviceState');
 				store.dispatch('resetLoginState');
-				uni.reLaunch({
-					url: '/pages/login/login'
-				}); // 失败就跳转登陆
 				isRefreshing = true
 			})
 	};
@@ -131,19 +131,15 @@ instance.interceptors.request.use(function (config) {
 instance.interceptors.response.use(function (response) {
 	if (response.headers['token']) {
 		store.commit('changeToken', response.headers['token']);
-		setCache('token', response.headers['token'])
 	};
 	if (response.data.code == '401') {
-		// 清空store和localStorage
-		removeAllLocalStorage();
-		store.dispatch('resetDeviceState');
 		if (!store.getters.overDueWay) { 
 			uni.showToast({
 				title: 'token已过期,请重新登录!',
 				duration: 1000
 			});
 			setTimeout(() => {
-				uni.reLaunch({
+				uni.redirectTo({
 				 url: '/pages/login/login'
 				})
 			},2000);
@@ -151,30 +147,34 @@ instance.interceptors.response.use(function (response) {
 			uni.redirectTo({
 				url: '/pages/login/login'
 			})
-		}
+		};
+		// 清空store和localStorage
+		removeAllLocalStorage();
+		store.dispatch('resetLoginState');
 	};
 	return response
 }, function (error) {
 	if (Object.prototype.toString.call(error.response) === '[object Object]') {
 		if (error.response.hasOwnProperty('status')) {
 			if (error.response.status === 401) {
-				// 清空store和localStorage
-				store.dispatch('resetDeviceState');
 				if (!store.getters.overDueWay) { 
 					uni.showToast({
 						title: 'token已过期,请重新登录!',
 						duration: 1000
 					});
 					setTimeout(() => {
-						uni.reLaunch({
+						uni.redirectTo({
 						 url: '/pages/login/login'
 						})
 					},2000);
 				 } else {
-					uni.reLaunch({
+					uni.redirectTo({
 						url: '/pages/login/login'
 					})
-				}
+				};
+				// 清空store和localStorage
+				removeAllLocalStorage();
+				store.dispatch('resetLoginState');
 			}
 		}
 	};		

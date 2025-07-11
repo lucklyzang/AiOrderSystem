@@ -23,6 +23,10 @@ export default {
 			state.token = getCache('token') ? getCache('token') : null;
 			return state.token
 		},
+		affairToken:(state) => {
+			state.affairToken = getCache('affairToken') ? getCache('affairToken') : null;
+			return state.affairToken
+		},
 		overDueWay: state => state.overDueWay
 	},
 	mutations: {
@@ -44,6 +48,13 @@ export default {
 			if (playLoad && playLoad != 'null') {
 				setCache('token', playLoad);
 				state.token = playLoad
+			}
+		},
+		// 修改事务接口token状态
+		changeAffairToken(state, playLoad) {
+			if (playLoad && playLoad != 'null') {
+				setCache('affairToken', playLoad);
+				state.affairToken = playLoad
 			}
 		},
 		// 修改socken是否打开

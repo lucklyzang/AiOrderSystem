@@ -359,12 +359,6 @@ export const removeAllLocalStorage = () => {
   removeCache('userInfo');
   removeCache('isLogin');
   removeCache('token');
-	removeCache('familyId');
-	removeCache('familyMessage');
-	removeCache('userBasicInfo');
-	removeCache('nurseRankDictData');
   removeCache('storeOverDueWay');
-	removeCache('tradeStatisticsMessage');
-	removeCache('selectedBankMessage');
 	removeCache('socketOpen')
 }
