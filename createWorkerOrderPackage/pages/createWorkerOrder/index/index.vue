@@ -518,18 +518,21 @@ export default {
 			'statusBarHeight',
 			'navigationBarHeight'
 		]),
-    proId () {
-      return this.userInfo.extendData.proId
-    },
-    userName () {
-      return this.userInfo.userName
-    },
     proName () {
-      return this.userInfo.extendData.proName
+      return this.userInfo.worker['hospitalList'][0]['hospitalName']
     },
-    workerId () {
-      return this.userInfo.extendData.userId
-    }
+	proId() {
+		return this.userInfo.worker['hospitalList'][0]['hospitalId']
+	},
+	userName() {
+		return this.userInfo.userName
+	},
+	workerId() {
+		return this.userInfo.worker.id
+	},
+	depId() {
+		return this.userInfo.worker['departments'][0]['id']
+	}
   },
 
   methods: {

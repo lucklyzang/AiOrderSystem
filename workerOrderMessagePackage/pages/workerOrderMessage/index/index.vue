@@ -406,11 +406,17 @@
 			userName() {
 				return this.userInfo.userName
 			},
+			proName () {
+			  return this.userInfo.worker['hospitalList'][0]['hospitalName']
+			},
 			proId() {
-				return this.userInfo.extendData.proId
+				return this.userInfo.worker['hospitalList'][0]['hospitalId']
 			},
 			workerId() {
-				return this.userInfo.extendData.userId
+				return this.userInfo.worker.id
+			},
+			depId() {
+				return this.userInfo.worker['departments'][0]['id']
 			}
 		},
 		onShow() {
@@ -429,9 +435,9 @@
 				this.affairOrderShow = false;
 				this.getTransTaskList({
 					proId:this.proId, 
-					workerId: '',
+					workerId: this.workerId,
 					state: -1,
-					departmentId: this.userInfo.depId
+					departmentId: this.depId
 				});
 			} else if (this.currentIndex == 1) {
 				this.transportOrderShow = false;
@@ -441,7 +447,7 @@
 				this.getEnvironmentTaskList({
 					proId : this.proId, // 所属项目id
 					queryDate: '', // 查询时间
-					managerId: this.userInfo.id,//
+					managerId: this.workerId,//
 					taskType: 0 // 0-即时，1-专项
 				});
 			} else if (this.currentIndex == 2) {
@@ -485,9 +491,9 @@
 					this.affairOrderShow = false;
 					this.getTransTaskList({
 						proId:this.proId, 
-						workerId: '',
+						workerId: this.workerId,
 						state: -1,
-						departmentId: this.userInfo.depId
+						departmentId: this.depId
 					});
 				} else if (item.name === '环境订单') {
 					this.transportOrderShow = false;
@@ -912,7 +918,7 @@
 						this.getEnvironmentTaskList({
 							proId : this.proId, // 所属项目id
 							queryDate: '', // 查询时间
-							managerId: this.userInfo.id,// 保洁主管id 
+							managerId: this.workerId,// 保洁主管id 
 							taskType: 0 // 0-即时，1-专项
 						})
 					} else {

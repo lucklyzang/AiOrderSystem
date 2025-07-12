@@ -223,9 +223,19 @@
 				'allOrderCancelReason'
 			]),
 			userName() {
+				return this.userInfo.userName
+			},
+			proName () {
+			  return this.userInfo.worker['hospitalList'][0]['hospitalName']
 			},
 			proId() {
-				return this.userInfo.extendData.proId
+				return this.userInfo.worker['hospitalList'][0]['hospitalId']
+			},
+			workerId() {
+				return this.userInfo.worker.id
+			},
+			depId() {
+				return this.userInfo.worker['departments'][0]['id']
 			}
 		},
 		onShow() {

@@ -116,9 +116,19 @@
 				'locationMessage'
 			]),
 			userName() {
+				return this.userInfo.userName
+			},
+			proName () {
+			  return this.userInfo.worker['hospitalList'][0]['hospitalName']
 			},
 			proId() {
-				return this.userInfo.extendData.proId
+				return this.userInfo.worker['hospitalList'][0]['hospitalId']
+			},
+			workerId() {
+				return this.userInfo.worker.id
+			},
+			depId() {
+				return this.userInfo.worker['departments'][0]['id']
 			}
 		},
 		onLoad() {
@@ -137,7 +147,7 @@
 			// 获取建筑
 			getArchitecture () {
 				this.showLoadingHint = true;
-				getArchitectureMessage({proId: this.userInfo.proId}).then((res) => {
+				getArchitectureMessage({proId: this.proId}).then((res) => {
 						this.showLoadingHint = false;
 						if (res && res.data.code == 200) {
 							this.architectureList = [];
@@ -168,7 +178,7 @@
 				this.emptyShow = false;
 				this.showLoadingHint = true;
 				this.architectureShow = false;
-				getDepartmentMessage({proId: this.userInfo.proId,structId: this.selectArchitectureValue[0]['id']}).then((res) => {
+				getDepartmentMessage({proId: this.proId,structId: this.selectArchitectureValue[0]['id']}).then((res) => {
 						this.showLoadingHint = false;
 						if (res && res.data.code == 200) {
 							this.departmentList = [];
@@ -199,7 +209,7 @@
 				this.emptyShow = false;
 				this.showLoadingHint = true;
 				this.departmentShow = false;
-				getGoalAreaMessage({proId: this.userInfo.proId,status: 1}).then((res) => {
+				getGoalAreaMessage({proId: this.proId,status: 1}).then((res) => {
 						this.showLoadingHint = false;
 						if (res && res.data.code == 200) {
 							this.goalAreaList = [];
@@ -230,7 +240,7 @@
 				this.emptyShow = false;
 				this.showLoadingHint = true;
 				this.goalAreaShow = false;
-				getFunctionAreaMessage({hospitalId: this.userInfo.proId}).then((res) => {
+				getFunctionAreaMessage({hospitalId: this.proId}).then((res) => {
 						this.showLoadingHint = false;
 						if (res && res.data.code == 200) {
 							this.functionAreaList = [];

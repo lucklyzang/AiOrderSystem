@@ -272,9 +272,19 @@
 				'environmentTaskMessage'
 			]),
 			userName() {
+				return this.userInfo.userName
+			},
+			proName () {
+			  return this.userInfo.worker['hospitalList'][0]['hospitalName']
 			},
 			proId() {
-				return this.userInfo.extendData.proId
+				return this.userInfo.worker['hospitalList'][0]['hospitalId']
+			},
+			workerId() {
+				return this.userInfo.worker.id
+			},
+			depId() {
+				return this.userInfo.worker['departments'][0]['id']
 			}
 		},
 		
@@ -763,8 +773,8 @@
 			        planPersons: this.personNumberValue, // 任务预计所需人数
 			        planUseTime: this.durationValue, // 任务预计用时，单位为分钟
 			        taskRemark: this.enterRemark, // 任务备注信息
-			        proId: this.userInfo.proId, // 所属项目id
-			        proName: this.userInfo.proName // 所属项目名称
+			        proId: this.proId, // 所属项目id
+			        proName: this.proName // 所属项目名称
 			      };
 					// 上传图片到服务器
 					if (this.resultimageList.length > 0) {

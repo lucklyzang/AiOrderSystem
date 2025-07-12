@@ -128,6 +128,21 @@ export default {
 
   computed: {
     ...mapGetters(["userInfo","environmentTaskMessage",'statusBarHeight','navigationBarHeight','allOrderCancelReason']),
+	userName() {
+		return this.userInfo.userName
+	},
+	proName () {
+	  return this.userInfo.worker['hospitalList'][0]['hospitalName']
+	},
+	proId() {
+		return this.userInfo.worker['hospitalList'][0]['hospitalId']
+	},
+	workerId() {
+		return this.userInfo.worker.id
+	},
+	depId() {
+		return this.userInfo.worker['departments'][0]['id']
+	}
   },
 	onShow() {
 		const pages = getCurrentPages(); //获取当前页面栈的实例数组

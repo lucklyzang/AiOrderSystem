@@ -357,17 +357,20 @@
 				'navigationBarHeight',
 				"templateType"
 			]),
-			proId () {
-				return this.userInfo.extendData.proId
+			proName () {
+			  return this.userInfo.worker['hospitalList'][0]['hospitalName']
 			},
-			userName () {
+			proId() {
+				return this.userInfo.worker['hospitalList'][0]['hospitalId']
+			},
+			userName() {
 				return this.userInfo.userName
 			},
-			proName () {
-				return this.userInfo.extendData.proName
+			workerId() {
+				return this.userInfo.worker.id
 			},
-			workerId () {
-				return this.userInfo.extendData.userId
+			depId() {
+				return this.userInfo.worker['departments'][0]['id']
 			}
 		},
 		onLoad() {

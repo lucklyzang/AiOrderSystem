@@ -33,14 +33,19 @@
 				'userBasicInfo'
 			]),
 			userName() {
+				return this.userInfo.userName
+			},
+			proName () {
+			  return this.userInfo.worker['hospitalList'][0]['hospitalName']
 			},
 			proId() {
+				return this.userInfo.worker['hospitalList'][0]['hospitalId']
 			},
-			proName() {
-			},  
 			workerId() {
+				return this.userInfo.worker.id
 			},
-			depName() {
+			depId() {
+				return this.userInfo.worker['departments'][0]['id']
 			},
 			accountName() {
 			}
