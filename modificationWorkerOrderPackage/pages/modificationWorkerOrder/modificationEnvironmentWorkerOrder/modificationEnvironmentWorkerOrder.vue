@@ -272,7 +272,10 @@
 				'environmentTaskMessage'
 			]),
 			userName() {
-				return this.userInfo.userName
+				return this.userInfo.worker.name
+			},
+			userAccount() {
+				return this.userInfo.username
 			},
 			proName () {
 			  return this.userInfo.worker['hospitalList'][0]['hospitalName']
@@ -580,7 +583,7 @@
 			     // 查询保洁员列表
 			    getWorkerList () {
 						this.showLoadingHint = true;
-			      attendanceWorkerList(this.userInfo.proId).then((res) => {
+			      attendanceWorkerList(this.proId).then((res) => {
 							this.showLoadingHint = false;
 			          if (res && res.data.code == 200) {
 			            if (res.data.data.length > 0) {
@@ -751,10 +754,10 @@
 			      };
 			      let paramsData = {
 							id: this.environmentTaskMessage['id'], // 任务id
-			        managerId: this.userInfo.id, // 保洁主管id，当前登陆人员id
-			        managerName: this.userInfo.name,// 保洁主管姓名，当前登陆人员姓名
-			        assignId: this.userInfo.id, // 任务分配人员id，当前登陆人员id
-			        assignName: this.userInfo.name,// 任务分配人员姓名，当前登陆人员姓名
+							managerId: this.workerId, // 保洁主管id，当前登陆人员id
+							managerName: this.userName,// 保洁主管姓名，当前登陆人员姓名
+							assignId: this.workerId, // 任务分配人员id，当前登陆人员id
+							assignName: this.userName,// 任务分配人员姓名，当前登陆人员姓名
 			        workerId: this.workerValue == 0 ? '' :  this.workerValue,//保洁员id
 			        priority: this.priorityValue, //优先级
 			        workerName: this.workerText == '请选择保洁员' ? '' : this.workerText,//保洁员姓名

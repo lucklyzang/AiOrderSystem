@@ -357,7 +357,10 @@
 				'projectTaskMessage'
 			]),
 			userName() {
-				return this.userInfo.userName
+				return this.userInfo.worker.name
+			},
+			userAccount() {
+				return this.userInfo.username
 			},
 			proName () {
 			  return this.userInfo.worker['hospitalList'][0]['hospitalName']
@@ -605,13 +608,14 @@
 								}
 							};
 							if (item3) {
-								// 运送员
+								// 维修员
 								for (let i = 0, len = item3.length; i < len; i++) {
 									this.transporterOption.push({
 										text: item3[i].workerName,
 										value: item3[i]['id'],
 										id: i
 									});
+									// 参与人
 									this.participantOption.push({
 										text: item3[i].workerName,
 										value: item3[i]['id'],
@@ -673,7 +677,7 @@
 					.catch((err) => {
 						this.showLoadingHint = false;
 						this.$refs.uToast.show({
-							message: `${err}`,
+							message: `${err.message}`,
 							type: 'error'
 						})
 					})
@@ -695,7 +699,7 @@
 							}
 						})
 						.catch((err) => {
-							reject({message:err.message})
+							reject({message:err})
 						})
 					})
 				},
@@ -716,7 +720,7 @@
 							}
 						})
 						.catch((err) => {
-							reject({message:err.message})
+							reject({message:err})
 						})
 					})
 				},
@@ -737,7 +741,7 @@
 							}
 						})
 						.catch((err) => {
-							reject({message:err.message})
+							reject({message:err})
 						})
 					})
 				},
@@ -758,7 +762,7 @@
 							}
 						})
 						.catch((err) => {
-							reject({message:err.message})
+							reject({message:err})
 						})
 					})
 				},
@@ -766,7 +770,7 @@
 			// 查询维修员
 			queryTransporter () {
 				return new Promise((resolve,reject) => {
-					getTransporter(this.proId, this.workerId)
+					getTransporter(this.proId)
 					.then((res) => {
 						if (res && res.data.code == 200) {
 							resolve(res.data.data)
@@ -780,7 +784,7 @@
 							}
 					})
 					.catch((err) => {
-						reject({message:err.message})
+						reject({message:err})
 					})
 				})
 			},
@@ -802,7 +806,7 @@
 							}
 					})
 					.catch((err) => {
-						reject({message:err.message})
+						reject({message:err})
 					})
 				})
 			},
@@ -1018,7 +1022,7 @@
 					proName: this.proName,
 					createId: this.workerId,
 					createName: this.userName,
-					createType: 0, // 创建类型 0-调度员 2-医务人员 3-巡检人员
+					createType: 2, // 创建类型 0-调度员 2-医务人员 3-巡检人员
 					workerId: this.currentTransporter == '请选择' || !this.currentTransporter ? '' : this.getCurrentTransporterIdByName(this.currentTransporter),
 					workerName: this.currentTransporter == '请选择' || !this.currentTransporter ? '' : this.currentTransporter,
 					modifyName: this.userName, //修改者姓名
@@ -1105,7 +1109,7 @@
 				.catch((err) => {
 					this.showLoadingHint = false;
 					this.$refs.uToast.show({
-						message: `${err.message}`,
+						message: `${err}`,
 						type: 'error'
 					})
 				})

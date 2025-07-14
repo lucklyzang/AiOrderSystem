@@ -223,7 +223,10 @@
 				'allOrderCancelReason'
 			]),
 			userName() {
-				return this.userInfo.userName
+				return this.userInfo.worker.name
+			},
+			userAccount() {
+				return this.userInfo.username
 			},
 			proName () {
 			  return this.userInfo.worker['hospitalList'][0]['hospitalName']
@@ -309,7 +312,7 @@
 					this.showLoadingHint = false;
 					this.$refs['cancelOption'].clearSelectValue();
 					this.$refs.uToast.show({
-						message: `${err.message}`,
+						message: `${err}`,
 						type: 'error'
 					})
 			  })
@@ -417,7 +420,7 @@
 				.catch((err) => {
 					this.showLoadingHint = false;
 					this.$refs.uToast.show({
-						message: `${err.message}`,
+						message: `${err}`,
 						type: 'error',
 						position: 'bottom'
 					})

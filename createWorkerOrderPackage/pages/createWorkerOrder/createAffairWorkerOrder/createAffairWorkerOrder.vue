@@ -147,7 +147,10 @@
 				"templateType",
 			]),
 			userName() {
-				return this.userInfo.userName
+				return this.userInfo.worker.name
+			},
+			userAccount() {
+				return this.userInfo.username
 			},
 			proName () {
 			  return this.userInfo.worker['hospitalList'][0]['hospitalName']
@@ -426,7 +429,7 @@
 				.catch((err) => {
 					this.showLoadingHint = false;
 					this.$refs.uToast.show({
-						message: `${err}`,
+						message: `${err.message}`,
 						type: 'error'
 					})
 				})
@@ -448,11 +451,37 @@
 							}
 					})
 					.catch((err) => {
-						reject({message:err.message})
+						reject({message:err})
 					})
 				})
 			},
 			
+			// 生成事务任务编号
+			generateTaskNumber(type) {
+				  let index = Math.floor(Math.random() * 10);
+					let startField = '';
+					let endIndex = index +1 >= 10 ? `0${index+1}` : `00${index+1}`;
+					let month = new Date().getMonth() + 1;
+					let date = new Date().getDate();
+					let seconds = new Date().getSeconds();
+					if (month >= 1 && month <= 9) {
+							month = "0" + month;
+					};
+					if (date >= 0 && date <= 9) {
+							date = "0" + date;
+					};
+					if (type == '即时') {
+							startField = 'JS'
+					} else if (type == '专项') {
+							startField = 'ZX'
+					} else if (type == '巡检') {
+							startField = 'XJ'
+					} else {
+							startField = 'TMJS'
+					};
+					return  `${startField}${month}${date}${seconds}${endIndex}`
+			},
+
 			
 			// 确认事件(创建事务任务)
 			async sureEvent () {
@@ -466,7 +495,7 @@
 			};
 			// 创建事务任务
 			let temporaryMessage = {
-				priority: this.priorityRadioValue,
+				priority: Number(this.priorityRadioValue),
 				proId: this.proId,
 				structureId: this.currentStructure == '请选择' ? '' : this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value'], // 建筑id
 				structureName: this.currentStructure == '请选择' ? '' : this.currentStructure, // 建筑名称
@@ -476,6 +505,7 @@
 				images: [],
 				source: '手动创建',
 				system: 6,
+				number: this.generateTaskNumber(''),
 				manager: this.currentParticipant, //负责人
 				departmentName: this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment, //目的科室名称
 				departmentId: this.currentGoalDepartment == '请选择' ? '' : this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'] // 目的科室id
@@ -516,7 +546,7 @@
 				.catch((err) => {
 					this.showLoadingHint = false;
 					this.$refs.uToast.show({
-						message: `${err.message}`,
+						message: `${err}`,
 						type: 'error'
 					})
 				})

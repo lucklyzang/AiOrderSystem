@@ -42,7 +42,7 @@
       </view>
       <view class="location">
         <text>检查主管</text>
-        <text>{{ environmentTaskMessage.managerName }}</text>
+        <text>{{ !environmentTaskMessage.managerName ? '未选择' : environmentTaskMessage.managerName }}</text>
       </view>
       <view class="location-other">
         <view class="location-other-left">
@@ -129,7 +129,10 @@ export default {
   computed: {
     ...mapGetters(["userInfo","environmentTaskMessage",'statusBarHeight','navigationBarHeight','allOrderCancelReason']),
 	userName() {
-		return this.userInfo.userName
+		return this.userInfo.worker.name
+	},
+	userAccount() {
+		return this.userInfo.username
 	},
 	proName () {
 	  return this.userInfo.worker['hospitalList'][0]['hospitalName']
@@ -195,7 +198,7 @@ export default {
 			.catch((err) => {
 				this.showLoadingHint = false;
 				this.$refs.uToast.show({
-					message: `${err.message}`,
+					message: `${err}`,
 					type: 'error'
 				})
 			})
@@ -227,7 +230,7 @@ export default {
     		this.showLoadingHint = false;
     		this.$refs['environmentCancelOption'].clearSelectValue();
     		this.$refs.uToast.show({
-    			message: `${err.message}`,
+    			message: `${err}`,
     			type: 'error'
     		})
       })

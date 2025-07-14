@@ -69,7 +69,7 @@
 									<text>具体事项</text>
 							</view>
 							<view class="message-two-right">
-									{{ affairTaskMessage.details }}
+									{{ affairTaskMessage.hasOwnProperty('details') ? affairTaskMessage.details : '' }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -157,21 +157,24 @@ export default {
 
   computed: {
     ...mapGetters(["userInfo","affairTaskMessage",'statusBarHeight','navigationBarHeight','allOrderCancelReason']),
-	userName() {
-		return this.userInfo.userName
-	},
-	proName () {
-	  return this.userInfo.worker['hospitalList'][0]['hospitalName']
-	},
-	proId() {
-		return this.userInfo.worker['hospitalList'][0]['hospitalId']
-	},
-	workerId() {
-		return this.userInfo.worker.id
-	},
-	depId() {
-		return this.userInfo.worker['departments'][0]['id']
-	}
+		userName() {
+			return this.userInfo.worker.name
+		},
+		userAccount() {
+			return this.userInfo.username
+		},
+		proName () {
+			return this.userInfo.worker['hospitalList'][0]['hospitalName']
+		},
+		proId() {
+			return this.userInfo.worker['hospitalList'][0]['hospitalId']
+		},
+		workerId() {
+			return this.userInfo.worker.id
+		},
+		depId() {
+			return this.userInfo.worker['departments'][0]['id']
+		}
   },
 
   methods: {
@@ -205,7 +208,7 @@ export default {
 		 	.catch((err) => {
 		 		this.showLoadingHint = false;
 		 		this.$refs.uToast.show({
-		 			message: `${err.message}`,
+		 			message: `${err}`,
 		 			type: 'error'
 		 		})
 		 	})
@@ -301,7 +304,7 @@ export default {
    		this.showLoadingHint = false;
    		this.$refs['affairCancelOption'].clearSelectValue();
    		this.$refs.uToast.show({
-   			message: `${err.message}`,
+   			message: `${err}`,
    			type: 'error'
    		})
      })

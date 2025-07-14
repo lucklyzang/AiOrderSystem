@@ -57,7 +57,7 @@ instance.interceptors.request.use(function (config) {
 	if (config['url'] == 'nblink/auth/login') {
 		config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
 	};
-	if (config['url'].indexOf('nblink') != -1 && config['url'] != 'nblink/auth/login') {
+	if (config['url'].indexOf('nblink') == -1 && config['url'] != 'nblink/auth/login') {
 		config.headers['Http_request_type'] = 'new';
 	};
 	if (store.getters.token) {

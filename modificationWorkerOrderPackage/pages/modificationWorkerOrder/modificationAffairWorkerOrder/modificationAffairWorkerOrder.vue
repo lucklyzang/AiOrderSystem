@@ -149,7 +149,10 @@
 				'affairTaskMessage'
 			]),
 			userName() {
-				return this.userInfo.userName
+				return this.userInfo.worker.name
+			},
+			userAccount() {
+				return this.userInfo.username
 			},
 			proName () {
 			  return this.userInfo.worker['hospitalList'][0]['hospitalName']
@@ -181,16 +184,21 @@
 			echoTemporaryStorageMessage () {
 				try {
 					let casuallyTemporaryStorageCreateAffairTaskMessage = this.affairTaskMessage;
-					this.priorityValue = casuallyTemporaryStorageCreateAffairTaskMessage['priority'].toString();
-					this.priorityText = this.getPriorityText(casuallyTemporaryStorageCreateAffairTaskMessage['priority']);
-					this.specificAffairDescribe = casuallyTemporaryStorageCreateAffairTaskMessage['details'];
+					this.priorityRadioValue = casuallyTemporaryStorageCreateAffairTaskMessage['priority'].toString();
+					this.specificAffairDescribe = casuallyTemporaryStorageCreateAffairTaskMessage.hasOwnProperty('details') ? casuallyTemporaryStorageCreateAffairTaskMessage.details : '';
 					this.resultimageList = this.getResultimageList(casuallyTemporaryStorageCreateAffairTaskMessage['images']);
 					this.fileList = this.getResultimageList(casuallyTemporaryStorageCreateAffairTaskMessage['images']);
 					this.currentParticipant = casuallyTemporaryStorageCreateAffairTaskMessage['manager'];
 					this.currentStructure = casuallyTemporaryStorageCreateAffairTaskMessage['structureName'] == '' ? '请选择' : casuallyTemporaryStorageCreateAffairTaskMessage['structureName'];
 					this.currentGoalDepartment = casuallyTemporaryStorageCreateAffairTaskMessage['departmentName'] == '' ? '请选择' : casuallyTemporaryStorageCreateAffairTaskMessage['departmentName'];
-					// 显示目的建筑索引
-					this.structureDefaultIndex = [this.structureOption.findIndex((item) => { return item.value ==  this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value']})];
+					if (this.currentStructure != '请选择') {
+						// 显示目的建筑索引
+						this.structureDefaultIndex = [this.structureOption.findIndex((item) => { return item.value == casuallyTemporaryStorageCreateAffairTaskMessage['structureId'] })];
+					};
+					if (this.currentGoalDepartment != '请选择') {
+						// 显示目的科室索引
+						this.goalDepartmentDefaultIndex = [this.goalDepartmentOption.findIndex((item) => { return item.value == casuallyTemporaryStorageCreateAffairTaskMessage['departmentId']  })];
+					}
 				} catch(err) {
 					this.$refs.uToast.show({
 						message: `${err}`,
@@ -212,13 +220,6 @@
 				return returnImgArr;
 			},
 			
-			// 提取优先级text事件
-			getPriorityText (value) {
-				let temporaryPriorityArr = this.priorityOption[0].filter((item)=>{ return item.value == value });
-				if (temporaryPriorityArr.length > 0) {
-					return temporaryPriorityArr[0]['text']
-				}
-			},
 		
 			// 图片删除弹框确定按钮
 			sureCancel() {
@@ -286,15 +287,15 @@
 			
 			// 目的建筑下拉选择框确认事件
 			structureSureEvent (val,value,id) {
-			if (val) {
-				this.structureDefaultIndex = [id];
-				this.currentStructure =  val;
-				this.currentGoalDepartment = '请选择';
-				this.getDepartmentByStructureId(this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value'],false,false)
-			} else {
-				this.currentStructure = '请选择'
-			};
-			this.showStructure = false
+				if (val) {
+					this.structureDefaultIndex = [id];
+					this.currentStructure =  val;
+					this.currentGoalDepartment = '请选择';
+					this.getDepartmentByStructureId(this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value'],false,false)
+				} else {
+					this.currentStructure = '请选择'
+				};
+				this.showStructure = false
 			},
 			
 			// 目的建筑下拉选择框取消事件
@@ -363,12 +364,7 @@
 						// 显示目的科室索引
 						if (this.currentGoalDepartment != '请选择') {
 							this.goalDepartmentDefaultIndex = [this.goalDepartmentOption.findIndex((item) => { return item.value ==  this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value']})];
-						};
-						if (isInitial) {
-							if (this.currentGoalDepartment != '请选择') {
-								this.getSpacesByDepartmentId(this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'],false)
-							}
-						}  
+						}
 					};
 					if (flag) {
 						this.showGoalDepartment = true
@@ -414,7 +410,7 @@
 				.catch((err) => {
 					this.showLoadingHint = false;
 					this.$refs.uToast.show({
-						message: `${err}`,
+						message: `${err.message}`,
 						type: 'error'
 					})
 				})
@@ -436,7 +432,7 @@
 							}
 					})
 					.catch((err) => {
-						reject({message:err.message})
+						reject({message:err})
 					})
 				})
 			},
@@ -503,6 +499,33 @@
 				})
 			},
 			
+			// 生成事务任务编号
+			generateTaskNumber (type) {
+				  let index = Math.floor(Math.random() * 10);
+					let startField = '';
+					let endIndex = index +1 >= 10 ? `0${index+1}` : `00${index+1}`;
+					let month = new Date().getMonth() + 1;
+					let date = new Date().getDate();
+					let seconds = new Date().getSeconds();
+					if (month >= 1 && month <= 9) {
+							month = "0" + month;
+					};
+					if (date >= 0 && date <= 9) {
+							date = "0" + date;
+					};
+					if (type == '即时') {
+							startField = 'JS'
+					} else if (type == '专项') {
+							startField = 'ZX'
+					} else if (type == '巡检') {
+							startField = 'XJ'
+					} else {
+							startField = 'TMJS'
+					};
+					return  `${startField}${month}${date}${seconds}${endIndex}`
+			},
+			
+			
 			// 确认事件(编辑事务任务)
 			async sureEvent () {
 			// 具体事项不能为空
@@ -538,9 +561,9 @@
 			     for (let imgI of needUploadOnlineImgArr) {
 			     	await this.uploadFileEvent(imgI)
 			     };
-			     paramsData.images = this.imageOnlinePathArr.concat(alreadyUploadOnlineImgArr);
+			     temporaryMessage.images = this.imageOnlinePathArr.concat(alreadyUploadOnlineImgArr);
 			  } else {
-			   paramsData.images = alreadyUploadOnlineImgArr;
+			   temporaryMessage.images = alreadyUploadOnlineImgArr;
 			};
 			this.postEditAffairTask(temporaryMessage)
 			},
@@ -569,7 +592,7 @@
 			.catch((err) => {
 				this.showLoadingHint = false;
 				this.$refs.uToast.show({
-					message: `${err.message}`,
+					message: `${err}`,
 					type: 'error'
 				})
 			})

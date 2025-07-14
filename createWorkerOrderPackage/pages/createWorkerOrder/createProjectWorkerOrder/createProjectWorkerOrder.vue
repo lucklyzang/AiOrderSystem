@@ -364,7 +364,10 @@
 				return this.userInfo.worker['hospitalList'][0]['hospitalId']
 			},
 			userName() {
-				return this.userInfo.userName
+				return this.userInfo.worker.name
+			},
+			userAccount() {
+				return this.userInfo.username
 			},
 			workerId() {
 				return this.userInfo.worker.id
@@ -574,13 +577,14 @@
 								}
 							};
 							if (item3) {
-								// 运送员
+								// 维修员
 								for (let i = 0, len = item3.length; i < len; i++) {
 									this.transporterOption.push({
 										text: item3[i].workerName,
 										value: item3[i]['id'],
 										id: i
 									});
+									// 参与人
 									this.participantOption.push({
 										text: item3[i].workerName,
 										value: item3[i]['id'],
@@ -629,7 +633,7 @@
 					.catch((err) => {
 						this.showLoadingHint = false;
 						this.$refs.uToast.show({
-							message: `${err}`,
+							message: `${err.message}`,
 							type: 'error'
 						})
 					})
@@ -651,7 +655,7 @@
 							}
 						})
 						.catch((err) => {
-							reject({message:err.message})
+							reject({message:err})
 						})
 					})
 				},
@@ -672,7 +676,7 @@
 							}
 						})
 						.catch((err) => {
-							reject({message:err.message})
+							reject({message:err})
 						})
 					})
 				},
@@ -693,7 +697,7 @@
 							}
 						})
 						.catch((err) => {
-							reject({message:err.message})
+							reject({message:err})
 						})
 					})
 				},
@@ -701,7 +705,7 @@
 				// 查询维修员
 				queryTransporter () {
 				return new Promise((resolve,reject) => {
-					getTransporter(this.proId, this.workerId)
+					getTransporter(this.proId)
 					.then((res) => {
 						if (res && res.data.code == 200) {
 							resolve(res.data.data)
@@ -715,7 +719,7 @@
 							}
 					})
 					.catch((err) => {
-						reject({message:err.message})
+						reject({message:err})
 					})
 				})
 				},
@@ -737,7 +741,7 @@
 							}
 						})
 						.catch((err) => {
-							reject({message:err.message})
+							reject({message:err})
 						})
 					})
 				},
@@ -1032,7 +1036,7 @@
 				.catch((err) => {
 					this.showLoadingHint = false;
 					this.$refs.uToast.show({
-						message: `${err.message}`,
+						message: `${err}`,
 						type: 'error'
 					})
 				})

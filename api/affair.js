@@ -13,7 +13,7 @@ export function affairList (data) {
 // 事务任务取消
 export function cancelAffairTask (data) {
   return request({
-    url: 'nblink/patrol/transactionManagement',
+    url: 'nblink/patrol/transactionManagement/',
     method: 'put',
     data
   })
@@ -22,7 +22,7 @@ export function cancelAffairTask (data) {
 // 事务任务编辑
 export function editAffairTask (data) {
   return request({
-    url: 'nblink/patrol/transactionManagement',
+    url: 'nblink/patrol/transactionManagement/',
     method: 'put',
     data
   })
@@ -32,7 +32,7 @@ export function editAffairTask (data) {
 // 事务任务创建
 export function createAffairTask (data) {
   return request({
-    url: 'nblink/patrol/transactionManagement',
+    url: 'nblink/patrol/transactionManagement/',
     method: 'post',
     data
   })

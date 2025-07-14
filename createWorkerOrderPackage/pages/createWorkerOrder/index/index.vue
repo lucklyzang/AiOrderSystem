@@ -521,18 +521,21 @@ export default {
     proName () {
       return this.userInfo.worker['hospitalList'][0]['hospitalName']
     },
-	proId() {
-		return this.userInfo.worker['hospitalList'][0]['hospitalId']
-	},
-	userName() {
-		return this.userInfo.userName
-	},
-	workerId() {
-		return this.userInfo.worker.id
-	},
-	depId() {
-		return this.userInfo.worker['departments'][0]['id']
-	}
+		proId() {
+			return this.userInfo.worker['hospitalList'][0]['hospitalId']
+		},
+		userName() {
+			return this.userInfo.worker.name
+		},
+		userAccount() {
+			return this.userInfo.username
+		},
+		workerId() {
+			return this.userInfo.worker.id
+		},
+		depId() {
+			return this.userInfo.worker['departments'][0]['id']
+		}
   },
 
   methods: {
@@ -738,7 +741,7 @@ export default {
       .catch((err) => {
         this.showLoadingHint = false;
 				this.$refs.uToast.show({
-					message: `${err.message}`,
+					message: `${err}`,
 					type: 'error'
 				})
       })
@@ -761,7 +764,7 @@ export default {
 					}
         })
         .catch((err) => {
-          reject({message:err.message})
+          reject({message:err})
         })
       })
     },
@@ -784,7 +787,7 @@ export default {
 					}
         })
           .catch((err) => {
-            reject({message:err.message})
+            reject({message:err})
           })
       })
     },
@@ -927,7 +930,7 @@ export default {
 						}
           })
           .catch((err) => {
-            reject({message:err.message})
+            reject({message:err})
           })
         })
       },
@@ -949,7 +952,7 @@ export default {
 					}
         })
         .catch((err) => {
-          reject({message:err.message})
+          reject({message:err})
         })
       })
     },
@@ -971,7 +974,7 @@ export default {
 					}
         })
         .catch((err) => {
-          reject({message:err.message})
+          reject({message:err})
         })
       })
     },
@@ -1263,7 +1266,7 @@ export default {
       .catch((err) => {
 				this.showLoadingHint = false;
         this.$refs.uToast.show({
-        	message: `${err.message}`,
+        	message: `${err}`,
         	type: 'error'
         })
       })
@@ -1423,7 +1426,7 @@ export default {
       .catch((err) => {
         this.showLoadingHint = false;
         this.$refs.uToast.show({
-        	message: `${err.message}`,
+        	message: `${err}`,
         	type: 'error'
         })
       })
@@ -1455,7 +1458,7 @@ export default {
       .catch((err) => {
         this.showLoadingHint = false;
         this.$refs.uToast.show({
-        	message: `${err.message}`,
+        	message: `${err}`,
         	type: 'error'
         })
       })

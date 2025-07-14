@@ -302,7 +302,7 @@
 					<view class="list-content-center-top">
 						<view>
 							<text>事项:</text>
-							<text>{{ item.taskDesc }}</text>
+							<text>{{ item.details }}</text>
 						</view>
 					</view>
 				</view>
@@ -326,7 +326,8 @@
 	} from 'vuex'
 	import {
 		setCache,
-		removeAllLocalStorage
+		removeAllLocalStorage,
+		getDate
 	} from '@/common/js/utils'
 	import { getDispatchTaskComplete, queryDispatchTaskCancelReason, updateDispatchTask, queryTransportTypeClass} from '@/api/transport.js'
 	import { queryCleaningManageTaskList, cancelTask, cancelTaskReason } from "@/api/environment.js";
@@ -404,7 +405,10 @@
 				'currentIndex'
 			]),
 			userName() {
-				return this.userInfo.userName
+				return this.userInfo.worker.name
+			},
+			userAccount() {
+				return this.userInfo.username
 			},
 			proName () {
 			  return this.userInfo.worker['hospitalList'][0]['hospitalName']
@@ -503,7 +507,7 @@
 					this.getEnvironmentTaskList({
 						proId : this.proId, // 所属项目id
 						queryDate: '', // 查询时间
-						managerId: this.userInfo.id,// 保洁主管id
+						managerId: this.workerId,// 保洁主管id
 						taskType: 0 // 0-即时，1-专项
 					});
 				} else if (item.name === '工程订单') {
@@ -538,7 +542,7 @@
 							}
 					})
 					.catch((err) => {
-						reject({message:err.message})
+						reject({message:err})
 					})
 				})
 			},
@@ -560,7 +564,7 @@
 							}
 					})
 					.catch((err) => {
-						reject({message:err.message})
+						reject({message:err})
 					})
 				})
 			},
@@ -582,7 +586,7 @@
 							}
 					})
 					.catch((err) => {
-						reject({message:err.message})
+						reject({message:err})
 					})
 				})
 			},
@@ -604,7 +608,7 @@
 							}
 					})
 					.catch((err) => {
-						reject({message:err.message})
+						reject({message:err})
 					})
 				})
 			},
@@ -848,7 +852,7 @@
 						this.getTransTaskList(
 						{
 						 proId:this.proId, workerId:this.workerId,state: -1,
-						 departmentId: this.userInfo.depId
+						 departmentId: this.depId
 						})
 					} else {
 					 this.$refs.uToast.show({
@@ -861,7 +865,7 @@
 					this.showLoadingHint = false;
 					this.$refs['cancelOption'].clearSelectValue();
 					this.$refs.uToast.show({
-						message: `${err.message}`,
+						message: `${err}`,
 						type: 'error'
 					})
 			  })
@@ -932,7 +936,7 @@
 					this.showLoadingHint = false;
 					this.$refs['environmentCancelOption'].clearSelectValue();
 					this.$refs.uToast.show({
-						message: `${err.message}`,
+						message: `${err}`,
 						type: 'error'
 					})
 			  })
@@ -994,7 +998,7 @@
 					this.showLoadingHint = false;
 					this.$refs['projectCancelOption'].clearSelectValue();
 					this.$refs.uToast.show({
-						message: `${err.message}`,
+						message: `${err}`,
 						type: 'error'
 					})
 			  })
@@ -1057,7 +1061,7 @@
 					this.showLoadingHint = false;
 					this.$refs['affairCancelOption'].clearSelectValue();
 					this.$refs.uToast.show({
-						message: `${err.message}`,
+						message: `${err}`,
 						type: 'error'
 					})
 			  })
@@ -1191,8 +1195,8 @@
 			affairList({
 				proId: this.proId,
 				system: 6,
-				startDate: '',
-				endDate: ''
+				startDate: getDate(),
+				endDate: getDate()
 			})
 			.then((res) => {
 				this.showLoadingHint = false;

@@ -503,9 +503,12 @@ export default {
 			'statusBarHeight',
 			'navigationBarHeight'
 		]),
-    userName() {
-		return this.userInfo.userName
-	},
+  userName() {
+  	return this.userInfo.worker.name
+  },
+  userAccount() {
+  	return this.userInfo.username
+  },
 	proName () {
 	  return this.userInfo.worker['hospitalList'][0]['hospitalName']
 	},
@@ -863,7 +866,7 @@ export default {
 			.catch((err) => {
 				this.showLoadingHint = false;
 				this.$refs.uToast.show({
-					message: `${err.message}`,
+					message: `${err}`,
 					type: 'error'
 				})
 			})
@@ -886,7 +889,7 @@ export default {
 							}
 				})
 				.catch((err) => {
-					reject({message:err.message})
+					reject({message:err})
 				})
 			})
 		},
@@ -909,7 +912,7 @@ export default {
 							}
 				})
 					.catch((err) => {
-						reject({message:err.message})
+						reject({message:err})
 					})
 			})
 		},
@@ -1080,7 +1083,7 @@ export default {
 							}
 					})
 					.catch((err) => {
-						reject({message:err.message})
+						reject({message:err})
 					})
 				})
 			},
@@ -1102,7 +1105,7 @@ export default {
 							}
 				})
 				.catch((err) => {
-					reject({message:err.message})
+					reject({message:err})
 				})
 			})
 		},
@@ -1124,7 +1127,7 @@ export default {
 							}
 				})
 				.catch((err) => {
-					reject({message:err.message})
+					reject({message:err})
 				})
 			})
 		},
@@ -1385,7 +1388,7 @@ export default {
 			.catch((err) => {
 				this.showLoadingHint = false;
 				this.$refs.uToast.show({
-					message: `${err.message}`,
+					message: `${err}`,
 					type: 'error'
 				})
 			})
@@ -1543,7 +1546,7 @@ export default {
 			.catch((err) => {
 				this.showLoadingHint = false;
         this.$refs.uToast.show({
-        	message: `${err.message}`,
+        	message: `${err}`,
         	type: 'error'
         })
 			})
@@ -1573,7 +1576,7 @@ export default {
 			.catch((err) => {
 				this.showLoadingHint = false;
 				this.$refs.uToast.show({
-					message: `${err.message}`,
+					message: `${err}`,
 					type: 'error'
 				})
 			})
