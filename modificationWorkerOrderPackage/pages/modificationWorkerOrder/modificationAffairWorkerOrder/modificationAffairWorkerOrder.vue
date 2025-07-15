@@ -443,7 +443,7 @@
 				this.showLoadingHint = true;
 				return new Promise((resolve, reject) => {
 					uni.uploadFile({
-					url: 'https://blink.blinktech.cn/patrol/oss/getSign',
+					url: 'https://blink.blinktech.cn/nblink/patrol/oss/getSign',
 					filePath: imgI,
 					name: 'files',
 					header: {
