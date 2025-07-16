@@ -189,8 +189,8 @@
 					this.resultimageList = this.getResultimageList(casuallyTemporaryStorageCreateAffairTaskMessage['images']);
 					this.fileList = this.getResultimageList(casuallyTemporaryStorageCreateAffairTaskMessage['images']);
 					this.currentParticipant = casuallyTemporaryStorageCreateAffairTaskMessage['manager'];
-					this.currentStructure = casuallyTemporaryStorageCreateAffairTaskMessage['structureName'] == '' ? '请选择' : casuallyTemporaryStorageCreateAffairTaskMessage['structureName'];
-					this.currentGoalDepartment = casuallyTemporaryStorageCreateAffairTaskMessage['departmentName'] == '' ? '请选择' : casuallyTemporaryStorageCreateAffairTaskMessage['departmentName'];
+					this.currentStructure = casuallyTemporaryStorageCreateAffairTaskMessage['structureName'] ? casuallyTemporaryStorageCreateAffairTaskMessage['structureName'] : '请选择';
+					this.currentGoalDepartment = casuallyTemporaryStorageCreateAffairTaskMessage['departmentName'] ? casuallyTemporaryStorageCreateAffairTaskMessage['departmentName'] : '请选择';
 					if (this.currentStructure != '请选择') {
 						// 显示目的建筑索引
 						this.structureDefaultIndex = [this.structureOption.findIndex((item) => { return item.value == casuallyTemporaryStorageCreateAffairTaskMessage['structureId'] })];

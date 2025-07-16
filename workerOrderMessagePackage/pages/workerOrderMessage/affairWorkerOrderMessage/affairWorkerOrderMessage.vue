@@ -77,7 +77,7 @@
 									<text>目的建筑</text>
 							</view>
 							<view class="message-two-right">
-								 {{ affairTaskMessage.structureName }}
+								 {{ affairTaskMessage.structureName ? affairTaskMessage.structureName : '无' }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -85,7 +85,7 @@
 									<text>目的科室</text>
 							</view>
 							<view class="message-two-right">
-									{{ affairTaskMessage.departmentName }}
+									{{ affairTaskMessage.departmentName ? affairTaskMessage.departmentName : '无' }}
 							</view>
 					</view>
 					<view class="message-one message-two">
@@ -93,7 +93,7 @@
 									<text>负责人</text>
 							</view>
 							<view class="message-two-right">
-									{{ affairTaskMessage.manager }}
+									{{ affairTaskMessage.manager ? affairTaskMessage.manager : '无' }}
 							</view>
 					</view>
 					<view class="issue-image">
@@ -102,7 +102,7 @@
 							</view>
 							<view class="issue-image-list" v-if="problemPicturesEchoList.length > 0">
 									<text v-for="(innerItem,innerIndex) in problemPicturesEchoList" :key="innerIndex" >
-											<image alt="" :src="innerItem.path" @click="enlareEvent(innerItem.path)"
+											<image alt="" :src="innerItem" @click="enlareEvent(innerItem)"
 											>
 									</text>
 							</view>
@@ -220,7 +220,8 @@ export default {
 			if (this.affairTaskMessage.hasOwnProperty('images')) {
 				if (this.affairTaskMessage['images'].length > 0) {
 					this.problemPicturesEchoList = this.affairTaskMessage['images'];
-				}
+				};
+				console.log('图片李彪',this.problemPicturesEchoList)
 			}	
 		},
 		

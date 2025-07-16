@@ -552,7 +552,8 @@
 							 name: 'files',
 							 header: {
 								'content-type': 'multipart/form-data',
-								'Authorization': `${store.getters.token}`
+								'Authorization': `${store.getters.token}`,
+								'HTTP_REQUEST_TYPE': 'new'
 							 },
 							 success: (res) => {
 								if (res.statusCode == 200) {

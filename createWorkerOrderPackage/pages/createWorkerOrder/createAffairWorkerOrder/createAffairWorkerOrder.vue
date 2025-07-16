@@ -248,7 +248,7 @@
 				this.showLoadingHint = true;
 				return new Promise((resolve, reject) => {
 					uni.uploadFile({
-					 url: 'https://blink.blinktech.cn/nblink/patrol/oss/getSign',
+					 url: 'https://blink.blinktech.cn/nblink/patrol/oss/upload',
 					 filePath: imgI,
 					 name: 'files',
 					 header: {
@@ -259,20 +259,11 @@
 						if (res.statusCode == 200) {
 							if (res.data != '') {
 								let temporaryData = JSON.parse(res.data);
-								if (temporaryData.code == 200) {
-									this.imageOnlinePathArr.push(temporaryData.data[0]);
-									resolve()
-								} else {
-									this.showLoadingHint = false;
-									this.$refs.uToast.show({
-										message: temporaryData.msg,
-										type: 'error',
-										position: 'center'
-									});
-									reject()
-								}
+								this.imageOnlinePathArr.push(temporaryData[0]);
+								resolve()
 							} else {
 								this.showLoadingHint = false;
+								this.infoText = '';
 								this.$refs.uToast.show({
 									message: '返回数据为空',
 									type: 'error',
@@ -282,6 +273,7 @@
 							}	
 						} else {
 							this.showLoadingHint = false;
+							this.infoText = '';
 							this.$refs.uToast.show({
 								message: '上传图片失败',
 								type: 'error',
@@ -292,6 +284,7 @@
 					 },
 					 fail: (err) => {
 						this.showLoadingHint = false;
+						this.infoText = '';
 						this.$refs.uToast.show({
 							message: err.errMsg,
 							type: 'error',
@@ -515,7 +508,7 @@
 			  for (let imgI of this.fileList) {
 			  	await this.uploadFileEvent(imgI)
 			  };
-				paramsData.images = this.imageOnlinePathArr
+				temporaryMessage.images = this.imageOnlinePathArr
 			};
 			this.postGenerateAffairTask(temporaryMessage)
 			},
